@@ -1,0 +1,14 @@
+@import '../../vars.scss';
+
+.card:hover {
+  border-style: solid;
+  border-color: #f98148;
+  border-width: 1px;
+  box-shadow: 0 0 71px -13px rgba(251, 215, 214, 1);
+  cursor: pointer;
+}
+
+.cardTitle {
+  background-color: white;
+  color: rgba(0, 0, 0, 0.829);
+}

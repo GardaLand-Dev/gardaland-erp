@@ -1,0 +1,22 @@
+{
+  "name": "caissier-desktop-app",
+  "productName": "caissier-desktop-app",
+  "version": "0.1.0",
+  "description": "Caissier Desktop app using electronjs and reactjs",
+  "main": "./main.prod.js",
+  "author": {
+    "name": "Electron React Boilerplate Maintainers",
+    "email": "yasser.hamida08@gmail.com",
+    "url": "https://github.com/pfeteam1"
+  },
+  "contributors": [
+    "Hamida Yasser <yasser.hamida08@gmail.com>",
+    "Benzaamia Errabia <rbenzamia@gmail.com>"
+  ],
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}

@@ -1,0 +1,7 @@
+{
+  "ROOT": "/",
+  "HOME": "/Home",
+  "LOGIN": "/Login",
+  "COUNTER": "/counter",
+  "ADMIN": "/Admin"
+}

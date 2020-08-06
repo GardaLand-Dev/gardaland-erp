@@ -1,0 +1,23 @@
+.sidebarButton {
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  &:hover {
+    background: #dfdfdf;
+    color: black;
+    box-shadow: 0 0 20px 0 rgb(216, 216, 216);
+  }
+  &:active {
+    background: $theme-gradient;
+    color: white;
+    box-shadow: 0 0 71px -13px rgba(251, 215, 214, 1);
+  }
+  &:focus {
+    outline: none;
+  }
+  &.active {
+    background: $theme-gradient;
+    color: white;
+    box-shadow: 0 0 71px -13px rgba(251, 215, 214, 1);
+  }
+}
