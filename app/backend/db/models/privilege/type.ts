@@ -4,8 +4,6 @@ import { BuildOptions, Model } from 'sequelize';
 export interface PrivilegeAttributes {
   id?: number;
   name: string;
-  action: string;
-  subject: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

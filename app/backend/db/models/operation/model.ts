@@ -18,10 +18,6 @@ export default function OperationFactory(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    subject: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

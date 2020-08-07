@@ -12,10 +12,6 @@ export default function ResourceFactory(sequelize: Sequelize): ResourceStatic {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    action: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     subject: {
       type: DataTypes.STRING,
       allowNull: false,

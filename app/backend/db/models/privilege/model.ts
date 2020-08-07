@@ -14,14 +14,6 @@ export default function PrivilegeFactory(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    action: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    subject: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

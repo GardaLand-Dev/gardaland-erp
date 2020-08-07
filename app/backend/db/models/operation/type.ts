@@ -1,19 +1,18 @@
 /* eslint-disable max-classes-per-file */
 import { BuildOptions, Model } from 'sequelize';
 
-export interface PrivilegeAttributes {
+export interface OperationAttributes {
   id?: number;
   name: string;
   action: string;
-  subject: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
-export interface PrivilegeModel
-  extends Model<PrivilegeAttributes>,
-    PrivilegeAttributes {}
-export class Privilege extends Model<PrivilegeModel, PrivilegeAttributes> {}
-export type PrivilegeStatic = typeof Model & {
+export interface OperationModel
+  extends Model<OperationAttributes>,
+    OperationAttributes {}
+export class Operation extends Model<OperationModel, OperationAttributes> {}
+export type OperationStatic = typeof Model & {
   // eslint-disable-next-line @typescript-eslint/ban-types
-  new (values?: object, options?: BuildOptions): PrivilegeModel;
+  new (values?: object, options?: BuildOptions): OperationModel;
 };
