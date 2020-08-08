@@ -10,6 +10,7 @@ export default function RoleFactory(sequelize: Sequelize): RoleStatic {
     },
     name: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: false,
     },
     createdAt: {

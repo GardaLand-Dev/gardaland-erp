@@ -8,6 +8,15 @@ export default function UserFactory(sequelize: Sequelize): UserStatic {
       autoIncrement: true,
       primaryKey: true,
     },
+    userName: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -23,16 +32,6 @@ export default function UserFactory(sequelize: Sequelize): UserStatic {
     },
     phone: {
       type: DataTypes.STRING,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
   });
 }
