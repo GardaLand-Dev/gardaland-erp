@@ -1,27 +1,18 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { RoleStatic } from './type';
+import { DataTypes, Sequelize, UUIDV4, ModelCtor } from 'sequelize';
+import { Role } from './type';
 
-export default function RoleFactory(sequelize: Sequelize): RoleStatic {
-  return <RoleStatic>sequelize.define('roles', {
+export default function RoleFactory(sequelize: Sequelize): ModelCtor<Role> {
+  return sequelize.define('roles', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true, // use auto gen
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
   });
 }

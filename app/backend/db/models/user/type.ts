@@ -8,7 +8,8 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   Association,
-  BuildOptions,
+  // BuildOptions,
+  HasManyAddAssociationsMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { Role } from '../role/type';
@@ -22,7 +23,10 @@ export interface UserAttributes {
   email: string;
   phone: string;
 }
-export type UserCreationAttributes = Optional<UserAttributes, 'id'>;
+export type UserCreationAttributes = Optional<
+  UserAttributes,
+  'id' | 'email' | 'phone'
+>;
 export class User extends Model<UserAttributes, UserCreationAttributes>
   implements UserCreationAttributes {
   public id!: number;
@@ -35,9 +39,9 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
 
   public lastName!: string;
 
-  public email: string | null;
+  public email: string | undefined;
 
-  public phone: string | null;
+  public phone: string | undefined;
 
   //  timestamps
   public createdAt!: Date;
@@ -48,6 +52,8 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
   public getRoles!: HasManyGetAssociationsMixin<Role>;
 
   public addRole!: HasManyAddAssociationMixin<Role, number>;
+
+  public addRoles!: HasManyAddAssociationsMixin<Role, number>;
 
   public hasRole!: HasManyHasAssociationMixin<Role, number>;
 
@@ -63,7 +69,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
   };
 }
 // export interface UserModel extends Model<UserAttributes>, UserAttributes {}
-export type UserStatic = typeof Model & {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  new (values?: object, options?: BuildOptions): User;
-};
+// export type UserStatic = typeof Model & {
+//   // eslint-disable-next-line @typescript-eslint/ban-types
+//   new (values?: object, options?: BuildOptions): User;
+// };

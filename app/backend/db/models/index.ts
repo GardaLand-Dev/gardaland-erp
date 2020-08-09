@@ -11,7 +11,7 @@ import ResourceFactory from './resource/model';
  * then itialize with a Dev User
  * */
 
-export const dbConfig = (() => {
+const dbConfig = (() => {
   const sequilze = new Sequelize(
     (process.env.DB_NAME = 'db'),
     (process.env.DB_USER = ''),
@@ -22,10 +22,19 @@ export const dbConfig = (() => {
       storage: './db.sqlite',
     }
   );
-  sequilze.query('PRAGMA cipher_compatibility = 3');
   sequilze.query(`PRAGMA key="${process.env.DB_PASSWORD}"`);
   return sequilze;
 })();
+
+// export const dbConfig1 = (() => {
+//   const sequilze = new Sequelize({
+//     dialect: 'sqlite',
+//     storage: './db1.sqlite',
+//   });
+//   return sequilze;
+// })();
+
+export default dbConfig;
 
 // THIS ONES ARE THE ONES YOU NEED TO USE ON YOUR CONTROLLERS
 /* RBAC */
@@ -34,6 +43,7 @@ export const Resource = ResourceFactory(dbConfig);
 export const Privilege = PrivilegeFactory(dbConfig);
 export const Role = RoleFactory(dbConfig);
 export const User = UserFactory(dbConfig);
+
 /* RBAC - RELATIONS */
 /** role-user */
 User.belongsToMany(Role, { through: 'User_Role', onDelete: 'CASCADE' });
@@ -53,3 +63,7 @@ Resource.hasMany(Privilege);
 /** privilege-Operation */
 Privilege.belongsTo(Operation);
 Operation.hasMany(Privilege);
+
+/* SYNCING */
+
+dbConfig.sync();

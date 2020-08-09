@@ -1,12 +1,13 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { UserStatic } from './type';
+import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
+import { User } from './type';
 
-export default function UserFactory(sequelize: Sequelize): UserStatic {
-  return <UserStatic>sequelize.define('users', {
+export default function UserFactory(sequelize: Sequelize): ModelCtor<User> {
+  return sequelize.define('users', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     userName: {
       type: DataTypes.STRING,

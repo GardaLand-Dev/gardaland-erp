@@ -1,14 +1,15 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { OperationStatic } from './type';
+import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
+import { Operation } from './type';
 
 export default function OperationFactory(
   sequelize: Sequelize
-): OperationStatic {
-  return <OperationStatic>sequelize.define('operations', {
+): ModelCtor<Operation> {
+  return sequelize.define('operations', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true, // use auto gen
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,

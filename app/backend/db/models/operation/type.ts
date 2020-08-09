@@ -49,7 +49,3 @@ export class Operation
     privileges: Association<Operation, Privilege>;
   };
 }
-export type OperationStatic = typeof Model & {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  new (values?: object, options?: BuildOptions): Operation;
-};

@@ -1,14 +1,15 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { PrivilegeStatic } from './type';
+import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
+import { Privilege } from './type';
 
 export default function PrivilegeFactory(
   sequelize: Sequelize
-): PrivilegeStatic {
-  return <PrivilegeStatic>sequelize.define('privileges', {
+): ModelCtor<Privilege> {
+  return sequelize.define('privileges', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true, // use auto gen
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,

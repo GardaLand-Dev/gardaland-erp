@@ -1,6 +1,5 @@
 /* eslint-disable max-classes-per-file */
 import {
-  BuildOptions,
   Model,
   Optional,
   HasManyGetAssociationsMixin,
@@ -76,7 +75,3 @@ export class Privilege
     Roles: Association<Role, Privilege>;
   };
 }
-export type PrivilegeStatic = typeof Model & {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  new (values?: object, options?: BuildOptions): Privilege;
-};

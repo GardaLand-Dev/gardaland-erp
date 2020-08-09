@@ -1,6 +1,5 @@
 /* eslint-disable max-classes-per-file */
 import {
-  BuildOptions,
   Model,
   Optional,
   HasManyGetAssociationsMixin,
@@ -9,6 +8,7 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   Association,
+  HasManyAddAssociationsMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { User } from '../user/type';
@@ -22,7 +22,7 @@ export interface RoleAttributes {
 }
 export type RoleCreationAttributes = Optional<RoleAttributes, 'id'>;
 
-export class Role extends Model<RoleCreationAttributes, RoleAttributes>
+export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   implements RoleCreationAttributes {
   public id!: number;
 
@@ -50,6 +50,8 @@ export class Role extends Model<RoleCreationAttributes, RoleAttributes>
 
   public addPrivilege!: HasManyAddAssociationMixin<Privilege, number>;
 
+  public addPrivileges!: HasManyAddAssociationsMixin<Privilege, number>;
+
   public hasPrivilege!: HasManyHasAssociationMixin<Privilege, number>;
 
   public countPrivilege!: HasManyCountAssociationsMixin;
@@ -66,9 +68,6 @@ export class Role extends Model<RoleCreationAttributes, RoleAttributes>
     privileges: Association<Role, Privilege>;
   };
 }
-export type RoleStatic = typeof Model & {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  new (values?: object, options?: BuildOptions): Role;
-};
+export type RoleStatic = typeof Role;
 
 // export interface RoleModel extends Model<RoleAttributes>, RoleAttributes {}

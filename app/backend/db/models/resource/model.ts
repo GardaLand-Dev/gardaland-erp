@@ -1,12 +1,15 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { ResourceStatic } from './type';
+import { DataTypes, Sequelize, UUIDV4, ModelCtor } from 'sequelize';
+import { Resource } from './type';
 
-export default function ResourceFactory(sequelize: Sequelize): ResourceStatic {
-  return <ResourceStatic>sequelize.define('resources', {
+export default function ResourceFactory(
+  sequelize: Sequelize
+): ModelCtor<Resource> {
+  return sequelize.define('resources', {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true, // use auto gen
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
