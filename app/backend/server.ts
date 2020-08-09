@@ -2,27 +2,34 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import TestRoutes from './routes/test_route';
 import CommonRoutes from './routes/common_routes';
+import UserRoute from './routes/user_route';
 // import sqlite3 from '@journeyapps/sqlcipher';
 
-class Server {
+export class Server {
   public app: express.Application;
 
-  private test_routes: TestRoutes = new TestRoutes();
+  private test_routes: TestRoutes;
 
-  private common_routes: CommonRoutes = new CommonRoutes();
+  private common_routes: CommonRoutes;
+
+  // private user_route: UserRoute;
 
   // private db: sqlite3.default;
 
   constructor() {
+    this.test_routes = new TestRoutes();
+    this.common_routes = new CommonRoutes();
+    // this.user_route = new UserRoute();
     this.app = express();
     this.config();
     this.test_routes.route(this.app);
+    UserRoute.route(this.app);
     this.common_routes.route(this.app);
   }
 
   private config(): void {
     this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 }
 
