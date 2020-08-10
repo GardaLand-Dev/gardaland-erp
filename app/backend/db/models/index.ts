@@ -46,8 +46,8 @@ export const User = UserFactory(dbConfig);
 
 /* RBAC - RELATIONS */
 /** role-user */
-User.belongsToMany(Role, { through: 'User_Role', onDelete: 'CASCADE' });
-Role.belongsToMany(User, { through: 'User_Role' });
+User.belongsToMany(Role, { through: 'User_Role' });
+Role.belongsToMany(User, { through: 'User_Role', onDelete: 'RESTRICT' });
 /** role-privilege */
 Role.belongsToMany(Privilege, {
   through: 'Role_Privilege',
@@ -55,14 +55,24 @@ Role.belongsToMany(Privilege, {
 });
 Privilege.belongsToMany(Role, {
   through: 'Role_Privilege',
-  onDelete: 'CASCADE',
+  onDelete: 'RESTRICT',
 });
 /** privilege-resource */
 Privilege.belongsTo(Resource);
-Resource.hasMany(Privilege);
+Resource.hasMany(Privilege, {
+  foreignKey: {
+    allowNull: false,
+  },
+  onDelete: 'RESTRICT',
+});
 /** privilege-Operation */
 Privilege.belongsTo(Operation);
-Operation.hasMany(Privilege);
+Operation.hasMany(Privilege, {
+  foreignKey: {
+    allowNull: false,
+  },
+  onDelete: 'RESTRICT',
+});
 
 /* SYNCING */
 

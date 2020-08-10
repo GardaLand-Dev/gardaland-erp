@@ -14,20 +14,11 @@ export default function ResourceFactory(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
-    subject: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+    // subject: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    // },
   });
 }

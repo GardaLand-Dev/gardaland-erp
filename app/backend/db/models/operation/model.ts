@@ -14,20 +14,11 @@ export default function OperationFactory(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
-    action: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+    // action: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    // },
   });
 }
