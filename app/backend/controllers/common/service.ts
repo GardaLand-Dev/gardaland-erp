@@ -3,6 +3,7 @@ import { Response } from 'express';
 enum ResponseStatusCodes {
   success = 200,
   bad_request = 400,
+  unauthorized = 401,
   internal_server_error = 500,
 }
 
@@ -26,6 +27,17 @@ export function insufficientParameters(res: Response) {
   return res.status(ResponseStatusCodes.bad_request).json({
     STATUS: 'FAILURE',
     MESSAGE: 'Insufficient parameters',
+    DATA: {},
+  });
+}
+
+export function unauthorizedRequest(
+  res: Response,
+  msg = 'Unauthorized Access'
+) {
+  return res.status(ResponseStatusCodes.unauthorized).json({
+    STATUS: 'FAILURE',
+    MESSAGE: msg,
     DATA: {},
   });
 }

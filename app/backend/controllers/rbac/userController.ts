@@ -3,9 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
-} from './common/service';
-import { User } from '../db/models';
-import { UserCreationAttributes } from '../db/models/user/type';
+} from '../common/service';
+import { User } from '../../db/models';
+import { UserCreationAttributes } from '../../db/models/user/type';
 
 export default class UserController {
   public static createUser(req: Request, res: Response) {

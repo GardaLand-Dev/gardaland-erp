@@ -3,9 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
-} from './common/service';
-import { Operation } from '../db/models';
-import { OperationCreationAttributes } from '../db/models/operation/type';
+} from '../common/service';
+import { Operation } from '../../db/models';
+import { OperationCreationAttributes } from '../../db/models/operation/type';
 
 export default class OperationController {
   public static createOperation(req: Request, res: Response) {

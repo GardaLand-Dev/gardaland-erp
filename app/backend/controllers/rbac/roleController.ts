@@ -3,9 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
-} from './common/service';
-import { Role } from '../db/models';
-import { RoleCreationAttributes } from '../db/models/role/type';
+} from '../common/service';
+import { Role } from '../../db/models';
+import { RoleCreationAttributes } from '../../db/models/role/type';
 
 export default class RoleController {
   public static createRole(req: Request, res: Response) {

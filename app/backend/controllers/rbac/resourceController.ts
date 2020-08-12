@@ -3,9 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
-} from './common/service';
-import { Resource } from '../db/models';
-import { ResourceCreationAttributes } from '../db/models/resource/type';
+} from '../common/service';
+import { Resource } from '../../db/models';
+import { ResourceCreationAttributes } from '../../db/models/resource/type';
 
 export default class ResourceController {
   public static createResource(req: Request, res: Response) {

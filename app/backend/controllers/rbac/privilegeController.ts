@@ -3,9 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
-} from './common/service';
-import { Privilege } from '../db/models';
-import { PrivilegeCreationAttributes } from '../db/models/privilege/type';
+} from '../common/service';
+import { Privilege } from '../../db/models';
+import { PrivilegeCreationAttributes } from '../../db/models/privilege/type';
 
 export default class PrivilegeController {
   public static createPrivilege(req: Request, res: Response) {
@@ -16,10 +16,13 @@ export default class PrivilegeController {
     ) {
       const privilegeParams: PrivilegeCreationAttributes = {
         name: req.body.privilege_name,
-        resourceId: req.body.resource_id,
-        operationId: req.body.operation_id,
       };
       Privilege.create(privilegeParams)
+        .then((privilegeData) => {
+          privilegeData.setOperation();
+          privilegeData.setResource();
+          return privilegeData.save();
+        })
         .then((privilegeData) =>
           successResponse('create privilege successfull', privilegeData, res)
         )
@@ -51,20 +54,20 @@ export default class PrivilegeController {
         ? { where: { id: req.body.id } }
         : { where: { name: req.body.privilege_name } };
       Privilege.findOne(privilegeFilter)
-        .then((privilegeData) => {
+        .then(async (privilegeData) => {
           if (!privilegeData) throw new Error("couldn't find privilege");
-          const privilegeParams: PrivilegeCreationAttributes = {
-            name: req.body.privilege_name
-              ? req.body.privilege_name
-              : privilegeData?.name,
-            resourceId: req.body.ressource_id
-              ? req.body.ressource_id
-              : privilegeData?.resourceId,
-            operationId: req.body.operation_id
+          privilegeData?.setResource(
+            req.body.resource_id
+              ? req.body.resource_id
+              : (await privilegeData.getResource()).id
+          );
+          privilegeData?.setOperation(
+            req.body.operation_id
               ? req.body.operation_id
-              : privilegeData?.operationId,
-          };
-          privilegeData?.setAttributes(privilegeParams);
+              : (await privilegeData.getOperation()).id
+          );
+          // TODO: privilege name should be generated automatically
+          // privilegeData?.setAttributes(privilegeParams);
           return privilegeData.save();
         })
         .then((privilegeData) =>
