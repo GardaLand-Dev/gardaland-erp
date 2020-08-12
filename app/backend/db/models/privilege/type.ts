@@ -22,8 +22,6 @@ import { Operation } from '../operation/type';
 export interface PrivilegeAttributes {
   id: number;
   name: string;
-  operationId: number;
-  resourceId: number;
 }
 export type PrivilegeCreationAttributes = Optional<PrivilegeAttributes, 'id'>;
 export class Privilege
@@ -32,10 +30,6 @@ export class Privilege
   public id!: number;
 
   public name!: string;
-
-  public operationId!: number;
-
-  public resourceId!: number;
 
   // timestamps
   public createdAt!: Date;
