@@ -20,8 +20,6 @@ export default function UserFactory(sequelize: Sequelize): ModelCtor<User> {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
     },
     firstName: {
       type: DataTypes.STRING,
