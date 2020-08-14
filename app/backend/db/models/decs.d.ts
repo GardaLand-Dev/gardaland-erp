@@ -1,14 +1,6 @@
-// /* eslint-disable @typescript-eslint/naming-convention */
-// // Type definitions for @journeyapps/sqlcipher 4.1.0
-// // Project: https://github.com/journeyapps/node-sqlcipher
-// // Definitions by: Nick Malaguti <https://github.com/nmalaguti>
-// //                 Sumant Manne <https://github.com/dpyro>
-// //                 Behind The Math <https://github.com/BehindTheMath>
-// // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-classes-per-file */
 declare module '@journeyapps/sqlcipher' {
-  // /// <reference types="node" />
-
   import events = require('events');
 
   export const OPEN_READONLY: number;

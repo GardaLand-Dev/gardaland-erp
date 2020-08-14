@@ -29,5 +29,6 @@
     "app/renderer.prod.js",
     "app/dist",
     "dll"
-  ]
+  ],
+  "include": ["app/backend/db/models/decs.d.ts"]
 }

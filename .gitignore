@@ -54,3 +54,4 @@ app/backend/tsconfig.json
 app/backend/package.json
 app/backend/db.sqlite
 app/backend/index.ts
+db.sqlite

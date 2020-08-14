@@ -15,7 +15,7 @@ import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import startServer from './backend/server';
+import backendapp from './backend/server';
 
 export default class AppUpdater {
   constructor() {
@@ -120,12 +120,18 @@ app.on('window-all-closed', () => {
 if (process.env.E2E_BUILD === 'true') {
   // new
   // require('./backend/server');
-  startServer();
+  const port = 3333;
+  backendapp.listen(port, () => {
+    console.log(`listening at ${port}`);
+  });
   // eslint-disable-next-line promise/catch-or-return
   app.whenReady().then(createWindow);
 } else {
   // new
-  startServer();
+  const port = 3333;
+  backendapp.listen(port, () => {
+    console.log(`listening at ${port}`);
+  });
   // require('./backend/server');
   app.on('ready', createWindow);
 }
