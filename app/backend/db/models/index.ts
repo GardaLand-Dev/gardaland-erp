@@ -8,7 +8,8 @@ import ResourceFactory from './resource/model';
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
  * default/basic RBAC tables i.e. Privileges, Operations, Resources and Roles
- * then itialize with a Dev User
+ * then itialize with a Dev User.
+ * FIXME: multiple validation errors at initialisation
  * */
 
 const dbConfig = (() => {
