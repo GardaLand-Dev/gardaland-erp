@@ -3,7 +3,27 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 $enable-responsive-font-sizes: true;
-
+$grid-breakpoints: (
+  // Extra small screen / phone
+    xs: 0,
+  // Small screen / phone
+    sm: 576px,
+  // Medium screen / tablet
+    md: 768px,
+  // Large screen / desktop
+    lg: 992px,
+  // Extra large screen / wide desktop
+    xl: 1200px,
+  // Extra Extra large screen
+    xxl: 1600px
+);
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1520px,
+);
 @import './vars.scss';
 @import '~bootstrap/scss/bootstrap.scss';
 
@@ -136,7 +156,7 @@ body {
 }
 //components
 @import './components/article/Article.scss';
-@import './components/Login.scss';
+@import './components/login/Login.scss';
 @import './components/sidebar/Sidebar.scss';
 @import './components/sidebar/SideBarButton.scss';
 // @import './components/cart/Cart.scss';
