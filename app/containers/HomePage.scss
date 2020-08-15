@@ -48,5 +48,8 @@
   }
 }
 .cartWidth {
-  width: 600px !important;
+  // width: 600px !important;
+  flex-basis: 50ch;
+  flex-grow: 1;
+  flex-shrink: 0;
 }

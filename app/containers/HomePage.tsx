@@ -27,14 +27,13 @@ export default function HomePage(): JSX.Element {
           </div>
           <div className="flex-grow-1 h-100 of-hidden">
             <div className="d-flex h-100 flex-row align-items-stretch mt-3">
-              <div className="flex-grow-1 pl-3">
+              <div className="w-100 pl-3">
                 <div className="p-0 h-100 overflow-auto customScrollBar">
                   <MenuArticles />
                 </div>
                 {/* menuarticles here */}
               </div>
               <div className="p-0 cartWidth">
-                {/* FIXME: fix this div's width. use media queries for responsiveness */}
                 <Cart />
               </div>
             </div>
