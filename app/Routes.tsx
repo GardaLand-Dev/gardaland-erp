@@ -1,10 +1,12 @@
 /* eslint react/jsx-props-no-spreading: off */
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import routes from './constants/routes.json';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
 import LoginPage from './containers/LoginPage';
+import { selectLoggedIn } from './reducers/authentication.reducer';
 
 // Lazily load routes and code split with webpacck
 // const LazyCounterPage = React.lazy(() =>
@@ -16,9 +18,6 @@ import LoginPage from './containers/LoginPage';
 //     <LazyCounterPage {...props} />
 //   </React.Suspense>
 // );
-const fakeAuth = {
-  isAuthenticated: true,
-};
 
 function PrivateRoute({
   children,
@@ -31,15 +30,14 @@ function PrivateRoute({
   redirect: string;
   exact?: boolean;
 }) {
+  const isAuthenticated = useSelector(selectLoggedIn);
   return (
     <Route
       {...rest}
       render={
         () => {
           const bool =
-            redirect === routes.LOGIN
-              ? fakeAuth.isAuthenticated
-              : !fakeAuth.isAuthenticated;
+            redirect === routes.LOGIN ? isAuthenticated : !isAuthenticated;
           return bool ? children : <Redirect to={redirect} />;
         }
         // eslint-disable-next-line react/jsx-curly-newline
