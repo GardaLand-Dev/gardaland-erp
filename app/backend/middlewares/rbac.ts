@@ -63,8 +63,9 @@ const defaultInitConf: RBACInitConf = {
   ],
 };
 
-const rbacInit = (dbInitiator = dbInit, initConf = defaultInitConf) => {
-  dbInitiator();
+const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
+  await dbInitiator();
+  console.log('initiated');
   /**
    * deconstracting initConf to get operations, resources, privileges and roles
    */

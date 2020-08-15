@@ -45,7 +45,7 @@ export const Resource = ResourceFactory(dbConfig);
 export const Privilege = PrivilegeFactory(dbConfig);
 export const Role = RoleFactory(dbConfig);
 export const User = UserFactory(dbConfig);
-export const dbInit = () => {
+export const dbInit = async () => {
   /* RBAC - RELATIONS */
   /** role-user */
   User.belongsToMany(Role, { through: 'User_Role' });
@@ -77,7 +77,7 @@ export const dbInit = () => {
   });
 
   /* SYNCING */
-  dbConfig
+  await dbConfig
     .sync()
     .then(() => console.log('database created and syncronized'))
     .catch((err) => console.log('couldnt synchronize db', err));
