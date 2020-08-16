@@ -39,7 +39,9 @@ export default class LoginController {
           const data = jwt.sign(
             userData.toJSON(),
             process.env.PRIVATE_KEY ? process.env.PRIVATE_KEY : 'yasser999',
+            // TODO: try asymetric algorithm
             { algorithm: 'HS256' }
+            // TODO: add expiration time
           );
           return successResponse('Login succeded', data, res);
         })

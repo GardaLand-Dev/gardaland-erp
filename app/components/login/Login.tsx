@@ -9,6 +9,11 @@ import {
 import { login } from '../../reducers/authentication.reducer';
 
 export default function Login(): JSX.Element {
+  /**
+   * TODO: possibly add synchronising loading animation
+   * and disable login ?
+   * while the backend syncronizes data with the server
+   */
   const dispatch = useDispatch();
 
   const state = useSelector(selectLoginState);

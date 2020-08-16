@@ -7,6 +7,10 @@ function logout() {
 }
 
 function handleResponse(response: Response) {
+  /**
+   * TODO: if login is successful and user has admin/manager role
+   * suggest to login as manager
+   */
   return response.text().then((text) => {
     const jsonResponse = text && JSON.parse(text);
     if (!response.ok) {
