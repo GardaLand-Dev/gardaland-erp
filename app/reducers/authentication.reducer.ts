@@ -3,24 +3,38 @@ import { createSlice } from '@reduxjs/toolkit';
 import { RootState, AppThunk, history } from '../store';
 import userService from '../services/user.service';
 
+type AuthState = {
+  loggedIn?: boolean;
+  logginIn?: boolean;
+  user?: any;
+};
+
 const user = JSON.parse(localStorage.getItem('user'));
-const initialState = user ? { loggedIn: true, user } : {};
+const initialState: AuthState = user ? { loggedIn: true, user } : {};
 
 const authenticationSlice = createSlice({
   name: 'authentication',
   initialState,
   reducers: {
-    userLoginRequest: (_state, { payload }) => {
-      return { logginIn: true, user: payload };
+    userLoginRequest: (state, { payload }) => {
+      state.logginIn = true;
+      state.user = payload;
+      // return { logginIn: true, user: payload };
     },
-    userLoginSuccess: (_state, { payload }) => {
-      return { loggedIn: true, user: payload };
+    userLoginSuccess: (state, { payload }) => {
+      state.loggedIn = true;
+      state.user = payload;
+      // return { loggedIn: true, user: payload };
     },
-    userLoginFailure: () => {
-      return {};
+    userLoginFailure: (state) => {
+      state.loggedIn = null;
+      state.logginIn = null;
+      state.user = null;
     },
-    userLogout: () => {
-      return {};
+    userLogout: (state) => {
+      state.loggedIn = null;
+      state.logginIn = null;
+      state.user = null;
     },
   },
 });
@@ -51,7 +65,7 @@ export const login = (user_name, password): AppThunk => {
 
 export const logout = (): AppThunk => {
   return (dispatch) => {
-    dispatch(userLogout);
+    dispatch(userLogout());
     userService.logout();
   };
 };
