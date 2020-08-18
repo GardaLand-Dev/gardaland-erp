@@ -159,7 +159,10 @@ body {
 @import './components/login/Login.scss';
 @import './components/sidebar/Sidebar.scss';
 @import './components/sidebar/SideBarButton.scss';
+@import './components/manager/Logo.scss';
+@import './components/manager/features/MenuManagement.scss';
 // @import './components/cart/Cart.scss';
 
 //containers
 @import './containers/HomePage.scss';
+@import './containers/ManagerPage.scss';
