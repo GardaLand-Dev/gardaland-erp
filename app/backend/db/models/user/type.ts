@@ -15,33 +15,18 @@ import {
 import { Role } from '../role/type';
 
 export interface UserAttributes {
-  id: number;
+  id: string;
   userName: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
 }
-export type UserCreationAttributes = Optional<
-  UserAttributes,
-  'id' | 'email' | 'phone'
->;
+export type UserCreationAttributes = Optional<UserAttributes, 'id'>;
 export class User extends Model<UserAttributes, UserCreationAttributes>
   implements UserCreationAttributes {
-  public id!: number;
+  public id!: string;
 
   public userName!: string;
 
   public password!: string;
-
-  public firstName!: string;
-
-  public lastName!: string;
-
-  public email: string | undefined;
-
-  public phone: string | undefined;
 
   //  timestamps
   public createdAt!: Date;

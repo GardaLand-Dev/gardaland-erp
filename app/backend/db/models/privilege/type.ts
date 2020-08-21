@@ -20,14 +20,14 @@ import { Resource } from '../Resource/type';
 import { Operation } from '../operation/type';
 
 export interface PrivilegeAttributes {
-  id: number;
+  id: string;
   name: string;
 }
 export type PrivilegeCreationAttributes = Optional<PrivilegeAttributes, 'id'>;
 export class Privilege
   extends Model<PrivilegeAttributes, PrivilegeCreationAttributes>
   implements PrivilegeAttributes {
-  public id!: number;
+  public id!: string;
 
   public name!: string;
 

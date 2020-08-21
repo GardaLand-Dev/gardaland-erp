@@ -13,14 +13,14 @@ import {
 import { Privilege } from '../privilege/type';
 
 export interface ResourceAttributes {
-  id: number;
+  id: string;
   name: string;
 }
 export type ResourceCreationAttributes = Optional<ResourceAttributes, 'id'>;
 export class Resource
   extends Model<ResourceAttributes, ResourceCreationAttributes>
   implements ResourceAttributes {
-  public id!: number;
+  public id!: string;
 
   public name!: string;
 

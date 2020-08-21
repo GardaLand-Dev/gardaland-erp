@@ -1,10 +1,10 @@
 import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
-import { Operation } from './type';
+import { Supplier } from './type';
 
-export default function OperationFactory(
+export default function SupplierFactory(
   sequelize: Sequelize
-): ModelCtor<Operation> {
-  return sequelize.define('operations', {
+): ModelCtor<Supplier> {
+  return sequelize.define('suppliers', {
     id: {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
@@ -16,9 +16,13 @@ export default function OperationFactory(
       allowNull: false,
       unique: true,
     },
-    // action: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    // },
+    address: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    tel: {
+      type: DataTypes.STRING(15),
+      allowNull: true,
+    },
   });
 }

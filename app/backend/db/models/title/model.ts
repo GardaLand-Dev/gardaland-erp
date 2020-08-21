@@ -1,21 +1,24 @@
 import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
-import { User } from './type';
+import { Title } from './type';
 
-export default function UserFactory(sequelize: Sequelize): ModelCtor<User> {
-  return sequelize.define('users', {
+export default function TitleFactory(sequelize: Sequelize): ModelCtor<Title> {
+  return sequelize.define('titles', {
     id: {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
       primaryKey: true,
       allowNull: false,
     },
-    userName: {
+    name: {
       type: DataTypes.STRING(50),
-      unique: true,
       allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING(50),
+    from: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    to: {
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
   });

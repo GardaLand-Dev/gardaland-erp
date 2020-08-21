@@ -14,14 +14,14 @@ import {
 import { Privilege } from '../privilege/type';
 
 export interface OperationAttributes {
-  id: number;
+  id: string;
   name: string;
 }
 export type OperationCreationAttributes = Optional<OperationAttributes, 'id'>;
 export class Operation
   extends Model<OperationAttributes, OperationCreationAttributes>
   implements OperationAttributes {
-  public id!: number;
+  public id!: string;
 
   public name!: string;
 

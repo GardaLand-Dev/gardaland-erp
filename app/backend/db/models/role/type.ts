@@ -17,14 +17,14 @@ import { User } from '../user/type';
 import { Privilege } from '../privilege/type';
 
 export interface RoleAttributes {
-  id: number;
+  id: string;
   name: string;
 }
 export type RoleCreationAttributes = Optional<RoleAttributes, 'id'>;
 
 export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   implements RoleCreationAttributes {
-  public id!: number;
+  public id!: string;
 
   public name!: string;
 
