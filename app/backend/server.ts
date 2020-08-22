@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { dbInit } from './db/models';
 import authCheck, { notAuthHandler } from './middlewares/authCheck';
-import rbacInit from './middlewares/rbac';
+import { rbacInit } from './middlewares/rbac';
 
 import TestRoutes from './routes/test_route';
 import CommonRoutes from './routes/common_routes';
@@ -18,6 +18,7 @@ class Server {
 
   constructor() {
     // init
+    console.time('rbac');
     rbacInit(dbInit);
     process.env.PRIVATE_KEY = 'yasser9999';
     this.test_routes = new TestRoutes();

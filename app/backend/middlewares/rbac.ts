@@ -10,10 +10,7 @@
 // TODO: change privileges name to scope
 
 import { Response, NextFunction, Request } from 'express';
-// import { OperationCreationAttributes } from '../db/models/operation/type';
-// import { ResourceCreationAttributes } from '../db/models/Resource/type';
-// import { PrivilegeCreationAttributes } from '../db/models/privilege/type';
-// import { RoleCreationAttributes } from '../db/models/role/type';
+import AsyncLock from 'async-lock';
 import {
   Operation,
   Resource,
@@ -63,9 +60,12 @@ const defaultInitConf: RBACInitConf = {
   ],
 };
 
-const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
+export const rbacInit = async (
+  dbInitiator = dbInit,
+  initConf = defaultInitConf
+) => {
   await dbInitiator();
-  console.log('initiated');
+  console.log('db initiated');
   /**
    * deconstracting initConf to get operations, resources, privileges and roles
    */
@@ -74,57 +74,63 @@ const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
    * operations and resources and privs
    */
   initConf.roles.forEach(async (role) => {
-    const [rl] = await Role.findOrBuild({
+    const [rl] = await Role.findOrCreate({
       where: { name: role.name },
       defaults: { name: role.name },
     });
+    const lock = new AsyncLock();
+
     role.privileges.forEach(async (priv) => {
-      if (priv && privilegeValidator.test(priv)) {
-        const [rs] = await Resource.findOrBuild({
-          where: { name: priv?.split(':')[0] },
-          defaults: { name: priv?.split(':')[0] },
-        });
-        // console.log('logging resource: ', isc, rs.name);
-        const [op] = await Operation.findOrBuild({
-          where: { name: priv?.split(':')[1] },
-          defaults: { name: priv?.split(':')[1] },
-        });
-        const [prv] = await Privilege.findOrBuild({
-          where: { name: priv },
-          defaults: { name: priv },
-        });
-        rs.save()
-          .then(() => op.save())
-          .then(() => {
-            prv.setOperation(op);
-            prv.setResource(rs);
-            return prv.save();
-          })
-          .then(() => {
-            rl.addPrivilege(prv);
-            return rl.save();
-          })
-          .catch((err) => console.log(err));
-      }
-    });
-    await rl.save();
-    /* DEFAULT USER */
-    await User.findOrCreate({
-      where: { userName: 'ADMIN' },
-      defaults: {
-        userName: 'ADMIN',
-        firstName: 'ADMIN',
-        lastName: 'ADMIN',
-        password: 'ADMIN',
-      },
-    })
-      .then(async (userData) => {
-        if (!(await userData[0].hasRole(rl))) {
-          await userData[0].addRole(rl);
+      await lock.acquire('role-privs', async () => {
+        if (priv && privilegeValidator.test(priv)) {
+          const [rs] = await Resource.findOrBuild({
+            where: { name: priv?.split(':')[0] },
+            defaults: { name: priv?.split(':')[0] },
+          });
+
+          // console.log('logging resource: ', isc, rs.name);
+          const [op] = await Operation.findOrBuild({
+            where: { name: priv?.split(':')[1] },
+            defaults: { name: priv?.split(':')[1] },
+          });
+
+          await rs
+            .save()
+            .then(() => op.save())
+            .then(() =>
+              Privilege.findOrCreate({
+                where: { name: priv },
+                defaults: { name: priv, resourceId: rs.id, operationId: op.id },
+              })
+            )
+            .then(([prv]) => rl.addPrivilege(prv))
+            // .then(() => rl.save())
+            .catch((err) =>
+              console.log('cant create one of [Resource, Privlege, Role]', err)
+            );
         }
-        return userData[0].save();
+      });
+    });
+
+    await lock.acquire('role-privs', async () => {
+      await rl.save();
+      /* DEFAULT USER */
+      await User.findOrCreate({
+        where: { userName: 'ADMIN' },
+        defaults: {
+          userName: 'ADMIN',
+          password: 'ADMIN',
+        },
       })
-      .catch((err) => console.log(err));
+        .then(async (userData) => {
+          if (!(await userData[0].hasRole(rl))) {
+            await userData[0].addRole(rl);
+          }
+          return userData[0].save();
+        })
+        .catch((err) => console.log('cant create user or find', err));
+    });
+    console.timeLog('rbac');
   });
 
   /**
@@ -145,7 +151,7 @@ const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
   // });
 };
 
-export default rbacInit;
+// export rbacInit;
 type Options = {
   checkAllScopes?: boolean;
   failWithError?: boolean;
@@ -153,19 +159,18 @@ type Options = {
 
 // TODO: User isnt a string, figure wat it is and fix it
 export const checkRole = async (
-  user: string,
+  user: any,
   scopes: string[] | string,
   checkAll: boolean
 ): Promise<boolean> => {
   const userprivs = await User.findOne({
-    where: { userName: user },
+    where: { id: user.id },
     include: {
       model: Role,
       include: [Privilege],
     },
   })
     .then((userData) => {
-      console.log(userData);
       if (!userData || !userData.roles)
         throw new Error('Couldnt get user or roles');
       const privilegesData: any = {};
@@ -208,7 +213,7 @@ export const getAuthChecker = (
   return (req: Request, res: Response, next: NextFunction) => {
     const myreq: JwtRequest = req;
     if (!myreq.auth) return unauthorizedRequest(res);
-    return checkRole(myreq.auth.toString(), scopes, checkAllScopes)
+    return checkRole(myreq.auth, scopes, checkAllScopes)
       .then(() => next())
       .catch((err) => unauthorizedRequest(res));
   };

@@ -9,14 +9,7 @@ import { UserCreationAttributes } from '../../db/models/user/type';
 
 export default class UserController {
   public static createUser(req: Request, res: Response) {
-    if (
-      req.body.user_name &&
-      req.body.password &&
-      req.body.first_name &&
-      req.body.last_name &&
-      req.body.email &&
-      req.body.phone
-    ) {
+    if (req.body.user_name && req.body.password) {
       if (
         req.body.roles &&
         req.body.roles.length &&
@@ -25,10 +18,6 @@ export default class UserController {
         const userParams: UserCreationAttributes = {
           userName: req.body.user_name,
           password: req.body.password,
-          firstName: req.body.first_name,
-          lastName: req.body.last_name,
-          email: req.body.email,
-          phone: req.body.phone,
         };
         const userData = User.build(userParams);
         userData.addRoles(req.body.roles);
@@ -36,10 +25,6 @@ export default class UserController {
         const userParams: UserCreationAttributes = {
           userName: req.body.user_name,
           password: req.body.password,
-          firstName: req.body.first_name,
-          lastName: req.body.last_name,
-          email: req.body.email,
-          phone: req.body.phone,
         };
         // const a = UserFactory(dbConfig1);
         // console.log(dbConfig1.isDefined('users'));
@@ -72,14 +57,7 @@ export default class UserController {
   }
 
   public static updateUser(req: Request, res: Response) {
-    if (
-      (req.body.id || req.body.user_name) &&
-      (req.body.user_name ||
-        req.body.first_name ||
-        req.body.last_name ||
-        req.body.email ||
-        req.body.phone)
-    ) {
+    if (req.body.id || req.body.user_name) {
       const userFilter = { where: { id: req.body.id } };
       User.findOne(userFilter)
         .then((userData) => {
@@ -92,14 +70,6 @@ export default class UserController {
             password: req.body.password
               ? req.body.password
               : userData?.password,
-            firstName: req.body.first_name
-              ? req.body.first_name
-              : userData?.firstName,
-            lastName: req.body.last_name
-              ? req.body.last_name
-              : userData?.lastName,
-            email: req.body.email ? req.body.email : userData?.email,
-            phone: req.body.phone ? req.body.phone : userData?.phone,
           };
           userData.setAttributes(userParams);
           return userData.save();
