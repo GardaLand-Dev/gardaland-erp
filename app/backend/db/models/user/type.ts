@@ -36,11 +36,11 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
   //  model association methods
   public getRoles!: HasManyGetAssociationsMixin<Role>;
 
-  public addRole!: HasManyAddAssociationMixin<Role, number>;
+  public addRole!: HasManyAddAssociationMixin<Role, string>;
 
-  public addRoles!: HasManyAddAssociationsMixin<Role, number>;
+  public addRoles!: HasManyAddAssociationsMixin<Role, string>;
 
-  public hasRole!: HasManyHasAssociationMixin<Role, number>;
+  public hasRole!: HasManyHasAssociationMixin<Role, string>;
 
   public countRoles!: HasManyCountAssociationsMixin;
 

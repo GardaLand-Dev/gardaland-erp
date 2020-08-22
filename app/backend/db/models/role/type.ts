@@ -37,9 +37,9 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   //  Role-User
   public getUsers!: HasManyGetAssociationsMixin<User>;
 
-  public addUser!: HasManyAddAssociationMixin<User, number>;
+  public addUser!: HasManyAddAssociationMixin<User, string>;
 
-  public hasUser!: HasManyHasAssociationMixin<User, number>;
+  public hasUser!: HasManyHasAssociationMixin<User, string>;
 
   public countUser!: HasManyCountAssociationsMixin;
 
@@ -48,11 +48,11 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   //  Role-Privilege
   public getPrivileges!: HasManyGetAssociationsMixin<Privilege>;
 
-  public addPrivilege!: HasManyAddAssociationMixin<Privilege, number>;
+  public addPrivilege!: HasManyAddAssociationMixin<Privilege, string>;
 
-  public addPrivileges!: HasManyAddAssociationsMixin<Privilege, number>;
+  public addPrivileges!: HasManyAddAssociationsMixin<Privilege, string>;
 
-  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, number>;
+  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, string>;
 
   public countPrivilege!: HasManyCountAssociationsMixin;
 

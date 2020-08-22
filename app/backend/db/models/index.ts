@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import path from 'path';
 import UserFactory from './user/model';
 import RoleFactory from './role/model';
 import PrivilegeFactory from './privilege/model';
@@ -34,7 +35,7 @@ const dbConfig = (() => {
     {
       dialect: 'sqlite',
       dialectModulePath: '@journeyapps/sqlcipher',
-      storage: './db.sqlite',
+      storage: 'db.sqlite',
       logging: () => {},
     }
   );
@@ -109,6 +110,9 @@ export const dbInit = async () => {
     },
     onDelete: 'RESTRICT',
   });
+  /** resource-operation */
+  // Resource.belongsToMany(Operation, { through: Privilege });
+  // Operation.belongsToMany(Resource, { through: Privilege });
 
   /* PRODUCTION - RELATIONS */
   /*  STATICS */
@@ -166,7 +170,8 @@ export const dbInit = async () => {
   Supply.belongsTo(User);
   User.hasMany(Supply, { foreignKey: 'createdBy', foreignKeyConstraint: true });
   /**  user-employee */
-  Employee.hasOne(User);
+  // Employee.hasOne(User, { foreignKey: { allowNull: true } });
+  User.belongsTo(Employee);
   /**  user-payroll */
   Payroll.belongsTo(User);
   User.hasMany(Payroll, {

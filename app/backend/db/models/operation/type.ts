@@ -1,6 +1,5 @@
 /* eslint-disable max-classes-per-file */
 import {
-  BuildOptions,
   Model,
   Optional,
   HasManyGetAssociationsMixin,
@@ -34,9 +33,9 @@ export class Operation
   //  Operation-Privilege
   public getPrivileges!: HasManyGetAssociationsMixin<Privilege>;
 
-  public addPrivilege!: HasManyAddAssociationMixin<Privilege, number>;
+  public addPrivilege!: HasManyAddAssociationMixin<Privilege, string>;
 
-  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, number>;
+  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, string>;
 
   public countPrivilege!: HasManyCountAssociationsMixin;
 

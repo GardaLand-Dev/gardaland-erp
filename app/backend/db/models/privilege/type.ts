@@ -22,6 +22,8 @@ import { Operation } from '../operation/type';
 export interface PrivilegeAttributes {
   id: string;
   name: string;
+  resourceId: string;
+  operationId: string;
 }
 export type PrivilegeCreationAttributes = Optional<PrivilegeAttributes, 'id'>;
 export class Privilege
@@ -36,13 +38,18 @@ export class Privilege
 
   public updatedAt!: Date;
 
+  // Foreign Keys
+  public resourceId!: string;
+
+  public operationId!: string;
+
   // MODEL ASSOCIATION METHODS
   //  Privilege-Role
   public getRoles!: HasManyGetAssociationsMixin<Role>;
 
-  public addRole!: HasManyAddAssociationMixin<Role, number>;
+  public addRole!: HasManyAddAssociationMixin<Role, string>;
 
-  public hasRole!: HasManyHasAssociationMixin<Role, number>;
+  public hasRole!: HasManyHasAssociationMixin<Role, string>;
 
   public countRole!: HasManyCountAssociationsMixin;
 
@@ -51,14 +58,14 @@ export class Privilege
   //  Privilege-Resource
   public getResource!: BelongsToGetAssociationMixin<Resource>;
 
-  public setResource!: BelongsToSetAssociationMixin<Resource, number>;
+  public setResource!: BelongsToSetAssociationMixin<Resource, string>;
 
   public createResource!: BelongsToCreateAssociationMixin<Resource>;
 
   //  Privilege-Operation
   public getOperation!: BelongsToGetAssociationMixin<Operation>;
 
-  public setOperation!: BelongsToSetAssociationMixin<Operation, number>;
+  public setOperation!: BelongsToSetAssociationMixin<Operation, string>;
 
   public createOperation!: BelongsToCreateAssociationMixin<Operation>;
 
