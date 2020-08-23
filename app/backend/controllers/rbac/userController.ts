@@ -4,7 +4,7 @@ import {
   dbError,
   successResponse,
 } from '../common/service';
-import { User } from '../../db/models';
+import { User, Role } from '../../db/models';
 import { UserCreationAttributes } from '../../db/models/user/type';
 
 export default class UserController {
@@ -40,10 +40,10 @@ export default class UserController {
   }
 
   public static getUser(req: Request, res: Response) {
-    if (req.query.id || req.query.user_name) {
-      const filter = req.query.id
-        ? { id: req.query.id }
-        : { userName: req.query.user_name };
+    if (req.body.id || req.body.user_name) {
+      const filter = req.body.id
+        ? { id: req.body.id }
+        : { userName: req.body.user_name };
       const userFilter = { where: filter };
       // const a = UserFactory(dbConfig1);
       User.findOne(userFilter)
@@ -57,19 +57,16 @@ export default class UserController {
   }
 
   public static updateUser(req: Request, res: Response) {
-    if (req.body.id || req.body.user_name) {
-      const userFilter = { where: { id: req.body.id } };
-      User.findOne(userFilter)
+    if (req.body.id) {
+      User.findByPk(req.body.id)
         .then((userData) => {
           if (!userData) throw new Error("couldn't recieve userdata");
           const userParams = {
-            id: userData?.id,
+            id: userData.id,
             userName: req.body.user_name
               ? req.body.user_name
-              : userData?.userName,
-            password: req.body.password
-              ? req.body.password
-              : userData?.password,
+              : userData.userName,
+            password: req.body.password ? req.body.password : userData.password,
           };
           userData.setAttributes(userParams);
           return userData.save();
@@ -84,10 +81,55 @@ export default class UserController {
   }
 
   public static deleteUser(req: Request, res: Response) {
-    if (req.params.id) {
-      const userFilter = { where: { id: req.params.id } };
-      User.findOne(userFilter)
-        .then((userData) => userData?.destroy())
+    if (req.body.id) {
+      User.findByPk(req.body.id)
+        .then((userData) => {
+          if (!userData) throw Error('No matching user');
+          return userData.destroy();
+        })
+        .then(() => successResponse('user deleted successfuly', {}, res))
+        .catch((err) => dbError(err, res));
+    } else {
+      insufficientParameters(res);
+    }
+  }
+
+  public static async addRoleUser(req: Request, res: Response) {
+    if (req.body.id && (req.body.role_id || req.body.role_name)) {
+      const filter = req.body.role_id
+        ? { id: req.body.role_id }
+        : { name: req.body.role_name };
+      const rl = await Role.findOne({ where: filter });
+      if (!rl) throw new Error('cant find role');
+      const usr = await User.findByPk(req.body.id);
+      if (!usr) throw Error('No matching user');
+      usr
+        .hasRole(rl)
+        .then((hasRole) => {
+          if (hasRole) throw new Error('user already has this role');
+          return usr.addRole(rl);
+        })
+        .catch((err) => dbError(err, res));
+    } else {
+      insufficientParameters(res);
+    }
+  }
+
+  public static async removeRoleUser(req: Request, res: Response) {
+    if (req.body.id && (req.body.role_id || req.body.role_name)) {
+      const filter = req.body.role_id
+        ? { id: req.body.role_id }
+        : { name: req.body.role_name };
+      const rl = await Role.findOne({ where: filter });
+      if (!rl) throw new Error('cant find role');
+      const usr = await User.findByPk(req.body.id);
+      if (!usr) throw Error('No matching user');
+      usr
+        .hasRole(rl)
+        .then((hasRole) => {
+          if (!hasRole) throw new Error('user doesnr have this role');
+          return usr.removeRole(rl);
+        })
         .catch((err) => dbError(err, res));
     } else {
       insufficientParameters(res);
