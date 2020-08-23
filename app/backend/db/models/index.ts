@@ -26,6 +26,7 @@ import OrderProductFactory from './orderProducts/model';
  * then itialize with a Dev User.
  * FIXME: multiple validation errors at initialisation
  * */
+export const DEFAULT_LIMIT = 10;
 
 const dbConfig = (() => {
   const sequilze = new Sequelize(
