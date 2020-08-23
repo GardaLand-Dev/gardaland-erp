@@ -55,9 +55,62 @@ const defaultInitConf: RBACInitConf = {
         'rbac/user:create',
         'rbac/user:update',
         'rbac/user:delete',
+        'rbac/roleuser:view',
+        'rbac/roleuser:create',
+        'rbac/roleuser:delete',
       ],
     },
   ],
+};
+export const createPrivilege = async (privilegeName: string) => {
+  if (!privilegeName) throw new Error('privilege name cant be null');
+  if (privilegeValidator.test(privilegeName))
+    throw new Error(
+      'Wrong privilege format. Should be "feature/resource:operation"'
+    );
+  const [rs] = await Resource.findOrBuild({
+    where: { name: privilegeName?.split(':')[0] },
+    defaults: { name: privilegeName?.split(':')[0] },
+  });
+
+  // console.log('logging resource: ', isc, rs.name);
+  const [op] = await Operation.findOrBuild({
+    where: { name: privilegeName?.split(':')[1] },
+    defaults: { name: privilegeName?.split(':')[1] },
+  });
+
+  return rs
+    .save()
+    .then(() => op.save())
+    .then(() =>
+      Privilege.findOrCreate({
+        where: { name: privilegeName },
+        defaults: {
+          name: privilegeName,
+          resourceId: rs.id,
+          operationId: op.id,
+        },
+      }).then((privData) => privData[0])
+    );
+};
+
+export const createPrivilegeByIds = async (
+  resourceId: string,
+  operationId: string
+): Promise<import('../db/models/privilege/type').Privilege> => {
+  if (!resourceId || !operationId) throw new Error('Ids cant be null');
+
+  const rs = await Resource.findByPk(resourceId);
+  const op = await Operation.findByPk(operationId);
+  if (!rs || !op) throw new Error('couldnt find resourceid or operationid');
+
+  return Privilege.findOrCreate({
+    where: { operationId, resourceId },
+    defaults: { resourceId, operationId, name: `${rs.name}:${op.name}` },
+  }).then((priv): import('../db/models/privilege/type').Privilege => {
+    if (!priv[1]) throw new Error('Privilege already exists');
+    return priv[0];
+  });
 };
 
 export const rbacInit = async (
@@ -213,8 +266,11 @@ export const getAuthChecker = (
   return (req: Request, res: Response, next: NextFunction) => {
     const myreq: JwtRequest = req;
     if (!myreq.auth) return unauthorizedRequest(res);
-    return checkRole(myreq.auth, scopes, checkAllScopes)
-      .then(() => next())
-      .catch((err) => unauthorizedRequest(res));
+    return (
+      checkRole(myreq.auth, scopes, checkAllScopes)
+        // eslint-disable-next-line promise/no-callback-in-promise
+        .then(next)
+        .catch(() => unauthorizedRequest(res))
+    );
   };
 };
