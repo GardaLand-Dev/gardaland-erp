@@ -9,28 +9,47 @@ import OperationController from '../controllers/rbac/operationController';
 export default class RBACRoutes {
   public static route(app: Application) {
     // FIXME: the controller should be choosen depending on the scope which should be given in the request
-
+    const baseroute = '/api/rbac';
     /**
      * USERS
      */
     app.get(
-      '/api/rbac/user',
+      `${baseroute}/user`,
       getAuthChecker('rbac/user:view'),
       UserController.getUser
     );
     app.post(
-      '/api/rbac/user',
+      `${baseroute}/user`,
       getAuthChecker('rbac/user:create'),
       UserController.createUser
     );
     app.put(
-      'api/rbac/user',
+      `${baseroute}/user`,
       getAuthChecker('rbac/user:update'),
       UserController.updateUser
     );
     app.delete(
-      'api/rbac/user',
+      `${baseroute}/user`,
       getAuthChecker('rbac/user:delete'),
+      UserController.deleteUser
+    );
+
+    app.get(
+      `${baseroute}/users`,
+      getAuthChecker('rbac/users:view'),
+      UserController.getUsers
+    );
+    /**
+     * ROLE-USER
+     */
+    app.put(
+      `${baseroute}/roleuser`,
+      getAuthChecker('rbac/roleuser:create'),
+      UserController.addRoleUser
+    );
+    app.delete(
+      `${baseroute}/roleuser`,
+      getAuthChecker('rbac/roleuser:delete'),
       UserController.deleteUser
     );
 
@@ -39,24 +58,30 @@ export default class RBACRoutes {
      */
 
     app.get(
-      '/api/rbac/role',
+      `${baseroute}/role`,
       getAuthChecker('rbac/role:view'),
       RoleController.getRole
     );
     app.post(
-      '/api/rbac/role',
+      `${baseroute}/role`,
       getAuthChecker('rbac/role:create'),
       RoleController.createRole
     );
     app.put(
-      'api/rbac/role',
+      `${baseroute}/role`,
       getAuthChecker('rbac/role:update'),
       RoleController.updateRole
     );
     app.delete(
-      'api/rbac/role',
+      `${baseroute}/role`,
       getAuthChecker('rbac/role:delete'),
       RoleController.deleteRole
+    );
+
+    app.get(
+      `${baseroute}/roles`,
+      getAuthChecker('rbac/roles:view'),
+      RoleController.getRoles
     );
 
     /**
@@ -64,24 +89,30 @@ export default class RBACRoutes {
      */
 
     app.get(
-      '/api/rbac/privilege',
+      `${baseroute}/privilege`,
       getAuthChecker('rbac/privilege:view'),
       PrivilegeController.getPrivilege
     );
     app.post(
-      '/api/rbac/privilege',
+      `${baseroute}/privilege`,
       getAuthChecker('rbac/privilege:create'),
       PrivilegeController.createPrivilege
     );
     app.put(
-      'api/rbac/privilege',
+      `${baseroute}/privilege`,
       getAuthChecker('rbac/privilege:update'),
       PrivilegeController.updatePrivilege
     );
     app.delete(
-      'api/rbac/privilege',
+      `${baseroute}/privilege`,
       getAuthChecker('rbac/privilege:delete'),
       PrivilegeController.deletePrivilege
+    );
+
+    app.get(
+      `${baseroute}/privileges`,
+      getAuthChecker('rbac/privileges:view'),
+      PrivilegeController.getPrivileges
     );
 
     /**
@@ -89,24 +120,30 @@ export default class RBACRoutes {
      */
 
     app.get(
-      '/api/rbac/resource',
+      `${baseroute}/resource`,
       getAuthChecker('rbac/resource:view'),
       ResourceController.getResource
     );
     app.post(
-      '/api/rbac/resource',
+      `${baseroute}/resource`,
       getAuthChecker('rbac/resource:create'),
       ResourceController.createResource
     );
     app.put(
-      'api/rbac/resource',
+      `${baseroute}/resource`,
       getAuthChecker('rbac/resource:update'),
       ResourceController.updateResource
     );
     app.delete(
-      'api/rbac/resource',
+      `${baseroute}/resource`,
       getAuthChecker('rbac/resource:delete'),
       ResourceController.deleteResource
+    );
+
+    app.get(
+      `${baseroute}/resources`,
+      getAuthChecker('rbac/resources:view'),
+      ResourceController.getResources
     );
 
     /**
@@ -114,24 +151,30 @@ export default class RBACRoutes {
      */
 
     app.get(
-      '/api/rbac/operation',
+      `${baseroute}/operation`,
       getAuthChecker('rbac/operation:view'),
       OperationController.getOperation
     );
     app.post(
-      '/api/rbac/operation',
+      `${baseroute}/operation`,
       getAuthChecker('rbac/operation:create'),
       OperationController.createOperation
     );
     app.put(
-      'api/rbac/operation',
+      `${baseroute}/operation`,
       getAuthChecker('rbac/operation:update'),
       OperationController.updateOperation
     );
     app.delete(
-      'api/rbac/operation',
+      `${baseroute}/operation`,
       getAuthChecker('rbac/operation:delete'),
       OperationController.deleteOperation
+    );
+
+    app.get(
+      `${baseroute}/operations`,
+      getAuthChecker('rbac/operations:view'),
+      OperationController.getOperation
     );
   }
 }
