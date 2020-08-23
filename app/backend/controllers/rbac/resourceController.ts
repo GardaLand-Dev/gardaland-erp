@@ -3,8 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
+  failureResponse,
 } from '../common/service';
-import { Resource } from '../../db/models';
+import { Resource, DEFAULT_LIMIT } from '../../db/models';
 import { ResourceCreationAttributes } from '../../db/models/resource/type';
 
 export default class ResourceController {
@@ -74,5 +75,18 @@ export default class ResourceController {
     } else {
       insufficientParameters(res);
     }
+  }
+
+  public static getResources(req: Request, res: Response) {
+    const limit =
+      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+    const offset =
+      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+    const options = { limit, offset };
+    Resource.findAll(options)
+      .then((resourcesData) =>
+        successResponse('users retrieved', resourcesData, res)
+      )
+      .catch((err) => failureResponse('couldnt retrieve users', err, res));
   }
 }

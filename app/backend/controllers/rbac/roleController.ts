@@ -3,8 +3,9 @@ import {
   insufficientParameters,
   dbError,
   successResponse,
+  failureResponse,
 } from '../common/service';
-import { Role } from '../../db/models';
+import { Role, DEFAULT_LIMIT } from '../../db/models';
 import { RoleCreationAttributes } from '../../db/models/role/type';
 
 export default class RoleController {
@@ -84,5 +85,16 @@ export default class RoleController {
     } else {
       insufficientParameters(res);
     }
+  }
+
+  public static getRoles(req: Request, res: Response) {
+    const limit =
+      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+    const offset =
+      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+    const options = { limit, offset };
+    Role.findAll(options)
+      .then((rolesData) => successResponse('users retrieved', rolesData, res))
+      .catch((err) => failureResponse('couldnt retrieve users', err, res));
   }
 }

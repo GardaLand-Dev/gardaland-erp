@@ -5,7 +5,7 @@ import {
   successResponse,
   failureResponse,
 } from '../common/service';
-import { Privilege } from '../../db/models';
+import { Privilege, DEFAULT_LIMIT } from '../../db/models';
 import { createPrivilege, createPrivilegeByIds } from '../../middlewares/rbac';
 
 export default class PrivilegeController {
@@ -97,5 +97,18 @@ export default class PrivilegeController {
     } else {
       insufficientParameters(res);
     }
+  }
+
+  public static getPrivileges(req: Request, res: Response) {
+    const limit =
+      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+    const offset =
+      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+    const options = { limit, offset };
+    Privilege.findAll(options)
+      .then((privilegesData) =>
+        successResponse('users retrieved', privilegesData, res)
+      )
+      .catch((err) => failureResponse('couldnt retrieve users', err, res));
   }
 }
