@@ -1,5 +1,13 @@
 /* eslint-disable max-classes-per-file */
-import { Model, Optional } from 'sequelize';
+import {
+  Model,
+  Optional,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  Association,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Employee } from '../employee/type';
 
 export interface SalaryAttributes {
   id: string;
@@ -27,9 +35,15 @@ export class Salary extends Model<SalaryAttributes, SalaryCreationAttributes>
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
+  // Employee-Salary
+  public getEmployee!: BelongsToGetAssociationMixin<Employee>;
+
+  public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly employee?: Employee;
 
-  // public static assotations: {
-  // };
+  public static assotations: {
+    employee: Association<Employee, Salary>;
+  };
 }

@@ -1,5 +1,13 @@
 /* eslint-disable max-classes-per-file */
-import { Model, Optional } from 'sequelize';
+import {
+  Model,
+  Optional,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  Association,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Employee } from '../employee/type';
 
 export interface TitleAttributes {
   id: string;
@@ -24,9 +32,15 @@ export class Title extends Model<TitleAttributes, TitleCreationAttributes>
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
+  // Employee-Title
+  public getEmployee!: BelongsToGetAssociationMixin<Employee>;
+
+  public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly employee?: Employee;
 
-  // public static assotations: {
-  // };
+  public static assotations: {
+    employee: Association<Employee, Title>;
+  };
 }

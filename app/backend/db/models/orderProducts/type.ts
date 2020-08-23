@@ -1,5 +1,23 @@
 /* eslint-disable max-classes-per-file */
-import { Model, Optional } from 'sequelize';
+import {
+  Model,
+  Optional,
+  BelongsToGetAssociationMixin,
+  Order,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationMixin,
+  BelongsToManyHasAssociationsMixin,
+  BelongsToManyAddAssociationMixin,
+  BelongsToManyAddAssociationsMixin,
+  BelongsToManyRemoveAssociationMixin,
+  BelongsToManyRemoveAssociationsMixin,
+  Association,
+  BelongsToSetAssociationMixin,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Suppliment } from '../suppliment/type';
+// eslint-disable-next-line import/no-cycle
+import { Product } from '../product/type';
 
 export interface OrderProductAttributes {
   id: string;
@@ -25,9 +43,42 @@ export class OrderProduct
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
+  // Order-OrderProduct
+  public getOrder!: BelongsToGetAssociationMixin<Order>;
+
+  // Suppliments-OrderProduct
+  public getSuppliments!: BelongsToManyGetAssociationsMixin<Suppliment>;
+
+  public hasSuppliment!: BelongsToManyHasAssociationMixin<Suppliment, string>;
+
+  public hasSuppliments!: BelongsToManyHasAssociationsMixin<Suppliment, string>;
+
+  public addSuppliment!: BelongsToManyAddAssociationMixin<Suppliment, string>;
+
+  public addSuppliments!: BelongsToManyAddAssociationsMixin<Suppliment, string>;
+
+  public removeSuppliment!: BelongsToManyRemoveAssociationMixin<
+    Suppliment,
+    string
+  >;
+
+  public removeSuppliments!: BelongsToManyRemoveAssociationsMixin<
+    Suppliment,
+    string
+  >;
+
+  // Product-OrderProduct
+  public getProduct!: BelongsToGetAssociationMixin<Product>;
+
+  public setProduct!: BelongsToSetAssociationMixin<Product, string>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly suppliments?: Suppliment[];
 
-  // public static assotations: {
-  // };
+  public readonly product?: Product;
+
+  public static assotations: {
+    suppliments: Association<Suppliment, OrderProduct>;
+    product: Association<Product, OrderProduct>;
+  };
 }

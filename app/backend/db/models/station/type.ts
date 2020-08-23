@@ -1,5 +1,16 @@
 /* eslint-disable max-classes-per-file */
-import { Model, Optional } from 'sequelize';
+import {
+  Model,
+  Optional,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  Association,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Family } from '../family/type';
 
 export interface StationAttributes {
   id: string;
@@ -21,9 +32,21 @@ export class Station extends Model<StationAttributes, StationCreationAttributes>
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
+  // Family-Station
+  public getFamilies!: HasManyGetAssociationsMixin<Family>;
+
+  public createFamily!: HasManyCreateAssociationMixin<Family>;
+
+  public hasFamily!: HasManyHasAssociationMixin<Family, string>;
+
+  public hasFamilies!: HasManyHasAssociationsMixin<Family, string>;
+
+  public countFamilies!: HasManyCountAssociationsMixin;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly families?: Family[];
 
-  // public static assotations: {
-  // };
+  public static assotations: {
+    families: Association<Family, Station>;
+  };
 }

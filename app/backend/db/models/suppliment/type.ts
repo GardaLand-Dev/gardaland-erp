@@ -1,5 +1,17 @@
 /* eslint-disable max-classes-per-file */
-import { Model, Optional } from 'sequelize';
+import {
+  Model,
+  Optional,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  BelongsToCreateAssociationMixin,
+  Association,
+  BelongsToManyGetAssociationsMixin,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Stockable } from '../stockable/type';
+// eslint-disable-next-line import/no-cycle
+import { OrderProduct } from '../orderProducts/type';
 
 export interface SupplimentAttributes {
   id: string;
@@ -31,9 +43,23 @@ export class Suppliment
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
+  // Stockable-Suppliment
+  public getStockable!: BelongsToGetAssociationMixin<Stockable>;
+
+  public setStockable!: BelongsToSetAssociationMixin<Stockable, string>;
+
+  public createStockable!: BelongsToCreateAssociationMixin<Stockable>;
+
+  // OrderProduct-Suppliment
+  public getOrderProduct!: BelongsToManyGetAssociationsMixin<OrderProduct>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly stockable: Stockable;
 
-  // public static assotations: {
-  // };
+  public readonly orderProducts?: OrderProduct[];
+
+  public static assotations: {
+    stockable: Association<Stockable, Suppliment>;
+    orderProducts: Association<OrderProduct, Suppliment>;
+  };
 }

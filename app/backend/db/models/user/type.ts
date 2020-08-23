@@ -10,6 +10,7 @@ import {
   Association,
   // BuildOptions,
   HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { Role } from '../role/type';
@@ -39,6 +40,8 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
   public addRole!: HasManyAddAssociationMixin<Role, string>;
 
   public addRoles!: HasManyAddAssociationsMixin<Role, string>;
+
+  public removeRole!: HasManyRemoveAssociationMixin<Role, string>;
 
   public hasRole!: HasManyHasAssociationMixin<Role, string>;
 

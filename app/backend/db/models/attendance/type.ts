@@ -1,4 +1,12 @@
-import { Optional, Model } from 'sequelize';
+import {
+  Optional,
+  Model,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  Association,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Employee } from '../employee/type';
 
 export interface AttendanceAttributes {
   id: string;
@@ -24,6 +32,14 @@ export class Attendance
   public updatedAt!: Date;
 
   // MODEL ASSOCATION METHODS
+  public getEmployee!: BelongsToGetAssociationMixin<Employee>;
+
+  public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly employee?: Employee;
+
+  public static associations: {
+    employee: Association<Employee, Attendance>;
+  };
 }

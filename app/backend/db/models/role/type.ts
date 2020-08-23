@@ -9,6 +9,7 @@ import {
   HasManyCreateAssociationMixin,
   Association,
   HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { User } from '../user/type';
@@ -52,6 +53,8 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
 
   public addPrivileges!: HasManyAddAssociationsMixin<Privilege, string>;
 
+  public removePrivilege!: HasManyRemoveAssociationMixin<Privilege, string>;
+
   public hasPrivilege!: HasManyHasAssociationMixin<Privilege, string>;
 
   public countPrivilege!: HasManyCountAssociationsMixin;
@@ -63,7 +66,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
 
   public readonly privileges?: Privilege[];
 
-  public static assotations: {
+  public static associations: {
     users: Association<Role, User>;
     privileges: Association<Role, Privilege>;
   };

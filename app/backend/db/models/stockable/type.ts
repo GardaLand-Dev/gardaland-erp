@@ -1,5 +1,25 @@
 /* eslint-disable max-classes-per-file */
-import { Model, Optional } from 'sequelize';
+import {
+  Model,
+  Optional,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationMixin,
+  BelongsToManyHasAssociationsMixin,
+  BelongsToManyCountAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  Association,
+} from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Product } from '../product/type';
+// eslint-disable-next-line import/no-cycle
+import { Suppliment } from '../suppliment/type';
+// eslint-disable-next-line import/no-cycle
+import { Supply } from '../supply/type';
+// eslint-disable-next-line import/no-cycle
+import { Supplier } from '../supplier/type';
 
 export interface StockableAttributes {
   id: string;
@@ -31,9 +51,49 @@ export class Stockable
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
+  // Product-Stockable
+  public getProducts!: BelongsToManyGetAssociationsMixin<Product>;
+
+  public hasProduct!: BelongsToManyHasAssociationMixin<Product, string>;
+
+  public hasProducts!: BelongsToManyHasAssociationsMixin<Product, string>;
+
+  public countProducts!: BelongsToManyCountAssociationsMixin;
+
+  // Suppliment-Stockable
+  public getSuppliments!: HasManyGetAssociationsMixin<Suppliment>;
+
+  public hasSuppliment!: HasManyHasAssociationMixin<Suppliment, string>;
+
+  public hasSuppliments!: HasManyHasAssociationsMixin<Suppliment, string>;
+
+  public countSuppliments!: HasManyCountAssociationsMixin;
+
+  // Supply-Stockable
+  public getSupplies!: HasManyGetAssociationsMixin<Supply>;
+
+  // Supplier-Stockable
+  public getSuppliers!: BelongsToManyGetAssociationsMixin<Supplier>;
+
+  public hasSupplier!: BelongsToManyHasAssociationMixin<Supplier, string>;
+
+  public hasSuppliers!: BelongsToManyHasAssociationsMixin<Supplier, string>;
+
+  public countSuppliers!: BelongsToManyCountAssociationsMixin;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly products?: Product[];
 
-  // public static assotations: {
-  // };
+  public readonly suppliments?: Suppliment[];
+
+  public readonly supplies?: Supply[];
+
+  public readonly suppliers?: Supplier[];
+
+  public static assotations: {
+    products: Association<Product, Stockable>;
+    suppliments: Association<Suppliment, Stockable>;
+    supplies: Association<Supply, Stockable>;
+    suppliers: Association<Supplier, Stockable>;
+  };
 }

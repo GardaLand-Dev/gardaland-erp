@@ -129,6 +129,9 @@ export const dbInit = async () => {
   /**  stockable-supply */
   Supply.belongsTo(Stockable);
   Stockable.hasMany(Supply);
+  /**  stockable-supplier */
+  Stockable.belongsToMany(Supplier, { through: Supply });
+  Supplier.belongsToMany(Stockable, { through: Supply });
   /** HR */
   /**  employee-attendance  */
   Attendance.belongsTo(Employee);
