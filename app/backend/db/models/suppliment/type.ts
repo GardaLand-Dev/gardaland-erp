@@ -54,7 +54,7 @@ export class Suppliment
   public getOrderProduct!: BelongsToManyGetAssociationsMixin<OrderProduct>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
-  public readonly stockable: Stockable;
+  public readonly stockable?: Stockable;
 
   public readonly orderProducts?: OrderProduct[];
 
