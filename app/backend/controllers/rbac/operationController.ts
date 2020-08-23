@@ -24,10 +24,10 @@ export default class OperationController {
   }
 
   public static getOperation(req: Request, res: Response) {
-    if (req.query.id || req.query.operation_name) {
-      const filter = req.query.id
-        ? { id: req.query.id }
-        : { name: req.query.operation_name };
+    if (req.body.id || req.body.operation_name) {
+      const filter = req.body.id
+        ? { id: req.body.id }
+        : { name: req.body.operation_name };
       const operationFilter = { where: filter };
       Operation.findOne(operationFilter)
         .then((operationData) =>
@@ -66,8 +66,8 @@ export default class OperationController {
   }
 
   public static deleteOperation(req: Request, res: Response) {
-    if (req.query.id) {
-      const operationFilter = { where: { id: req.query.id } };
+    if (req.body.id) {
+      const operationFilter = { where: { id: req.body.id } };
       Operation.findOne(operationFilter)
         .then((operationData) => operationData?.destroy())
         .catch((err) => dbError(err, res));

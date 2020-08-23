@@ -24,10 +24,10 @@ export default class ResourceController {
   }
 
   public static getResource(req: Request, res: Response) {
-    if (req.query.id || req.query.resource_name) {
-      const filter = req.query.id
-        ? { id: req.query.id }
-        : { name: req.query.resource_name };
+    if (req.body.id || req.body.resource_name) {
+      const filter = req.body.id
+        ? { id: req.body.id }
+        : { name: req.body.resource_name };
       const resourceFilter = { where: filter };
       Resource.findOne(resourceFilter)
         .then((resourceData) =>
@@ -66,8 +66,8 @@ export default class ResourceController {
   }
 
   public static deleteResource(req: Request, res: Response) {
-    if (req.query.id) {
-      const resourceFilter = { where: { id: req.query.id } };
+    if (req.body.id) {
+      const resourceFilter = { where: { id: req.body.id } };
       Resource.findOne(resourceFilter)
         .then((resourceData) => resourceData?.destroy())
         .catch((err) => dbError(err, res));

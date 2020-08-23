@@ -36,10 +36,10 @@ export default class RoleController {
   }
 
   public static getRole(req: Request, res: Response) {
-    if (req.query.id || req.query.role_name) {
-      const filter = req.query.id
-        ? { id: req.query.id }
-        : { name: req.query.role_name };
+    if (req.body.id || req.body.role_name) {
+      const filter = req.body.id
+        ? { id: req.body.id }
+        : { name: req.body.role_name };
       const roleFilter = { where: filter };
       Role.findOne(roleFilter)
         .then((roleData) =>
@@ -76,8 +76,8 @@ export default class RoleController {
   }
 
   public static deleteRole(req: Request, res: Response) {
-    if (req.query.id) {
-      const roleFilter = { where: { id: req.query.id } };
+    if (req.body.id) {
+      const roleFilter = { where: { id: req.body.id } };
       Role.findOne(roleFilter)
         .then((roleData) => roleData?.destroy())
         .catch((err) => dbError(err, res));
