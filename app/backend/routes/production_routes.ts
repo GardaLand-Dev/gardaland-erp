@@ -1,5 +1,9 @@
 import { Application } from 'express';
 import { getAuthChecker } from '../middlewares/rbac';
+import StationController from '../controllers/production/statics/stationController';
+import FamilyController from '../controllers/production/statics/familyController';
+import ProductController from '../controllers/production/statics/productController';
+import StockableController from '../controllers/production/inventory/stockableController';
 
 export default class ProductionRoutes {
   public static route(app: Application) {
@@ -14,40 +18,113 @@ export default class ProductionRoutes {
     app.get(`${path}/Suppliments`, getAuthChecker('prod/suppliments:view'));
 
     // Product
-    app.get(`${path}/product`, getAuthChecker('prod/product:view'));
-    app.post(`${path}/product`, getAuthChecker('prod/product:create'));
+    app.get(
+      `${path}/product`,
+      getAuthChecker('prod/product:view'),
+      ProductController.getProduct
+    );
+    app.post(
+      `${path}/product`,
+      getAuthChecker('prod/product:create'),
+      ProductController.createProduct
+    );
     app.put(`${path}/product`, getAuthChecker('prod/product:update'));
-    app.delete(`${path}/product`, getAuthChecker('prod/product:delete'));
+    app.delete(
+      `${path}/product`,
+      getAuthChecker('prod/product:delete'),
+      ProductController.deleteProduct
+    );
 
-    app.get(`${path}/products`, getAuthChecker('prod/products:view'));
+    app.get(
+      `${path}/products`,
+      getAuthChecker('prod/products:view'),
+      ProductController.getProducts
+    );
 
     // Family
-    app.get(`${path}/family`, getAuthChecker('prod/family:view'));
-    app.post(`${path}/family`, getAuthChecker('prod/family:create'));
-    app.put(`${path}/family`, getAuthChecker('prod/family:update'));
-    app.delete(`${path}/family`, getAuthChecker('prod/family:delete'));
+    app.get(
+      `${path}/family`,
+      getAuthChecker('prod/family:view'),
+      FamilyController.getFamily
+    );
+    app.post(
+      `${path}/family`,
+      getAuthChecker('prod/family:create'),
+      FamilyController.createFamily
+    );
+    app.put(
+      `${path}/family`,
+      getAuthChecker('prod/family:update'),
+      FamilyController.updateFamily
+    );
+    app.delete(
+      `${path}/family`,
+      getAuthChecker('prod/family:delete'),
+      FamilyController.deleteFamily
+    );
 
-    app.get(`${path}/families`, getAuthChecker('prod/families:view'));
+    app.get(
+      `${path}/families`,
+      getAuthChecker('prod/families:view'),
+      FamilyController.getFamilies
+    );
 
     // Station
-    app.get(`${path}/station`, getAuthChecker('prod/station:view'));
-    app.post(`${path}/station`, getAuthChecker('prod/station:create'));
-    app.put(`${path}/station`, getAuthChecker('prod/station:update'));
-    app.delete(`${path}/station`, getAuthChecker('prod/station:delete'));
+    app.get(
+      `${path}/station`,
+      getAuthChecker('prod/station:view'),
+      StationController.getStation
+    );
+    app.post(
+      `${path}/station`,
+      getAuthChecker('prod/station:create'),
+      StationController.createStation
+    );
+    app.put(
+      `${path}/station`,
+      getAuthChecker('prod/station:update'),
+      StationController.updateStation
+    );
+    app.delete(
+      `${path}/station`,
+      getAuthChecker('prod/station:delete'),
+      StationController.deleteStation
+    );
 
-    app.get(`${path}/stations`, getAuthChecker('prod/stations:view'));
+    app.get(
+      `${path}/stations`,
+      getAuthChecker('prod/stations:view'),
+      StationController.getStations
+    );
 
     /** INVENTORY */
     // Stockable
-    app.get(`${path}/stockable`, getAuthChecker('inventory/stockable:view'));
-    app.post(`${path}/stockable`, getAuthChecker('inventory/stockable:create'));
-    app.put(`${path}/stockable`, getAuthChecker('inventory/stockable:update'));
+    app.get(
+      `${path}/stockable`,
+      getAuthChecker('inventory/stockable:view'),
+      StockableController.getStockable
+    );
+    app.post(
+      `${path}/stockable`,
+      getAuthChecker('inventory/stockable:create'),
+      StockableController.createStockable
+    );
+    app.put(
+      `${path}/stockable`,
+      getAuthChecker('inventory/stockable:update'),
+      StockableController.updateStockable
+    );
     app.delete(
       `${path}/stockable`,
-      getAuthChecker('inventory/stockable:delete')
+      getAuthChecker('inventory/stockable:delete'),
+      StockableController.deleteStockable
     );
 
-    app.get(`${path}/stockables`, getAuthChecker('inventory/stockables:view'));
+    app.get(
+      `${path}/stockables`,
+      getAuthChecker('inventory/stockables:view'),
+      StockableController.getStockables
+    );
 
     // Supplier
     app.get(`${path}/supplier`, getAuthChecker('inventory/supplier:view'));
