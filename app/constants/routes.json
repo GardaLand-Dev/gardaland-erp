@@ -2,6 +2,17 @@
   "ROOT": "/",
   "HOME": "/Home",
   "LOGIN": "/Login",
-  "COUNTER": "/counter",
-  "MANAGER": "/Manager"
+  "MANAGER": {
+    "root": "/Manager",
+    "VenteManagement": {
+      "List": "/Manager/vente/list"
+    },
+    "ProductManagement": {
+      "List": "/Manager/products/list",
+      "FamilleList": "/Manager/product/famillelist"
+    },
+    "StockManagement": {
+      "List": "/Manager/stock/list"
+    }
+  }
 }

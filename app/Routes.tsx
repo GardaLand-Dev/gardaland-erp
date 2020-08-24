@@ -7,7 +7,8 @@ import App from './containers/App';
 // import HomePage from './containers/HomePage';
 // import LoginPage from './containers/LoginPage';
 import { selectLoggedIn } from './reducers/authentication.reducer';
-import MangerPage from './containers/ManagerPage';
+// import MangerPage from './containers/ManagerPage';
+import HomePage from './containers/HomePage';
 
 // Lazily load routes and code split with webpacck
 // const LazyCounterPage = React.lazy(() =>
@@ -60,10 +61,10 @@ export default function Routes() {
         <PrivateRoute path={routes.LOGIN} redirect={routes.HOME} exact>
           <LoginPage />
         </PrivateRoute> */}
-        <Route path={routes.MANAGER} component={MangerPage} />
+        <Route path={routes.HOME} component={HomePage} />
         <Route
           path={routes.ROOT}
-          render={() => <Redirect to={routes.MANAGER} />}
+          render={() => <Redirect to={routes.HOME} />}
           exact
         />
       </Switch>
