@@ -90,10 +90,7 @@ export default class PrivilegeController {
       const privilegeFilter = { where: { id: req.body.id } };
       Privilege.findOne(privilegeFilter)
         .then((privilegeData) => privilegeData?.destroy())
-        .catch((err) => {
-          console.log(err);
-          dbError(err, res);
-        });
+        .catch((err) => dbError(err, res));
     } else {
       insufficientParameters(res);
     }

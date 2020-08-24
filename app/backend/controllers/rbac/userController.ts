@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { FindOptions } from 'sequelize/types';
 import {
   insufficientParameters,
   dbError,
@@ -142,7 +143,11 @@ export default class UserController {
       req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
     const offset =
       req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
-    const options = { limit, offset };
+    const options: FindOptions<import('../../db/models/user/type').User> = {
+      limit,
+      offset,
+      attributes: { exclude: ['password'] },
+    };
     User.findAll(options)
       .then((usersData) => successResponse('users retrieved', usersData, res))
       .catch((err) => failureResponse('couldnt retrieve users', err, res));
