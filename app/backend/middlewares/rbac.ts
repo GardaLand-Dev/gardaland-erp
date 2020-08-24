@@ -10,6 +10,7 @@
 // TODO: change privileges name to scope
 
 import { Response, NextFunction, Request } from 'express';
+import { Op } from 'sequelize';
 import AsyncLock from 'async-lock';
 import {
   Operation,
@@ -30,7 +31,34 @@ export type RBACInitConf = {
 };
 
 const privilegeValidator = new RegExp('((\\w)+\\/(\\w)+)+:\\w+');
-
+const privsToResOp = (
+  privs: Array<string | undefined>
+): {
+  rsrs: { [index: string]: string };
+  oprs: { [index: string]: string };
+  privs: { [index: string]: { r: string; o: string; id: string } };
+} => {
+  const rsrs: { [index: string]: string } = {};
+  const oprs: { [index: string]: string } = {};
+  // const newprivs: Array<{ r: string; o: string; id: string }> = [];
+  const newprivs: {
+    [index: string]: { r: string; o: string; id: string };
+  } = {};
+  privs.forEach((priv) => {
+    if (priv && privilegeValidator.test(priv)) {
+      if (!rsrs[priv.toLowerCase().split(':')[0]])
+        rsrs[priv.toLowerCase().split(':')[0]] = '';
+      if (!oprs[priv.toLowerCase().split(':')[1]])
+        oprs[priv.toLowerCase().split(':')[1]] = '';
+      newprivs[priv.toLowerCase()] = {
+        r: priv.toLowerCase().split(':')[0],
+        o: priv.toLowerCase().split(':')[1],
+        id: '',
+      };
+    }
+  });
+  return { rsrs, oprs, privs: newprivs };
+};
 /**
  *  TODO: either a constant or get from the DB
  */
@@ -190,7 +218,8 @@ export const createPrivilegeByIds = async (
   });
 };
 
-export const rbacInit = async (
+export const rbacInit2 = async (
+  // FIXME: this function is inificient
   dbInitiator = dbInit,
   initConf = defaultInitConf
 ) => {
@@ -281,6 +310,97 @@ export const rbacInit = async (
   // });
 };
 
+export const rbacInit = async (
+  dbInitiator = dbInit,
+  initConf = defaultInitConf
+) => {
+  await dbInitiator();
+  console.log('db initiated');
+
+  initConf.roles.forEach(async (role) => {
+    try {
+      const [rl] = await Role.findOrCreate({
+        where: { name: role.name },
+        defaults: { name: role.name },
+      });
+      const privDict = privsToResOp(role.privileges);
+      // get existing
+      const xrsrs = await Resource.findAll({
+        where: { name: { [Op.in]: Object.keys(privDict.rsrs) } },
+      });
+      xrsrs.forEach((r) => {
+        privDict.rsrs[r.name] = r.id;
+      });
+      const xoprs = await Operation.findAll({
+        where: { name: { [Op.in]: Object.keys(privDict.oprs) } },
+      });
+      xoprs.forEach((o) => {
+        privDict.oprs[o.name] = o.id;
+      });
+      // create nonexisting
+      const nrsrs = await Resource.bulkCreate(
+        Object.entries(privDict.rsrs)
+          .filter((r) => r[1].length === 0)
+          .map((r) => ({ name: r[0] }))
+      );
+      nrsrs.forEach((r) => {
+        privDict.rsrs[r.name] = r.id;
+      });
+      const noprs = await Operation.bulkCreate(
+        Object.entries(privDict.oprs)
+          .filter((o) => o[1].length === 0)
+          .map((o) => ({ name: o[0] }))
+      );
+      noprs.forEach((o) => {
+        privDict.oprs[o.name] = o.id;
+      });
+      // get existing privs
+      const oprivs = await Privilege.findAll({
+        where: { name: { [Op.in]: Object.keys(privDict.privs) } },
+      });
+
+      oprivs.forEach((p) => {
+        privDict.privs[p.name].id = p.id;
+      });
+
+      // create new privs
+      const nprivs = await Privilege.bulkCreate(
+        Object.entries(privDict.privs)
+          .filter((p) => p[1].id.length === 0)
+          .map((p) => ({
+            name: p[0],
+            resourceId: privDict.rsrs[p[1].r],
+            operationId: privDict.oprs[p[1].o],
+          }))
+      );
+
+      nprivs.forEach((p) => {
+        privDict.privs[p.name].id = p.id;
+      });
+      await rl.addPrivileges(
+        Object.entries(privDict.privs).map((p) => p[1].id)
+      );
+
+      await User.findOrCreate({
+        where: { userName: 'ADMIN' },
+        defaults: {
+          userName: 'ADMIN',
+          password: 'ADMIN',
+        },
+      })
+        .then(async (userData) => {
+          if (!(await userData[0].hasRole(rl))) {
+            await userData[0].addRole(rl);
+          }
+          return userData[0].save();
+        })
+        .catch((err) => console.log('cant create user or find', err));
+    } catch (err) {
+      console.log('coudnt initialize rbac role', err);
+    }
+    console.timeLog('rbac');
+  });
+};
 // export rbacInit;
 type Options = {
   checkAllScopes?: boolean;
