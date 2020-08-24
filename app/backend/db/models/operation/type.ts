@@ -1,6 +1,5 @@
 /* eslint-disable max-classes-per-file */
 import {
-  BuildOptions,
   Model,
   Optional,
   HasManyGetAssociationsMixin,
@@ -14,14 +13,14 @@ import {
 import { Privilege } from '../privilege/type';
 
 export interface OperationAttributes {
-  id: number;
+  id: string;
   name: string;
 }
 export type OperationCreationAttributes = Optional<OperationAttributes, 'id'>;
 export class Operation
   extends Model<OperationAttributes, OperationCreationAttributes>
   implements OperationAttributes {
-  public id!: number;
+  public id!: string;
 
   public name!: string;
 
@@ -34,9 +33,9 @@ export class Operation
   //  Operation-Privilege
   public getPrivileges!: HasManyGetAssociationsMixin<Privilege>;
 
-  public addPrivilege!: HasManyAddAssociationMixin<Privilege, number>;
+  public addPrivilege!: HasManyAddAssociationMixin<Privilege, string>;
 
-  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, number>;
+  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, string>;
 
   public countPrivilege!: HasManyCountAssociationsMixin;
 

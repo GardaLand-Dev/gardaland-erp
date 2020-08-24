@@ -10,7 +10,7 @@ export default function RoleFactory(sequelize: Sequelize): ModelCtor<Role> {
       allowNull: false,
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50),
       unique: true,
       allowNull: false,
     },

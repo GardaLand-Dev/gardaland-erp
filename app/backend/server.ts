@@ -2,12 +2,13 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { dbInit } from './db/models';
 import authCheck, { notAuthHandler } from './middlewares/authCheck';
-import rbacInit from './middlewares/rbac';
+import { rbacInit } from './middlewares/rbac';
 
 import TestRoutes from './routes/test_route';
 import CommonRoutes from './routes/common_routes';
 import RBACRoutes from './routes/rbac_routes';
 import LoginRoute from './routes/login_route';
+import ProductionRoutes from './routes/production_routes';
 
 class Server {
   public app: express.Application;
@@ -18,6 +19,7 @@ class Server {
 
   constructor() {
     // init
+    console.time('rbac');
     rbacInit(dbInit);
     process.env.PRIVATE_KEY = 'yasser9999';
     this.test_routes = new TestRoutes();
@@ -29,11 +31,16 @@ class Server {
   private config(): void {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use((req, _res, next) => {
+      console.log(`${req.method}: ${req.path} body is `, req.body);
+      next();
+    }); // for debuging
     this.app.use(authCheck);
     this.app.use(notAuthHandler);
     this.test_routes.route(this.app);
     LoginRoute.route(this.app);
     RBACRoutes.route(this.app);
+    ProductionRoutes.route(this.app);
     // this.common_routes.route(this.app);
   }
 }

@@ -10,38 +10,24 @@ import {
   Association,
   // BuildOptions,
   HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { Role } from '../role/type';
 
 export interface UserAttributes {
-  id: number;
+  id: string;
   userName: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
 }
-export type UserCreationAttributes = Optional<
-  UserAttributes,
-  'id' | 'email' | 'phone'
->;
+export type UserCreationAttributes = Optional<UserAttributes, 'id'>;
 export class User extends Model<UserAttributes, UserCreationAttributes>
   implements UserCreationAttributes {
-  public id!: number;
+  public id!: string;
 
   public userName!: string;
 
   public password!: string;
-
-  public firstName!: string;
-
-  public lastName!: string;
-
-  public email: string | undefined;
-
-  public phone: string | undefined;
 
   //  timestamps
   public createdAt!: Date;
@@ -51,11 +37,13 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
   //  model association methods
   public getRoles!: HasManyGetAssociationsMixin<Role>;
 
-  public addRole!: HasManyAddAssociationMixin<Role, number>;
+  public addRole!: HasManyAddAssociationMixin<Role, string>;
 
-  public addRoles!: HasManyAddAssociationsMixin<Role, number>;
+  public addRoles!: HasManyAddAssociationsMixin<Role, string>;
 
-  public hasRole!: HasManyHasAssociationMixin<Role, number>;
+  public removeRole!: HasManyRemoveAssociationMixin<Role, string>;
+
+  public hasRole!: HasManyHasAssociationMixin<Role, string>;
 
   public countRoles!: HasManyCountAssociationsMixin;
 

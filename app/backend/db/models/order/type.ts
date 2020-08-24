@@ -1,0 +1,68 @@
+/* eslint-disable max-classes-per-file */
+import {
+  Model,
+  Optional,
+  HasManyGetAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  HasManyRemoveAssociationMixin,
+  Association,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+} from 'sequelize';
+import { OrderProduct } from '../orderProducts/type';
+import { User } from '../user/type';
+
+export interface OrderAttributes {
+  id: string;
+  num: number;
+  modified: boolean;
+  canceled: boolean;
+}
+export type OrderCreationAttributes = Optional<
+  OrderAttributes,
+  'id' | 'canceled' | 'modified'
+>;
+export class Order extends Model<OrderAttributes, OrderCreationAttributes>
+  implements OrderAttributes {
+  public id!: string;
+
+  public num!: number;
+
+  public modified!: boolean;
+
+  public canceled!: boolean;
+
+  // timestamps
+  public createdAt!: Date;
+
+  public updatedAt!: Date;
+
+  // MODEL ASSOCIATION METHODS
+  // OrderProduct-Order
+  public getOrderPoducts!: HasManyGetAssociationsMixin<OrderProduct>;
+
+  public createOrderProduct!: HasManyCreateAssociationMixin<OrderProduct>;
+
+  public removeOrderProduct!: HasManyRemoveAssociationMixin<
+    OrderProduct,
+    string
+  >;
+
+  public countOrderProducts!: HasManyCountAssociationsMixin;
+
+  // User-OrderProduct
+  public getUser!: BelongsToGetAssociationMixin<User>;
+
+  public setUser!: BelongsToSetAssociationMixin<User, string>;
+
+  // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly orderProducts?: OrderProduct[];
+
+  public readonly user?: User;
+
+  public static assotations: {
+    orderProducts: Association<OrderProduct, Order>;
+    user: Association<User, Order>;
+  };
+}

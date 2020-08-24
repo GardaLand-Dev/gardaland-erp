@@ -9,6 +9,7 @@ import {
   HasManyCreateAssociationMixin,
   Association,
   HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { User } from '../user/type';
@@ -17,14 +18,14 @@ import { User } from '../user/type';
 import { Privilege } from '../privilege/type';
 
 export interface RoleAttributes {
-  id: number;
+  id: string;
   name: string;
 }
 export type RoleCreationAttributes = Optional<RoleAttributes, 'id'>;
 
 export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   implements RoleCreationAttributes {
-  public id!: number;
+  public id!: string;
 
   public name!: string;
 
@@ -37,9 +38,9 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   //  Role-User
   public getUsers!: HasManyGetAssociationsMixin<User>;
 
-  public addUser!: HasManyAddAssociationMixin<User, number>;
+  public addUser!: HasManyAddAssociationMixin<User, string>;
 
-  public hasUser!: HasManyHasAssociationMixin<User, number>;
+  public hasUser!: HasManyHasAssociationMixin<User, string>;
 
   public countUser!: HasManyCountAssociationsMixin;
 
@@ -48,11 +49,13 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
   //  Role-Privilege
   public getPrivileges!: HasManyGetAssociationsMixin<Privilege>;
 
-  public addPrivilege!: HasManyAddAssociationMixin<Privilege, number>;
+  public addPrivilege!: HasManyAddAssociationMixin<Privilege, string>;
 
-  public addPrivileges!: HasManyAddAssociationsMixin<Privilege, number>;
+  public addPrivileges!: HasManyAddAssociationsMixin<Privilege, string>;
 
-  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, number>;
+  public removePrivilege!: HasManyRemoveAssociationMixin<Privilege, string>;
+
+  public hasPrivilege!: HasManyHasAssociationMixin<Privilege, string>;
 
   public countPrivilege!: HasManyCountAssociationsMixin;
 
@@ -63,7 +66,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes>
 
   public readonly privileges?: Privilege[];
 
-  public static assotations: {
+  public static associations: {
     users: Association<Role, User>;
     privileges: Association<Role, Privilege>;
   };

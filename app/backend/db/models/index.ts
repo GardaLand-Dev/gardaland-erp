@@ -1,9 +1,25 @@
 import { Sequelize } from 'sequelize';
+import path from 'path';
 import UserFactory from './user/model';
 import RoleFactory from './role/model';
 import PrivilegeFactory from './privilege/model';
 import OperationFactory from './operation/model';
 import ResourceFactory from './resource/model';
+import ProductFactory from './product/model';
+import FamilyFactory from './family/model';
+import StationFactory from './station/model';
+import SupplimentFactory from './suppliment/model';
+import StockableFactory from './stockable/model';
+import SupplyFactory from './supply/model';
+import SupplierFactory from './supplier/model';
+import EmployeeFactory from './employee/model';
+import TitleFactory from './title/model';
+import SalaryFactory from './salary/model';
+import PayrollFactory from './payroll/model';
+import AttendanceFactory from './attendance/model';
+import OrderFactory from './order/model';
+import OrderProductFactory from './orderProducts/model';
+import ProductStockableFactory from './productStockables/model';
 
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
@@ -11,6 +27,7 @@ import ResourceFactory from './resource/model';
  * then itialize with a Dev User.
  * FIXME: multiple validation errors at initialisation
  * */
+export const DEFAULT_LIMIT = 10;
 
 const dbConfig = (() => {
   const sequilze = new Sequelize(
@@ -20,7 +37,7 @@ const dbConfig = (() => {
     {
       dialect: 'sqlite',
       dialectModulePath: '@journeyapps/sqlcipher',
-      storage: './db.sqlite',
+      storage: 'db.sqlite',
       logging: () => {},
     }
   );
@@ -45,18 +62,39 @@ export const Resource = ResourceFactory(dbConfig);
 export const Privilege = PrivilegeFactory(dbConfig);
 export const Role = RoleFactory(dbConfig);
 export const User = UserFactory(dbConfig);
+/* PRODUCTION */
+/** Statics */
+export const Product = ProductFactory(dbConfig);
+export const Family = FamilyFactory(dbConfig);
+export const Station = StationFactory(dbConfig);
+export const Suppliment = SupplimentFactory(dbConfig);
+/** Inventory */
+export const Stockable = StockableFactory(dbConfig);
+export const Supply = SupplyFactory(dbConfig);
+export const Supplier = SupplierFactory(dbConfig);
+export const ProductStockable = ProductStockableFactory(dbConfig);
+/** Humain Resources */
+export const Employee = EmployeeFactory(dbConfig);
+export const Title = TitleFactory(dbConfig);
+export const Salary = SalaryFactory(dbConfig);
+export const Payroll = PayrollFactory(dbConfig);
+export const Attendance = AttendanceFactory(dbConfig);
+/** Orders */
+export const Order = OrderFactory(dbConfig);
+export const OrderProduct = OrderProductFactory(dbConfig);
+
 export const dbInit = async () => {
   /* RBAC - RELATIONS */
   /** role-user */
-  User.belongsToMany(Role, { through: 'User_Role' });
-  Role.belongsToMany(User, { through: 'User_Role', onDelete: 'RESTRICT' });
+  User.belongsToMany(Role, { through: 'user_roles' });
+  Role.belongsToMany(User, { through: 'user_roles', onDelete: 'RESTRICT' });
   /** role-privilege */
   Role.belongsToMany(Privilege, {
-    through: 'Role_Privilege',
+    through: 'role_privileges',
     onDelete: 'CASCADE',
   });
   Privilege.belongsToMany(Role, {
-    through: 'Role_Privilege',
+    through: 'role_privilege',
     onDelete: 'RESTRICT',
   });
   /** privilege-resource */
@@ -75,6 +113,83 @@ export const dbInit = async () => {
     },
     onDelete: 'RESTRICT',
   });
+  /** resource-operation */
+  // Resource.belongsToMany(Operation, { through: Privilege });
+  // Operation.belongsToMany(Resource, { through: Privilege });
+
+  /* PRODUCTION - RELATIONS */
+  /*  STATICS */
+  /**  product-family */
+  Product.belongsTo(Family);
+  Family.hasMany(Product);
+  /**  family-station */
+  Family.belongsTo(Station);
+  Station.hasMany(Family);
+  /** INVENTORY */
+  /**  supplier-supply */
+  Supply.belongsTo(Supplier);
+  Supplier.hasMany(Supply);
+  /**  stockable-supply */
+  Supply.belongsTo(Stockable);
+  Stockable.hasMany(Supply);
+  /**  stockable-supplier */
+  Stockable.belongsToMany(Supplier, { through: Supply });
+  Supplier.belongsToMany(Stockable, { through: Supply });
+  /** HR */
+  /**  employee-attendance  */
+  Attendance.belongsTo(Employee);
+  Employee.hasMany(Attendance);
+  /**  employee-payroll  */
+  Payroll.belongsTo(Employee);
+  Employee.hasMany(Payroll);
+  /**  employee-salary  */
+  Salary.belongsTo(Employee);
+  Employee.hasMany(Salary);
+  /**  employee-title  */
+  Title.belongsTo(Employee);
+  Employee.hasMany(Title);
+  /** ORDERS */
+  /**  order-orderProduct */
+  OrderProduct.belongsTo(Order);
+  Order.hasMany(OrderProduct);
+
+  /** STATIC-INVENTORY RELATIONS */
+  /**  product-stockable */
+  Product.belongsToMany(Stockable, { through: ProductStockable });
+  Stockable.belongsToMany(Product, { through: ProductStockable });
+  /**  stockable-suppliment */
+  Suppliment.belongsTo(Stockable);
+  Stockable.hasMany(Suppliment);
+  /** STATIC-ORDER RELATIONS */
+  /**  product-orderProduct */
+  OrderProduct.belongsTo(Product);
+  Product.hasMany(OrderProduct);
+  /**  OrderProduct-suppliment */
+  Suppliment.belongsToMany(OrderProduct, {
+    through: 'orderProduct_suppliments',
+  });
+  OrderProduct.belongsToMany(Suppliment, {
+    through: 'orderProduct_suppliments',
+  });
+  /** PRODUCTION-RBAC RELATIONS */
+  /**  user-supply */
+  Supply.belongsTo(User);
+  User.hasMany(Supply, { foreignKey: 'createdBy', foreignKeyConstraint: true });
+  /**  user-employee */
+  // Employee.hasOne(User, { foreignKey: { allowNull: true } });
+  User.belongsTo(Employee);
+  /**  user-payroll */
+  Payroll.belongsTo(User);
+  User.hasMany(Payroll, {
+    foreignKey: 'createdBy',
+    foreignKeyConstraint: true,
+  });
+  /**  user-order */
+  Order.belongsTo(User, {
+    foreignKey: 'createdBy',
+    foreignKeyConstraint: true,
+  });
+  User.hasMany(Order);
 
   /* SYNCING */
   await dbConfig

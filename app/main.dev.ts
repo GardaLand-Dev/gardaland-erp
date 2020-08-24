@@ -24,7 +24,6 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -57,12 +56,12 @@ const createWindow = async () => {
   ) {
     await installExtensions();
   }
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
     webPreferences:
+      // TODO: this needs to be uncommented when depoloying
       // (process.env.NODE_ENV === 'development' ||
       //   process.env.E2E_BUILD === 'true') &&
       // process.env.ERB_SECURE !== 'true'

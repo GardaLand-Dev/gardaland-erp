@@ -10,10 +10,7 @@
 // TODO: change privileges name to scope
 
 import { Response, NextFunction, Request } from 'express';
-// import { OperationCreationAttributes } from '../db/models/operation/type';
-// import { ResourceCreationAttributes } from '../db/models/Resource/type';
-// import { PrivilegeCreationAttributes } from '../db/models/privilege/type';
-// import { RoleCreationAttributes } from '../db/models/role/type';
+import AsyncLock from 'async-lock';
 import {
   Operation,
   Resource,
@@ -46,6 +43,7 @@ const defaultInitConf: RBACInitConf = {
         'rbac/resource:create',
         'rbac/resource:update',
         'rbac/resource:delete',
+        'rbac/resources:view',
         'rbac/operation:view',
         'rbac/operation:create',
         'rbac/operation:update',
@@ -54,18 +52,150 @@ const defaultInitConf: RBACInitConf = {
         'rbac/role:create',
         'rbac/role:update',
         'rbac/role:delete',
+        'rbac/roles:view',
         'rbac/user:view',
         'rbac/user:create',
         'rbac/user:update',
         'rbac/user:delete',
+        'rbac/users:view',
+        'rbac/roleuser:view',
+        'rbac/roleuser:create',
+        'rbac/roleuser:delete',
+        //
+        'prod/suppliment:view',
+        'prod/suppliment:create',
+        'prod/suppliment:update',
+        'prod/suppliment:delete',
+        'prod/suppliments:view',
+        'prod/product:view',
+        'prod/product:create',
+        'prod/product:update',
+        'prod/product:delete',
+        'prod/products:view',
+        'prod/family:view',
+        'prod/family:create',
+        'prod/family:update',
+        'prod/family:delete',
+        'prod/families:view',
+        'prod/station:view',
+        'prod/station:create',
+        'prod/station:update',
+        'prod/station:delete',
+        'prod/stations:view',
+        //
+        'inventory/stockable:view',
+        'inventory/stockable:create',
+        'inventory/stockable:update',
+        'inventory/stockable:delete',
+        'inventory/stockables:view',
+        'inventory/supplier:view',
+        'inventory/supplier:create',
+        'inventory/supplier:update',
+        'inventory/supplier:delete',
+        'inventory/suppliers:view',
+        'inventory/supply:view',
+        'inventory/supply:create',
+        'inventory/supply:update',
+        'inventory/supply:delete',
+        'inventory/supplies:view',
+        //
+        'hr/employee:view',
+        'hr/employee:create',
+        'hr/employee:update',
+        'hr/employee:delete',
+        'hr/employees:view',
+        'hr/attendance:view',
+        'hr/attendance:create',
+        'hr/attendance:update',
+        'hr/attendance:delete',
+        'hr/attendances:view',
+        'hr/title:view',
+        'hr/title:create',
+        'hr/title:update',
+        'hr/title:delete',
+        'hr/titles:view',
+        'hr/salary:view',
+        'hr/salary:create',
+        'hr/salary:update',
+        'hr/salary:delete',
+        'hr/salaries:view',
+        'hr/payroll:view',
+        'hr/payroll:create',
+        'hr/payroll:update',
+        'hr/payroll:delete',
+        'hr/payrolls:view',
+        //
+        'orders/order:view',
+        'orders/order:create',
+        'orders/order:update',
+        'orders/order:delete',
+        'orders/orders:view',
+        'orders/orderproduct:view',
+        'orders/orderproduct:create',
+        'orders/orderproduct:update',
+        'orders/orderproduct:delete',
+        'orders/orderproducts:view',
       ],
     },
   ],
 };
+export const createPrivilege = async (privilegeName: string) => {
+  if (!privilegeName) throw new Error('privilege name cant be null');
+  if (privilegeValidator.test(privilegeName))
+    throw new Error(
+      'Wrong privilege format. Should be "feature/resource:operation"'
+    );
+  const [rs] = await Resource.findOrBuild({
+    where: { name: privilegeName?.split(':')[0] },
+    defaults: { name: privilegeName?.split(':')[0] },
+  });
 
-const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
+  // console.log('logging resource: ', isc, rs.name);
+  const [op] = await Operation.findOrBuild({
+    where: { name: privilegeName?.split(':')[1] },
+    defaults: { name: privilegeName?.split(':')[1] },
+  });
+
+  return rs
+    .save()
+    .then(() => op.save())
+    .then(() =>
+      Privilege.findOrCreate({
+        where: { name: privilegeName },
+        defaults: {
+          name: privilegeName,
+          resourceId: rs.id,
+          operationId: op.id,
+        },
+      }).then((privData) => privData[0])
+    );
+};
+
+export const createPrivilegeByIds = async (
+  resourceId: string,
+  operationId: string
+): Promise<import('../db/models/privilege/type').Privilege> => {
+  if (!resourceId || !operationId) throw new Error('Ids cant be null');
+
+  const rs = await Resource.findByPk(resourceId);
+  const op = await Operation.findByPk(operationId);
+  if (!rs || !op) throw new Error('couldnt find resourceid or operationid');
+
+  return Privilege.findOrCreate({
+    where: { operationId, resourceId },
+    defaults: { resourceId, operationId, name: `${rs.name}:${op.name}` },
+  }).then((priv): import('../db/models/privilege/type').Privilege => {
+    if (!priv[1]) throw new Error('Privilege already exists');
+    return priv[0];
+  });
+};
+
+export const rbacInit = async (
+  dbInitiator = dbInit,
+  initConf = defaultInitConf
+) => {
   await dbInitiator();
-  console.log('initiated');
+  console.log('db initiated');
   /**
    * deconstracting initConf to get operations, resources, privileges and roles
    */
@@ -74,57 +204,63 @@ const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
    * operations and resources and privs
    */
   initConf.roles.forEach(async (role) => {
-    const [rl] = await Role.findOrBuild({
+    const [rl] = await Role.findOrCreate({
       where: { name: role.name },
       defaults: { name: role.name },
     });
+    const lock = new AsyncLock();
+
     role.privileges.forEach(async (priv) => {
-      if (priv && privilegeValidator.test(priv)) {
-        const [rs] = await Resource.findOrBuild({
-          where: { name: priv?.split(':')[0] },
-          defaults: { name: priv?.split(':')[0] },
-        });
-        // console.log('logging resource: ', isc, rs.name);
-        const [op] = await Operation.findOrBuild({
-          where: { name: priv?.split(':')[1] },
-          defaults: { name: priv?.split(':')[1] },
-        });
-        const [prv] = await Privilege.findOrBuild({
-          where: { name: priv },
-          defaults: { name: priv },
-        });
-        rs.save()
-          .then(() => op.save())
-          .then(() => {
-            prv.setOperation(op);
-            prv.setResource(rs);
-            return prv.save();
-          })
-          .then(() => {
-            rl.addPrivilege(prv);
-            return rl.save();
-          })
-          .catch((err) => console.log(err));
-      }
-    });
-    await rl.save();
-    /* DEFAULT USER */
-    await User.findOrCreate({
-      where: { userName: 'ADMIN' },
-      defaults: {
-        userName: 'ADMIN',
-        firstName: 'ADMIN',
-        lastName: 'ADMIN',
-        password: 'ADMIN',
-      },
-    })
-      .then(async (userData) => {
-        if (!(await userData[0].hasRole(rl))) {
-          await userData[0].addRole(rl);
+      await lock.acquire('role-privs', async () => {
+        if (priv && privilegeValidator.test(priv)) {
+          const [rs] = await Resource.findOrBuild({
+            where: { name: priv?.split(':')[0] },
+            defaults: { name: priv?.split(':')[0] },
+          });
+
+          // console.log('logging resource: ', isc, rs.name);
+          const [op] = await Operation.findOrBuild({
+            where: { name: priv?.split(':')[1] },
+            defaults: { name: priv?.split(':')[1] },
+          });
+
+          await rs
+            .save()
+            .then(() => op.save())
+            .then(() =>
+              Privilege.findOrCreate({
+                where: { name: priv },
+                defaults: { name: priv, resourceId: rs.id, operationId: op.id },
+              })
+            )
+            .then(([prv]) => rl.addPrivilege(prv))
+            // .then(() => rl.save())
+            .catch((err) =>
+              console.log('cant create one of [Resource, Privlege, Role]', err)
+            );
         }
-        return userData[0].save();
+      });
+    });
+
+    await lock.acquire('role-privs', async () => {
+      await rl.save();
+      /* DEFAULT USER */
+      await User.findOrCreate({
+        where: { userName: 'ADMIN' },
+        defaults: {
+          userName: 'ADMIN',
+          password: 'ADMIN',
+        },
       })
-      .catch((err) => console.log(err));
+        .then(async (userData) => {
+          if (!(await userData[0].hasRole(rl))) {
+            await userData[0].addRole(rl);
+          }
+          return userData[0].save();
+        })
+        .catch((err) => console.log('cant create user or find', err));
+    });
+    console.timeLog('rbac');
   });
 
   /**
@@ -145,7 +281,7 @@ const rbacInit = async (dbInitiator = dbInit, initConf = defaultInitConf) => {
   // });
 };
 
-export default rbacInit;
+// export rbacInit;
 type Options = {
   checkAllScopes?: boolean;
   failWithError?: boolean;
@@ -153,19 +289,18 @@ type Options = {
 
 // TODO: User isnt a string, figure wat it is and fix it
 export const checkRole = async (
-  user: string,
+  user: any,
   scopes: string[] | string,
   checkAll: boolean
 ): Promise<boolean> => {
   const userprivs = await User.findOne({
-    where: { userName: user },
+    where: { id: user.id },
     include: {
       model: Role,
       include: [Privilege],
     },
   })
     .then((userData) => {
-      console.log(userData);
       if (!userData || !userData.roles)
         throw new Error('Couldnt get user or roles');
       const privilegesData: any = {};
@@ -208,8 +343,11 @@ export const getAuthChecker = (
   return (req: Request, res: Response, next: NextFunction) => {
     const myreq: JwtRequest = req;
     if (!myreq.auth) return unauthorizedRequest(res);
-    return checkRole(myreq.auth.toString(), scopes, checkAllScopes)
-      .then(() => next())
-      .catch((err) => unauthorizedRequest(res));
+    return (
+      checkRole(myreq.auth, scopes, checkAllScopes)
+        // eslint-disable-next-line promise/no-callback-in-promise
+        .then(next)
+        .catch(() => unauthorizedRequest(res))
+    );
   };
 };

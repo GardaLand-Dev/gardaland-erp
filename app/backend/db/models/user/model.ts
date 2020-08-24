@@ -10,27 +10,13 @@ export default function UserFactory(sequelize: Sequelize): ModelCtor<User> {
       allowNull: false,
     },
     userName: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50),
       unique: true,
       allowNull: false,
     },
     password: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50),
       allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-    },
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    phone: {
-      type: DataTypes.STRING,
     },
   });
 }
