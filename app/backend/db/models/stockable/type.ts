@@ -29,7 +29,10 @@ export interface StockableAttributes {
   quantity: number;
   alertQuantity: number;
 }
-export type StockableCreationAttributes = Optional<StockableAttributes, 'id'>;
+export type StockableCreationAttributes = Optional<
+  StockableAttributes,
+  'id' | 'quantity'
+>;
 export class Stockable
   extends Model<StockableAttributes, StockableCreationAttributes>
   implements StockableAttributes {

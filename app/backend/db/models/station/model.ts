@@ -18,6 +18,7 @@ export default function StationFactory(
     },
     printerIp: {
       type: DataTypes.STRING(15),
+      allowNull: false,
     },
   });
 }

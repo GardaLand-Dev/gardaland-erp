@@ -28,6 +28,7 @@ export default function StockableFactory(
     quantity: {
       type: DataTypes.NUMBER.UNSIGNED,
       allowNull: false,
+      defaultValue: 0,
     },
     alertQuantity: {
       type: DataTypes.NUMBER.UNSIGNED,

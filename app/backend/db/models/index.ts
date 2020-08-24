@@ -19,6 +19,7 @@ import PayrollFactory from './payroll/model';
 import AttendanceFactory from './attendance/model';
 import OrderFactory from './order/model';
 import OrderProductFactory from './orderProducts/model';
+import ProductStockableFactory from './productStockables/model';
 
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
@@ -71,6 +72,7 @@ export const Suppliment = SupplimentFactory(dbConfig);
 export const Stockable = StockableFactory(dbConfig);
 export const Supply = SupplyFactory(dbConfig);
 export const Supplier = SupplierFactory(dbConfig);
+export const ProductStockable = ProductStockableFactory(dbConfig);
 /** Humain Resources */
 export const Employee = EmployeeFactory(dbConfig);
 export const Title = TitleFactory(dbConfig);
@@ -153,8 +155,8 @@ export const dbInit = async () => {
 
   /** STATIC-INVENTORY RELATIONS */
   /**  product-stockable */
-  Product.belongsToMany(Stockable, { through: 'product_stockables' });
-  Stockable.belongsToMany(Product, { through: 'product_stockables' });
+  Product.belongsToMany(Stockable, { through: ProductStockable });
+  Stockable.belongsToMany(Product, { through: ProductStockable });
   /**  stockable-suppliment */
   Suppliment.belongsTo(Stockable);
   Stockable.hasMany(Suppliment);

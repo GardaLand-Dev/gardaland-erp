@@ -61,7 +61,7 @@ export class Employee
 
   public removeAttendance!: HasManyRemoveAssociationMixin<Attendance, string>;
 
-  public createAttendance: HasManyCreateAssociationMixin<Attendance>;
+  public createAttendance!: HasManyCreateAssociationMixin<Attendance>;
 
   public countAttendaces!: HasManyCountAssociationsMixin;
 
@@ -74,7 +74,7 @@ export class Employee
 
   public removePayroll!: HasManyRemoveAssociationMixin<Payroll, string>;
 
-  public createPayroll: HasManyCreateAssociationMixin<Payroll>;
+  public createPayroll!: HasManyCreateAssociationMixin<Payroll>;
 
   public countPayroll!: HasManyCountAssociationsMixin;
 
@@ -87,7 +87,7 @@ export class Employee
 
   public removeTitle!: HasManyRemoveAssociationMixin<Title, string>;
 
-  public createTitle: HasManyCreateAssociationMixin<Title>;
+  public createTitle!: HasManyCreateAssociationMixin<Title>;
 
   public countTitles!: HasManyCountAssociationsMixin;
 
@@ -100,7 +100,7 @@ export class Employee
 
   public removeSalary!: HasManyRemoveAssociationMixin<Salary, string>;
 
-  public createSalary: HasManyCreateAssociationMixin<Salary>;
+  public createSalary!: HasManyCreateAssociationMixin<Salary>;
 
   public countSalary!: HasManyCountAssociationsMixin;
 
