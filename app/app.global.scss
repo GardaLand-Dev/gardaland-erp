@@ -2,6 +2,7 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
 $enable-responsive-font-sizes: true;
 $grid-breakpoints: (
   // Extra small screen / phone
@@ -28,6 +29,10 @@ $container-max-widths: (
 @import '~bootstrap/scss/bootstrap.scss';
 
 /*
+* FONTS
+*/
+
+/*
  * extending bootstrap classes
  *
  */
@@ -36,6 +41,7 @@ $container-max-widths: (
 .m-05 {
   margin: ($spacer * 0.125) !important;
 }
+
 .p-025 {
   padding: 0.0625rem;
 }
@@ -52,18 +58,22 @@ $container-max-widths: (
 .of-x-auto {
   overflow-x: auto !important;
 }
+
 // c) backgrounds
 .bg-white-25 {
   background-color: rgba(255, 255, 255, 0.25) !important;
 }
+
 // d) borders
 // d-a) general
 .border-white-25 {
   border-color: rgba(255, 255, 255, 0.25) !important;
 }
+
 .border-white-50 {
   border-color: rgba(255, 255, 255, 0.5) !important;
 }
+
 // d-b) rounded
 .rounded-top-xlg {
   border-top-left-radius: 0.5rem !important;
@@ -88,6 +98,7 @@ $container-max-widths: (
 .rounded-xlg {
   border-radius: 0.5rem !important;
 }
+
 //btns
 .btn {
   &:focus {
@@ -100,14 +111,27 @@ $container-max-widths: (
  * My global custom classes
  *
 */
+
+button {
+  &:active {
+    border-style: solid;
+  }
+  &:focus {
+    outline: none !important;
+  }
+}
+
 html,
 #root {
   height: 100%;
+  font-family: 'Asap', sans-serif;
 }
+
 body {
   margin: 0;
   height: 100%;
 }
+
 .customScrollBar {
   &::-webkit-scrollbar-track {
     // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -117,16 +141,15 @@ body {
   &::-webkit-scrollbar {
     width: 5px;
     z-index: 10;
-
     // background-color: #F5F5F5;
   }
-
   &::-webkit-scrollbar-thumb {
     background-color: rgba($color: #000, $alpha: 0.3);
     z-index: 10;
     // border: 2px solid #c9b9b9;
   }
 }
+
 .customScrollBarLight {
   &::-webkit-scrollbar-track {
     // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -136,33 +159,39 @@ body {
     width: 5px;
     // background-color: #F5F5F5;
   }
-
   &::-webkit-scrollbar-thumb {
     background-color: rgba($color: #fff, $alpha: 0.3);
     // border: 2px solid #c9b9b9;
   }
 }
+
 .theme-gradient {
   color: white;
   background: $theme-gradient;
 }
+
 .theme-gradient-x {
   color: white;
   background: $theme-gradient-x;
 }
+
 .theme-gradient-y {
   color: white;
   background: $theme-gradient-y;
 }
+
+.theme-background {
+  background: $theme-background-color;
+}
+
 //components
 @import './components/article/Article.scss';
 @import './components/login/Login.scss';
 @import './components/sidebar/Sidebar.scss';
 @import './components/sidebar/SideBarButton.scss';
 @import './components/manager/Logo.scss';
-@import './components/manager/features/MenuManagement.scss';
+@import './components/manager/ManagerSidebar.scss';
 // @import './components/cart/Cart.scss';
-
 //containers
 @import './containers/HomePage.scss';
 @import './containers/ManagerPage.scss';

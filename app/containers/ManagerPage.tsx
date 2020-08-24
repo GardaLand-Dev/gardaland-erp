@@ -1,32 +1,44 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import Header from '../components/header/Header';
 import SideBar from '../components/manager/SideBar';
 import routes from '../constants/routes.json';
-import MenuManagement from '../components/manager/features/MenuManagement';
-import StaffManagement from '../components/manager/features/StaffManagement';
+import ProductList from '../components/manager/features/product/ProductList';
+import FamilleList from '../components/manager/features/Famille/FamilleList';
+import VenteList from '../components/manager/features/Vente/VenteList';
+import StockList from '../components/manager/features/Stock/StockList';
 
 export default function MangerPage(): JSX.Element {
   return (
-    <div className="d-flex flex-row w-100 h-100 border border-primary">
-      <div className="h-100 border border-secondary managerSideBar">
+    <div className="d-flex flex-row w-100 h-100 ">
+      <div className="h-100 managerSideBar">
         <SideBar />
       </div>
-      <div className="d-flex flex-column flex-grow-1 h-100 border border-secondary">
+      <div className="d-flex flex-column flex-grow-1 h-100 theme-background">
         <Header />
-        <div className="flex-grow-1 mt-3 mx-3">
+        <div className="flex-grow-1 mt-3 mx-3 ">
           {/* Features */}
           <Route
-            path={`${routes.MANAGER}/MenuManagement`}
-            component={MenuManagement}
+            path={routes.MANAGER.ProductManagement.List}
+            component={ProductList}
           />
           <Route
-            path={`${routes.MANAGER}/StaffManagement`}
-            component={StaffManagement}
+            path={routes.MANAGER.ProductManagement.FamilleList}
+            component={FamilleList}
           />
           <Route
-            path={routes.MANAGER}
-            render={() => <Redirect to={`${routes.MANAGER}/MenuManagement`} />}
+            path={routes.MANAGER.VenteManagement.List}
+            component={VenteList}
+          />
+          <Route
+            path={routes.MANAGER.StockManagement.List}
+            component={StockList}
+          />
+          <Route
+            path={routes.MANAGER.root}
+            render={() => (
+              <Redirect to={routes.MANAGER.ProductManagement.List} />
+            )}
             exact
           />
         </div>
