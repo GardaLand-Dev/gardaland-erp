@@ -12,6 +12,7 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   title: string;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
 export default function SimpleModal({
@@ -19,6 +20,7 @@ export default function SimpleModal({
   visible,
   onClose,
   title,
+  onSubmit,
 }: Props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -30,13 +32,17 @@ export default function SimpleModal({
       aria-labelledby="form-dialog-title"
     >
       <DialogTitle id="form-dialog-title">{title}</DialogTitle>
-      <DialogContent dividers>{children}</DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-        <Button color="primary">Valider</Button>
-      </DialogActions>
+      <form onSubmit={onSubmit}>
+        <DialogContent dividers>{children}</DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} color="primary">
+            Cancel
+          </Button>
+          <Button color="primary" type="submit">
+            Valider
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 }

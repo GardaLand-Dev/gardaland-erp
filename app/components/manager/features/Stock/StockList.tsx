@@ -6,7 +6,6 @@ import {
   Checkbox,
 } from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import { Autocomplete } from '@material-ui/lab';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
 
@@ -62,20 +61,20 @@ const columns = [
     button: true,
   },
 ];
-const unité = [
-  {
-    title: 'kg',
-  },
-  {
-    title: 'g',
-  },
-  {
-    title: 'piece',
-  },
-  {
-    title: 'litre',
-  },
-];
+// const unité = [
+//   {
+//     title: 'kg',
+//   },
+//   {
+//     title: 'g',
+//   },
+//   {
+//     title: 'piece',
+//   },
+//   {
+//     title: 'litre',
+//   },
+// ];
 export default function StockList(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const handleAddClicked = () => {
@@ -93,6 +92,8 @@ export default function StockList(): JSX.Element {
         onClose={() => setModalVisible(false)}
         visible={modalVisible}
         title="Ajouter stock"
+        // eslint-disable-next-line no-console
+        onSubmit={(e) => console.log(e)}
       >
         <TextField
           className="my-3"
@@ -101,14 +102,12 @@ export default function StockList(): JSX.Element {
           label="Nom"
           variant="outlined"
         />
-        <Autocomplete
-          options={unité}
-          getOptionLabel={(option) => option.title}
+        <TextField
+          className="my-3"
           style={{ width: '100%' }}
-          renderInput={(params) => (
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            <TextField {...params} label="unité" variant="outlined" />
-          )}
+          id="outlined-basic"
+          label="unité"
+          variant="outlined"
         />
         <TextField
           className="my-3"

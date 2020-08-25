@@ -4,6 +4,7 @@ import { Autocomplete } from '@material-ui/lab';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
+// import staticService from '../../../../services/statics.service';
 
 const columns = [
   {
@@ -56,8 +57,24 @@ const Emplacement = [
 ];
 export default function FamilleList(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
+  // const [familyParams, setFamilyParams] = useState({});
   const handleAddClicked = () => {
     setModalVisible(true);
+  };
+  // const handleFamilyValue = (e) => {
+  //   // const a = familyParams;
+  //   setFamilyParams(e.target.value);
+  // };
+  // const handleCreate = () => {
+  // staticService
+  //   .createFamily(familyName)
+  //   .then((ok) => console.log('familly added ', ok))
+  //   .catch((err) => console.log(err));
+  // };
+  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // eslint-disable-next-line no-console
+    console.log(e.currentTarget.elements);
   };
   return (
     <div>
@@ -73,11 +90,12 @@ export default function FamilleList(): JSX.Element {
         }}
         visible={modalVisible}
         title="Ajouter Famille"
+        onSubmit={handleCreate}
       >
         <TextField
           className="my-3"
           style={{ width: '100%' }}
-          id="outlined-basic"
+          id="pizza"
           label="Nom de famille"
           variant="outlined"
         />
