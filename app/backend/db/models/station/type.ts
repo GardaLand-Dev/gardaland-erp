@@ -15,7 +15,7 @@ import { Family } from '../family/type';
 export interface StationAttributes {
   id: string;
   name: string;
-  printerIp: string;
+  printer: string;
 }
 export type StationCreationAttributes = Optional<StationAttributes, 'id'>;
 export class Station extends Model<StationAttributes, StationCreationAttributes>
@@ -24,7 +24,7 @@ export class Station extends Model<StationAttributes, StationCreationAttributes>
 
   public name!: string;
 
-  public printerIp!: string;
+  public printer!: string;
 
   // timestamps
   public createdAt!: Date;
