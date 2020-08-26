@@ -18,7 +18,7 @@ export default function Login(): JSX.Element {
 
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
-  const [submitted, setSubmitted] = useState<boolean>();
+  const [submitted, setSubmitted] = useState<number>();
   const [roleSelection, setRoleSelection] = useState<string>();
   const hasManagerRole = useSelector(selecthasManagerRole);
   // const state = useSelector(selectLoginState);
@@ -28,13 +28,14 @@ export default function Login(): JSX.Element {
     // this.setState({ submitted: true });
     // eslint-disable-next-line @typescript-eslint/naming-convention
     if (username && password) {
-      if (hasManagerRole) {
+      if (hasManagerRole && hasManagerRole) {
+        setSubmitted(2);
         if (roleSelection === 'Manager') {
           dispatch(loginAsManager(username, password));
         } else dispatch(loginAsCaissier(username, password));
       } else dispatch(login(username, password));
     }
-    setSubmitted(true);
+    setSubmitted(1);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -81,14 +82,16 @@ export default function Login(): JSX.Element {
             className="btn theme-gradient btn-user btn-block "
           /> */}
           <select
-            className="custom-select mb-3"
+            className={`custom-select mb-3 ${
+              submitted === 2 && !roleSelection ? 'invalid' : ''
+            }`}
             hidden={!hasManagerRole}
             onChange={(e) => {
               setRoleSelection(e.target.value);
             }}
-            placeholder="Login as"
+            defaultValue="Login as"
           >
-            <option selected value="">
+            <option disabled selected value="">
               Login as
             </option>
             <option>Manager</option>

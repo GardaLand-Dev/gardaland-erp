@@ -10,9 +10,9 @@ import { OperationCreationAttributes } from '../../db/models/operation/type';
 
 export default class OperationController {
   public static createOperation(req: Request, res: Response) {
-    if (req.body.operation_name) {
+    if (req.body.operationName) {
       const operationParams: OperationCreationAttributes = {
-        name: req.body.operation_name,
+        name: req.body.operationName,
       };
       Operation.create(operationParams)
         .then((operationData) =>
@@ -25,10 +25,10 @@ export default class OperationController {
   }
 
   public static getOperation(req: Request, res: Response) {
-    if (req.body.id || req.body.operation_name) {
+    if (req.body.id || req.body.operationName) {
       const filter = req.body.id
         ? { id: req.body.id }
-        : { name: req.body.operation_name };
+        : { name: req.body.operationName };
       const operationFilter = { where: filter };
       Operation.findOne(operationFilter)
         .then((operationData) =>
@@ -41,17 +41,17 @@ export default class OperationController {
   }
 
   public static updateOperation(req: Request, res: Response) {
-    if (req.body.id || req.body.operation_name) {
+    if (req.body.id || req.body.operationName) {
       const operationFilter = req.body.id
         ? { where: { id: req.body.id } }
-        : { where: { name: req.body.operation_name } };
+        : { where: { name: req.body.operationName } };
       Operation.findOne(operationFilter)
         .then((operationData) => {
           if (!operationData) throw new Error("couldn't find operation");
           const operationParams: OperationCreationAttributes = {
             id: operationData?.id,
-            name: req.body.operation_name
-              ? req.body.operation_name
+            name: req.body.operationName
+              ? req.body.operationName
               : operationData?.name,
           };
           operationData?.setAttributes(operationParams);

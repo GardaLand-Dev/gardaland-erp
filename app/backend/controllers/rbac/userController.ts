@@ -11,21 +11,21 @@ import { UserCreationAttributes } from '../../db/models/user/type';
 
 export default class UserController {
   public static createUser(req: Request, res: Response) {
-    if (req.body.user_name && req.body.password) {
+    if (req.body.userName && req.body.password) {
       if (
         req.body.roles &&
         req.body.roles.length &&
         req.body.roles.length > 0
       ) {
         const userParams: UserCreationAttributes = {
-          userName: req.body.user_name,
+          userName: req.body.userName,
           password: req.body.password,
         };
         const userData = User.build(userParams);
         userData.addRoles(req.body.roles);
       } else {
         const userParams: UserCreationAttributes = {
-          userName: req.body.user_name,
+          userName: req.body.userName,
           password: req.body.password,
         };
         // const a = UserFactory(dbConfig1);
@@ -42,10 +42,10 @@ export default class UserController {
   }
 
   public static getUser(req: Request, res: Response) {
-    if (req.body.id || req.body.user_name) {
+    if (req.body.id || req.body.userName) {
       const filter = req.body.id
         ? { id: req.body.id }
-        : { userName: req.body.user_name };
+        : { userName: req.body.userName };
       const userFilter = { where: filter };
       // const a = UserFactory(dbConfig1);
       User.findOne(userFilter)
@@ -65,9 +65,7 @@ export default class UserController {
           if (!userData) throw new Error("couldn't recieve userdata");
           const userParams = {
             id: userData.id,
-            userName: req.body.user_name
-              ? req.body.user_name
-              : userData.userName,
+            userName: req.body.userName ? req.body.userName : userData.userName,
             password: req.body.password ? req.body.password : userData.password,
           };
           userData.setAttributes(userParams);
@@ -97,10 +95,10 @@ export default class UserController {
   }
 
   public static async addRoleUser(req: Request, res: Response) {
-    if (req.body.id && (req.body.role_id || req.body.role_name)) {
-      const filter = req.body.role_id
-        ? { id: req.body.role_id }
-        : { name: req.body.role_name };
+    if (req.body.id && (req.body.roleId || req.body.roleName)) {
+      const filter = req.body.roleId
+        ? { id: req.body.roleId }
+        : { name: req.body.roleName };
       const rl = await Role.findOne({ where: filter });
       if (!rl) throw new Error('cant find role');
       const usr = await User.findByPk(req.body.id);
@@ -118,10 +116,10 @@ export default class UserController {
   }
 
   public static async removeRoleUser(req: Request, res: Response) {
-    if (req.body.id && (req.body.role_id || req.body.role_name)) {
-      const filter = req.body.role_id
-        ? { id: req.body.role_id }
-        : { name: req.body.role_name };
+    if (req.body.id && (req.body.roleId || req.body.roleName)) {
+      const filter = req.body.roleId
+        ? { id: req.body.roleId }
+        : { name: req.body.roleName };
       const rl = await Role.findOne({ where: filter });
       if (!rl) throw new Error('cant find role');
       const usr = await User.findByPk(req.body.id);

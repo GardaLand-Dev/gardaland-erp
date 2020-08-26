@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User, Role, Privilege } from '../db/models';
+import { User, Role } from '../db/models';
 import {
   unauthorizedRequest,
   successResponse,
@@ -10,10 +10,10 @@ import {
 export default class LoginController {
   public static login(req: Request, res: Response) {
     // TODO: password should pass by a hasher
-    if (req.body.user_name && req.body.password) {
+    if (req.body.userName && req.body.password) {
       // TODO: userdata should have scopes
       User.findOne({
-        where: { userName: req.body.user_name, password: req.body.password },
+        where: { userName: req.body.userName, password: req.body.password },
         include: {
           model: Role,
           attributes: ['id', 'name'],

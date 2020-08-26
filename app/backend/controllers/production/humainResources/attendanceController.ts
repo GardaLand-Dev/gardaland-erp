@@ -14,14 +14,14 @@
 // export default class AttendanceController {
 //   public static createAttendance(req: Request, res: Response) {
 //     if (
-//       req.body.check_in &&
-//       req.body.day_date &&
-//       typeof req.body.check_in === 'string' &&
-//       typeof req.body.day_date === 'string'
+//       req.body.checkIn &&
+//       req.body.dayDate &&
+//       typeof req.body.checkIn === 'string' &&
+//       typeof req.body.dayDate === 'string'
 //     ) {
 //       const attendanceParams: AttendanceCreationAttributes = {
-//         firstName: (<string>req.body.first_name).normalize().toLowerCase(),
-//         lastName: (<string>req.body.last_name).normalize().toLowerCase(),
+//         firstName: (<string>req.body.firstName).normalize().toLowerCase(),
+//         lastName: (<string>req.body.lastName).normalize().toLowerCase(),
 //         address: (<string>req.body.address)?.normalize().toLowerCase(),
 //         email: (<string>req.body.email)?.normalize().toLowerCase(),
 //         tel: (<string>req.body.tel)?.normalize().toLowerCase(),
@@ -39,15 +39,15 @@
 //   public static getAttendance(req: Request, res: Response) {
 //     if (
 //       (req.body.id && typeof req.body.id === 'string') ||
-//       (req.body.fist_name &&
-//         req.body.last_name &&
-//         typeof req.body.first_name === 'string' &&
-//         typeof req.body.last_name === 'string')
+//       (req.body.fistName &&
+//         req.body.lastName &&
+//         typeof req.body.firstName === 'string' &&
+//         typeof req.body.lastName === 'string')
 //     ) {
 //       const filter = req.body.id
 //         ? { id: req.body.id }
 //         : {
-//             firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+//             firstName: (<string>req.body.firstName).normalize().toLowerCase(),
 //             lastName: (<string>req.body.lastName).normalize().toLowerCase(),
 //           };
 //       const attendanceFilter = { where: filter };
@@ -64,15 +64,15 @@
 //   public static updateAttendance(req: Request, res: Response) {
 //     if (
 //       (req.body.id && typeof req.body.id === 'string') ||
-//       (req.body.fist_name &&
-//         typeof req.body.first_name === 'string' &&
-//         req.body.last_name &&
-//         typeof req.body.last_name === 'string')
+//       (req.body.fistName &&
+//         typeof req.body.firstName === 'string' &&
+//         req.body.lastName &&
+//         typeof req.body.lastName === 'string')
 //     ) {
 //       const filter = req.body.id
 //         ? { id: req.body.id }
 //         : {
-//             firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+//             firstName: (<string>req.body.firstName).normalize().toLowerCase(),
 //             lastName: (<string>req.body.lastName).normalize().toLowerCase(),
 //           };
 //       const attendanceFilter = { where: filter };
@@ -80,11 +80,11 @@
 //         .then((attendanceData) => {
 //           if (!attendanceData) throw new Error("couldn't find attendance");
 //           const attendanceParams: AttendanceCreationAttributes = {
-//             firstName: req.body.first_name
-//               ? (<string>req.body.first_name).normalize().toLowerCase()
+//             firstName: req.body.firstName
+//               ? (<string>req.body.firstName).normalize().toLowerCase()
 //               : attendanceData.firstName,
-//             lastName: req.body.last_name
-//               ? (<string>req.body.last_name).normalize().toLowerCase()
+//             lastName: req.body.lastName
+//               ? (<string>req.body.lastName).normalize().toLowerCase()
 //               : attendanceData.lastName,
 //             email:
 //               req.body.email && typeof req.body.email

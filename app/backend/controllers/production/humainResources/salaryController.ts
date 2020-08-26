@@ -14,14 +14,14 @@ import { DEFAULT_LIMIT } from '../../../db/models';
 export default class SalaryController {
   // public static createSalary(req: Request, res: Response) {
   //   if (
-  //     req.body.first_name &&
-  //     req.body.last_name &&
-  //     typeof req.body.first_name === 'string' &&
-  //     typeof req.body.last_name === 'string'
+  //     req.body.firstName &&
+  //     req.body.lastName &&
+  //     typeof req.body.firstName === 'string' &&
+  //     typeof req.body.lastName === 'string'
   //   ) {
   //     const salaryParams: SalaryCreationAttributes = {
-  //       firstName: (<string>req.body.first_name).normalize().toLowerCase(),
-  //       lastName: (<string>req.body.last_name).normalize().toLowerCase(),
+  //       firstName: (<string>req.body.firstName).normalize().toLowerCase(),
+  //       lastName: (<string>req.body.lastName).normalize().toLowerCase(),
   //       address: (<string>req.body.address)?.normalize().toLowerCase(),
   //       email: (<string>req.body.email)?.normalize().toLowerCase(),
   //       tel: (<string>req.body.tel)?.normalize().toLowerCase(),
@@ -44,7 +44,7 @@ export default class SalaryController {
   //     const filter = req.body.id
   //       ? { id: req.body.id }
   //       : {
-  //           firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+  //           firstName: (<string>req.body.firstName).normalize().toLowerCase(),
   //           lastName: (<string>req.body.lastName).normalize().toLowerCase(),
   //         };
   //     const salaryFilter = { where: filter };
@@ -61,15 +61,15 @@ export default class SalaryController {
   // public static updateSalary(req: Request, res: Response) {
   //   if (
   //     (req.body.id && typeof req.body.id === 'string') ||
-  //     (req.body.fist_name &&
-  //       typeof req.body.first_name === 'string' &&
-  //       req.body.last_name &&
-  //       typeof req.body.last_name === 'string')
+  //     (req.body.fistName &&
+  //       typeof req.body.firstName === 'string' &&
+  //       req.body.lastName &&
+  //       typeof req.body.lastName === 'string')
   //   ) {
   //     const filter = req.body.id
   //       ? { id: req.body.id }
   //       : {
-  //           firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+  //           firstName: (<string>req.body.firstName).normalize().toLowerCase(),
   //           lastName: (<string>req.body.lastName).normalize().toLowerCase(),
   //         };
   //     const salaryFilter = { where: filter };
@@ -77,11 +77,11 @@ export default class SalaryController {
   //       .then((salaryData) => {
   //         if (!salaryData) throw new Error("couldn't find salary");
   //         const salaryParams: SalaryCreationAttributes = {
-  //           firstName: req.body.first_name
-  //             ? (<string>req.body.first_name).normalize().toLowerCase()
+  //           firstName: req.body.firstName
+  //             ? (<string>req.body.firstName).normalize().toLowerCase()
   //             : salaryData.firstName,
-  //           lastName: req.body.last_name
-  //             ? (<string>req.body.last_name).normalize().toLowerCase()
+  //           lastName: req.body.lastName
+  //             ? (<string>req.body.lastName).normalize().toLowerCase()
   //             : salaryData.lastName,
   //           email:
   //             req.body.email && typeof req.body.email

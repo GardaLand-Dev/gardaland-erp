@@ -11,10 +11,10 @@ import { createPrivilege, createPrivilegeByIds } from '../../middlewares/rbac';
 export default class PrivilegeController {
   public static createPrivilege(req: Request, res: Response) {
     if (
-      req.body.privilege_name &&
-      !(req.body.resource_id || req.body.operation_id)
+      req.body.privilegeName &&
+      !(req.body.resourceId || req.body.operationId)
     ) {
-      createPrivilege(req.body.privilege_name)
+      createPrivilege(req.body.privilegeName)
         .then((privData) =>
           successResponse('privilege created successfuly', privData, res)
         )
@@ -22,11 +22,11 @@ export default class PrivilegeController {
           failureResponse('couldnt create privilege', err, res)
         );
     } else if (
-      req.body.resource_id &&
-      req.body.operation_id &&
-      !req.body.privilege_name
+      req.body.resourceId &&
+      req.body.operationId &&
+      !req.body.privilegeName
     ) {
-      createPrivilegeByIds(req.body.resource_id, req.body.operation_id)
+      createPrivilegeByIds(req.body.resourceId, req.body.operationId)
         .then((privData) =>
           successResponse('privilege created successfuly', privData, res)
         )
@@ -39,10 +39,10 @@ export default class PrivilegeController {
   }
 
   public static getPrivilege(req: Request, res: Response) {
-    if (req.body.id || req.body.privilege_name) {
+    if (req.body.id || req.body.privilegeName) {
       const filter = req.body.id
         ? { id: req.body.id }
-        : { name: req.body.privilege_name };
+        : { name: req.body.privilegeName };
       const privilegeFilter = { where: filter };
       Privilege.findOne(privilegeFilter)
         .then((privilegeData) =>
@@ -55,21 +55,21 @@ export default class PrivilegeController {
   }
 
   public static updatePrivilege(req: Request, res: Response) {
-    if (req.body.id || req.body.privilege_name) {
+    if (req.body.id || req.body.privilegeName) {
       const privilegeFilter = req.body.id
         ? { where: { id: req.body.id } }
-        : { where: { name: req.body.privilege_name } };
+        : { where: { name: req.body.privilegeName } };
       Privilege.findOne(privilegeFilter)
         .then(async (privilegeData) => {
           if (!privilegeData) throw new Error("couldn't find privilege");
           privilegeData?.setResource(
-            req.body.resource_id
-              ? req.body.resource_id
+            req.body.resourceId
+              ? req.body.resourceId
               : (await privilegeData.getResource()).id
           );
           privilegeData?.setOperation(
-            req.body.operation_id
-              ? req.body.operation_id
+            req.body.operationId
+              ? req.body.operationId
               : (await privilegeData.getOperation()).id
           );
           // TODO: privilege name should be generated automatically

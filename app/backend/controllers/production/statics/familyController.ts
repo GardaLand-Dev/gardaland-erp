@@ -18,11 +18,8 @@ export default class FamilyController {
       Family.create(familyParams)
         .then((familyData) => {
           return (async () => {
-            if (
-              req.body.station_id &&
-              typeof req.body.station_id === 'string'
-            ) {
-              const st = await Station.findByPk(req.body.station_id);
+            if (req.body.stationId && typeof req.body.stationId === 'string') {
+              const st = await Station.findByPk(req.body.stationId);
               if (!st) throw new Error('coudnt find station');
               await familyData.setStation(st);
             }
@@ -84,11 +81,8 @@ export default class FamilyController {
         })
         .then((familyData) => {
           return (async () => {
-            if (
-              req.body.station_id &&
-              typeof req.body.station_id === 'string'
-            ) {
-              const st = await Station.findByPk(req.body.station_id);
+            if (req.body.stationId && typeof req.body.stationId === 'string') {
+              const st = await Station.findByPk(req.body.stationId);
               if (!st) throw new Error('coudnt find station');
               await familyData.setStation(st);
             }

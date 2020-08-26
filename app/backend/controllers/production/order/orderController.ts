@@ -18,7 +18,7 @@ import dbConfig, {
 export default class OrderController {
   public static async createOrder(req: Request, res: Response) {
     // eslint-disable-next-line no-constant-condition
-    if (req.body.order_products && req.body.num) {
+    if (req.body.orderProducts && req.body.num) {
       const t = await dbConfig.transaction();
       try {
         const orderParams: OrderCreationAttributes = {
@@ -44,7 +44,7 @@ export default class OrderController {
 
         const opDict: { [opQtHash: string]: string[] } = {};
         const ops = await OrderProduct.bulkCreate(
-          req.body.order_products.map(
+          req.body.orderProducts.map(
             (op: { product_id: string; quantity: number }) => ({
               orderId: o.id,
               productId: op.product_id,
@@ -63,7 +63,7 @@ export default class OrderController {
           else opDict[hash] = [op.id];
         });
         // create OrderProductSuppliment
-        const opspsIns = req.body.order_products.reduce(
+        const opspsIns = req.body.orderProducts.reduce(
           (
             acc: {
               orderProductId: string;
@@ -141,15 +141,15 @@ export default class OrderController {
   // public static updateOrder(req: Request, res: Response) {
   //   if (
   //     (req.body.id && typeof req.body.id === 'string') ||
-  //     (req.body.fist_name &&
-  //       typeof req.body.first_name === 'string' &&
-  //       req.body.last_name &&
-  //       typeof req.body.last_name === 'string')
+  //     (req.body.fistName &&
+  //       typeof req.body.firstName === 'string' &&
+  //       req.body.lastName &&
+  //       typeof req.body.lastName === 'string')
   //   ) {
   //     const filter = req.body.id
   //       ? { id: req.body.id }
   //       : {
-  //           firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+  //           firstName: (<string>req.body.firstName).normalize().toLowerCase(),
   //           lastName: (<string>req.body.lastName).normalize().toLowerCase(),
   //         };
   //     const orderFilter = { where: filter };
@@ -157,11 +157,11 @@ export default class OrderController {
   //       .then((orderData) => {
   //         if (!orderData) throw new Error("couldn't find order");
   //         const orderParams: OrderCreationAttributes = {
-  //           firstName: req.body.first_name
-  //             ? (<string>req.body.first_name).normalize().toLowerCase()
+  //           firstName: req.body.firstName
+  //             ? (<string>req.body.firstName).normalize().toLowerCase()
   //             : orderData.firstName,
-  //           lastName: req.body.last_name
-  //             ? (<string>req.body.last_name).normalize().toLowerCase()
+  //           lastName: req.body.lastName
+  //             ? (<string>req.body.lastName).normalize().toLowerCase()
   //             : orderData.lastName,
   //           email:
   //             req.body.email && typeof req.body.email

@@ -10,13 +10,13 @@ import { RoleCreationAttributes } from '../../db/models/role/type';
 
 export default class RoleController {
   public static createRole(req: Request, res: Response) {
-    if (req.body.role_name) {
+    if (req.body.roleName) {
       if (
         req.body.privileges &&
         req.body.privileges.length &&
         req.body.privileges.length > 0
       ) {
-        const roleParams: RoleCreationAttributes = { name: req.body.role_name };
+        const roleParams: RoleCreationAttributes = { name: req.body.roleName };
         const roleData = Role.build(roleParams);
         roleData.addPrivileges(req.body.privileges);
         roleData
@@ -24,7 +24,7 @@ export default class RoleController {
           .then((rd) => successResponse('create role successfull', rd, res))
           .catch((err) => dbError(err, res));
       } else {
-        const roleParams: RoleCreationAttributes = { name: req.body.role_name };
+        const roleParams: RoleCreationAttributes = { name: req.body.roleName };
         Role.create(roleParams)
           .then((roleData) =>
             successResponse('create role successfull', roleData, res)
@@ -37,10 +37,10 @@ export default class RoleController {
   }
 
   public static getRole(req: Request, res: Response) {
-    if (req.body.id || req.body.role_name) {
+    if (req.body.id || req.body.roleName) {
       const filter = req.body.id
         ? { id: req.body.id }
-        : { name: req.body.role_name };
+        : { name: req.body.roleName };
       const roleFilter = { where: filter };
       Role.findOne(roleFilter)
         .then((roleData) =>
@@ -53,16 +53,16 @@ export default class RoleController {
   }
 
   public static updateRole(req: Request, res: Response) {
-    if (req.body.id || req.body.role_name) {
+    if (req.body.id || req.body.roleName) {
       const roleFilter = req.body.id
         ? { where: { id: req.body.id } }
-        : { where: { name: req.body.role_name } };
+        : { where: { name: req.body.roleName } };
       Role.findOne(roleFilter)
         .then((roleData) => {
           if (!roleData) throw new Error("couldn't find role");
           const roleParams: RoleCreationAttributes = {
             id: roleData?.id,
-            name: req.body.role_name ? req.body.role_name : roleData?.name,
+            name: req.body.roleName ? req.body.roleName : roleData?.name,
           };
           roleData?.setAttributes(roleParams);
           return roleData.save();

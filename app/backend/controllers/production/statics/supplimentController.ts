@@ -11,11 +11,11 @@ import { DEFAULT_LIMIT, Suppliment } from '../../../db/models';
 
 export default class SupplimentController {
   public static createSuppliment(req: Request, res: Response) {
-    if (req.body.name && req.body.quantity && req.body.stockable_id) {
+    if (req.body.name && req.body.quantity && req.body.stockableId) {
       const supplimentParams: SupplimentCreationAttributes = {
         name: (<string>req.body.name).normalize().toLowerCase(),
         quantity: req.body.quantity,
-        stockableId: req.body.stockable_id,
+        stockableId: req.body.stockableId,
       };
       Suppliment.create(supplimentParams)
         .then((supplimentData) =>
@@ -77,10 +77,10 @@ export default class SupplimentController {
   //       .then((supplimentData) => {
   //         return (async () => {
   //           if (
-  //             req.body.station_id &&
-  //             typeof req.body.station_id === 'string'
+  //             req.body.stationId &&
+  //             typeof req.body.stationId === 'string'
   //           ) {
-  //             const st = await Station.findByPk(req.body.station_id);
+  //             const st = await Station.findByPk(req.body.stationId);
   //             if (!st) throw new Error('coudnt find station');
   //             await supplimentData.setStation(st);
   //           }

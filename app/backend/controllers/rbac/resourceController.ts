@@ -10,9 +10,9 @@ import { ResourceCreationAttributes } from '../../db/models/resource/type';
 
 export default class ResourceController {
   public static createResource(req: Request, res: Response) {
-    if (req.body.resource_name) {
+    if (req.body.resourceName) {
       const resourceParams: ResourceCreationAttributes = {
-        name: req.body.resource_name,
+        name: req.body.resourceName,
       };
       Resource.create(resourceParams)
         .then((resourceData) =>
@@ -25,10 +25,10 @@ export default class ResourceController {
   }
 
   public static getResource(req: Request, res: Response) {
-    if (req.body.id || req.body.resource_name) {
+    if (req.body.id || req.body.resourceName) {
       const filter = req.body.id
         ? { id: req.body.id }
-        : { name: req.body.resource_name };
+        : { name: req.body.resourceName };
       const resourceFilter = { where: filter };
       Resource.findOne(resourceFilter)
         .then((resourceData) =>
@@ -41,17 +41,17 @@ export default class ResourceController {
   }
 
   public static updateResource(req: Request, res: Response) {
-    if (req.body.id || req.body.resource_name) {
+    if (req.body.id || req.body.resourceName) {
       const resourceFilter = req.body.id
         ? { where: { id: req.body.id } }
-        : { where: { name: req.body.resource_name } };
+        : { where: { name: req.body.resourceName } };
       Resource.findOne(resourceFilter)
         .then((resourceData) => {
           if (!resourceData) throw new Error("couldn't find resource");
           const resourceParams: ResourceCreationAttributes = {
             id: resourceData?.id,
-            name: req.body.resource_name
-              ? req.body.resource_name
+            name: req.body.resourceName
+              ? req.body.resourceName
               : resourceData?.name,
           };
           resourceData?.setAttributes(resourceParams);

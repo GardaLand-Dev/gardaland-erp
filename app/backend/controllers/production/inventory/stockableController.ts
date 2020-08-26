@@ -14,18 +14,18 @@ export default class StockableController {
     if (
       req.body.name &&
       req.body.unit &&
-      req.body.alert_quantity &&
+      req.body.alertQuantity &&
       typeof req.body.unit === 'string' &&
       typeof req.body.name === 'string' &&
-      typeof req.body.is_ingredient === 'boolean' &&
-      typeof req.body.alert_quantity === 'number'
+      typeof req.body.isIngredient === 'boolean' &&
+      typeof req.body.alertQuantity === 'number'
     ) {
       const stockableParams: StockableCreationAttributes = {
         name: (<string>req.body.name).normalize().toLowerCase(),
         unit: (<string>req.body.unit).normalize().toLowerCase(),
-        isIngredient: req.body.is_ingredient,
+        isIngredient: req.body.isIngredient,
         quantity: req.body.quantity,
-        alertQuantity: req.body.alert_quantity,
+        alertQuantity: req.body.alertQuantity,
       };
       Stockable.create(stockableParams)
         .then((stockableData) =>
@@ -81,18 +81,18 @@ export default class StockableController {
                 ? (<string>req.body.unit).normalize().toLowerCase()
                 : stockableData.unit,
             isIngredient:
-              req.body.is_ingredient &&
-              typeof req.body.is_ingredient === 'boolean'
-                ? req.body.is_ingredient
+              req.body.isIngredient &&
+              typeof req.body.isIngredient === 'boolean'
+                ? req.body.isIngredient
                 : stockableData.isIngredient,
             quantity:
               req.body.quantity && typeof req.body.quantity === 'number'
                 ? req.body.quantity
                 : stockableData.quantity,
             alertQuantity:
-              req.body.alert_quantity &&
-              typeof req.body.alert_quantity === 'number'
-                ? req.body.alert_quantity
+              req.body.alertQuantity &&
+              typeof req.body.alertQuantity === 'number'
+                ? req.body.alertQuantity
                 : stockableData.alertQuantity,
           };
           stockableData.setAttributes(stockableParams);

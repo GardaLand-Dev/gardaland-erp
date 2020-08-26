@@ -29,11 +29,11 @@ function handleResponse(response: Response) {
   });
 }
 
-function login(user_name, password) {
+function login(username, password) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ user_name, password }),
+    body: JSON.stringify({ username, password }),
   };
   return fetch(`${config.apiUrl}/login`, requestOptions)
     .then(handleResponse)

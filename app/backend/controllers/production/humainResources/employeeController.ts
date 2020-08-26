@@ -14,14 +14,14 @@ import { DEFAULT_LIMIT } from '../../../db/models';
 export default class EmployeeController {
   public static createEmployee(req: Request, res: Response) {
     if (
-      req.body.first_name &&
-      req.body.last_name &&
-      typeof req.body.first_name === 'string' &&
-      typeof req.body.last_name === 'string'
+      req.body.firstName &&
+      req.body.lastName &&
+      typeof req.body.firstName === 'string' &&
+      typeof req.body.lastName === 'string'
     ) {
       const employeeParams: EmployeeCreationAttributes = {
-        firstName: (<string>req.body.first_name).normalize().toLowerCase(),
-        lastName: (<string>req.body.last_name).normalize().toLowerCase(),
+        firstName: (<string>req.body.firstName).normalize().toLowerCase(),
+        lastName: (<string>req.body.lastName).normalize().toLowerCase(),
         address: (<string>req.body.address)?.normalize().toLowerCase(),
         email: (<string>req.body.email)?.normalize().toLowerCase(),
         tel: (<string>req.body.tel)?.normalize().toLowerCase(),
@@ -39,15 +39,15 @@ export default class EmployeeController {
   public static getEmployee(req: Request, res: Response) {
     if (
       (req.body.id && typeof req.body.id === 'string') ||
-      (req.body.fist_name &&
-        req.body.last_name &&
-        typeof req.body.first_name === 'string' &&
-        typeof req.body.last_name === 'string')
+      (req.body.fistName &&
+        req.body.lastName &&
+        typeof req.body.firstName === 'string' &&
+        typeof req.body.lastName === 'string')
     ) {
       const filter = req.body.id
         ? { id: req.body.id }
         : {
-            firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+            firstName: (<string>req.body.firstName).normalize().toLowerCase(),
             lastName: (<string>req.body.lastName).normalize().toLowerCase(),
           };
       const employeeFilter = { where: filter };
@@ -64,15 +64,15 @@ export default class EmployeeController {
   public static updateEmployee(req: Request, res: Response) {
     if (
       (req.body.id && typeof req.body.id === 'string') ||
-      (req.body.fist_name &&
-        typeof req.body.first_name === 'string' &&
-        req.body.last_name &&
-        typeof req.body.last_name === 'string')
+      (req.body.fistName &&
+        typeof req.body.firstName === 'string' &&
+        req.body.lastName &&
+        typeof req.body.lastName === 'string')
     ) {
       const filter = req.body.id
         ? { id: req.body.id }
         : {
-            firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+            firstName: (<string>req.body.firstName).normalize().toLowerCase(),
             lastName: (<string>req.body.lastName).normalize().toLowerCase(),
           };
       const employeeFilter = { where: filter };
@@ -80,11 +80,11 @@ export default class EmployeeController {
         .then((employeeData) => {
           if (!employeeData) throw new Error("couldn't find employee");
           const employeeParams: EmployeeCreationAttributes = {
-            firstName: req.body.first_name
-              ? (<string>req.body.first_name).normalize().toLowerCase()
+            firstName: req.body.firstName
+              ? (<string>req.body.firstName).normalize().toLowerCase()
               : employeeData.firstName,
-            lastName: req.body.last_name
-              ? (<string>req.body.last_name).normalize().toLowerCase()
+            lastName: req.body.lastName
+              ? (<string>req.body.lastName).normalize().toLowerCase()
               : employeeData.lastName,
             email:
               req.body.email && typeof req.body.email

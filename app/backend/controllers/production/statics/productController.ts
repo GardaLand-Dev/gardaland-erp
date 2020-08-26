@@ -18,15 +18,15 @@ export default class ProductController {
     if (
       req.body.name &&
       typeof req.body.name === 'string' &&
-      typeof req.body.is_composed === 'boolean' &&
-      req.body.price_ttc &&
-      typeof req.body.price_ttc === 'number' &&
-      ((req.body.stockable_id &&
-        typeof req.body.stockable_id === 'string' &&
-        !req.body.is_composed) ||
+      typeof req.body.isComposed === 'boolean' &&
+      req.body.priceTtc &&
+      typeof req.body.priceTtc === 'number' &&
+      ((req.body.stockableId &&
+        typeof req.body.stockableId === 'string' &&
+        !req.body.isComposed) ||
         (req.body.stockables && typeof req.body.stockables === 'object')) &&
-      req.body.family_id &&
-      typeof req.body.family_id === 'string'
+      req.body.familyId &&
+      typeof req.body.familyId === 'string'
     ) {
       // verify stockable(s) exist(s)
 
@@ -34,14 +34,14 @@ export default class ProductController {
       try {
         const productParams: ProductCreationAttributes = {
           name: (<string>req.body.name).normalize().toLowerCase(),
-          isComposed: req.body.is_composed,
-          priceTTC: req.body.price_ttc,
+          isComposed: req.body.isComposed,
+          priceTTC: req.body.priceTtc,
           tva: req.body.tva,
         };
         const p = await Product.create(productParams, { transaction: t });
         if (!p) throw new Error('coudnt create user');
-        await p.setFamily(req.body.family_id, { transaction: t });
-        if (req.body.is_composed) {
+        await p.setFamily(req.body.familyId, { transaction: t });
+        if (req.body.isComposed) {
           // validate stockables
           (<Array<{ id: string; quantity: number }>>(
             req.body.stockables
@@ -63,7 +63,7 @@ export default class ProductController {
           );
           if (!ps) throw new Error('coudnt create ingredients');
         } else {
-          await p.addStockable(req.body.stockable_id, {
+          await p.addStockable(req.body.stockableId, {
             through: {
               quantity:
                 req.body.quantity && typeof req.body.quantity === 'number'
@@ -114,15 +114,15 @@ export default class ProductController {
   // public static updateProduct(req: Request, res: Response) {
   //   if (
   //     (req.body.id && typeof req.body.id === 'string') ||
-  //     (req.body.fist_name &&
-  //       typeof req.body.first_name === 'string' &&
-  //       req.body.last_name &&
-  //       typeof req.body.last_name === 'string')
+  //     (req.body.fistName &&
+  //       typeof req.body.firstName === 'string' &&
+  //       req.body.lastName &&
+  //       typeof req.body.lastName === 'string')
   //   ) {
   //     const filter = req.body.id
   //       ? { id: req.body.id }
   //       : {
-  //           firstName: (<string>req.body.first_name).normalize().toLowerCase(),
+  //           firstName: (<string>req.body.firstName).normalize().toLowerCase(),
   //           lastName: (<string>req.body.lastName).normalize().toLowerCase(),
   //         };
   //     const productFilter = { where: filter };
@@ -130,11 +130,11 @@ export default class ProductController {
   //       .then((productData) => {
   //         if (!productData) throw new Error("couldn't find product");
   //         const productParams: ProductCreationAttributes = {
-  //           firstName: req.body.first_name
-  //             ? (<string>req.body.first_name).normalize().toLowerCase()
+  //           firstName: req.body.firstName
+  //             ? (<string>req.body.firstName).normalize().toLowerCase()
   //             : productData.firstName,
-  //           lastName: req.body.last_name
-  //             ? (<string>req.body.last_name).normalize().toLowerCase()
+  //           lastName: req.body.lastName
+  //             ? (<string>req.body.lastName).normalize().toLowerCase()
   //             : productData.lastName,
   //           email:
   //             req.body.email && typeof req.body.email
