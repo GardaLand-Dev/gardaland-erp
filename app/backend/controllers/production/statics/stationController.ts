@@ -21,7 +21,6 @@ export default class StationController {
         name: (<string>req.body.name).normalize().toLowerCase(),
         printer: (<string>req.body.printerName).normalize().toLowerCase(),
       };
-      console.log(stationParams);
       Station.create(stationParams)
         .then((stationData) =>
           successResponse('create station successfull', stationData, res)
@@ -67,7 +66,6 @@ export default class StationController {
         : {
             name: (<string>req.body.name).normalize().toLowerCase(),
           };
-      console.log(filter);
       const stationFilter = { where: filter };
       Station.findOne(stationFilter)
         .then((stationData) => {

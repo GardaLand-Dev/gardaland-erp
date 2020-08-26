@@ -18,6 +18,10 @@ export default function SupplimentFactory(
       // TODO: Add validator : to be unique non archived
       // suppliment, do it also for product
     },
+    price: {
+      type: DataTypes.NUMBER.UNSIGNED,
+      allowNull: false,
+    },
     quantity: {
       type: DataTypes.NUMBER.UNSIGNED,
       allowNull: false,

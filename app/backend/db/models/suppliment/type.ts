@@ -16,6 +16,7 @@ import { OrderProduct } from '../orderProducts/type';
 export interface SupplimentAttributes {
   id: string;
   name: string;
+  price: number;
   quantity: number;
   toBeArchived: boolean;
   stockableId: string;
@@ -30,6 +31,8 @@ export class Suppliment
   public id!: string;
 
   public name!: string;
+
+  public price!: number;
 
   public quantity!: number;
 

@@ -11,10 +11,16 @@ import { DEFAULT_LIMIT, Suppliment } from '../../../db/models';
 
 export default class SupplimentController {
   public static createSuppliment(req: Request, res: Response) {
-    if (req.body.name && req.body.quantity && req.body.stockableId) {
+    if (
+      req.body.name &&
+      req.body.quantity &&
+      req.body.price &&
+      req.body.stockableId
+    ) {
       const supplimentParams: SupplimentCreationAttributes = {
         name: (<string>req.body.name).normalize().toLowerCase(),
         quantity: req.body.quantity,
+        price: req.body.price,
         stockableId: req.body.stockableId,
       };
       Suppliment.create(supplimentParams)
@@ -122,6 +128,7 @@ export default class SupplimentController {
       limit,
       offset,
     };
+    if (!(req.body.all === true)) options.where = { toBeArchived: false };
     Suppliment.findAll(options)
       .then((supplimentsData) =>
         successResponse('users retrieved', supplimentsData, res)

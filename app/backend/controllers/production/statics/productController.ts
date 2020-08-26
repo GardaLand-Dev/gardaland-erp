@@ -184,13 +184,14 @@ export default class ProductController {
     const options: FindOptions<import('../../../db/models/product/type').Product> = {
       limit,
       offset,
-      where: {
-        toBeArchived:
-          req.body.archived && typeof req.body.archived === 'boolean'
-            ? req.body.archived
-            : false,
-      },
+      // where: {
+      //   toBeArchived:
+      //     req.body.archived && typeof req.body.archived === 'boolean'
+      //       ? req.body.archived
+      //       : false,
+      // },
     };
+    if (!(req.body.all === true)) options.where = { toBeArchived: false };
     Product.findAll(options)
       .then((productsData) =>
         successResponse('users retrieved', productsData, res)
