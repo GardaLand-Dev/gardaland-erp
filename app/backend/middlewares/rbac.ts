@@ -65,7 +65,7 @@ const privsToResOp = (
 const defaultInitConf: RBACInitConf = {
   roles: [
     {
-      name: 'rbac_admin',
+      name: 'admin',
       privileges: [
         'rbac/resource:view',
         'rbac/resource:create',

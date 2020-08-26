@@ -17,8 +17,8 @@ export interface SupplimentAttributes {
   id: string;
   name: string;
   quantity: number;
-  date: Date;
   toBeArchived: boolean;
+  stockableId: string;
 }
 export type SupplimentCreationAttributes = Optional<
   SupplimentAttributes,
@@ -33,9 +33,9 @@ export class Suppliment
 
   public quantity!: number;
 
-  public date!: Date;
-
   public toBeArchived!: boolean;
+
+  public stockableId!: string;
 
   // timestamps
   public createdAt!: Date;

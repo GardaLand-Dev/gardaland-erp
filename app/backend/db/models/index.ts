@@ -1,5 +1,4 @@
 import { Sequelize } from 'sequelize';
-import path from 'path';
 import UserFactory from './user/model';
 import RoleFactory from './role/model';
 import PrivilegeFactory from './privilege/model';
@@ -20,6 +19,7 @@ import AttendanceFactory from './attendance/model';
 import OrderFactory from './order/model';
 import OrderProductFactory from './orderProducts/model';
 import ProductStockableFactory from './productStockables/model';
+import OrderProductSupplimentFactory from './orderProductSuppliments/model';
 
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
@@ -82,6 +82,7 @@ export const Attendance = AttendanceFactory(dbConfig);
 /** Orders */
 export const Order = OrderFactory(dbConfig);
 export const OrderProduct = OrderProductFactory(dbConfig);
+export const OrderProductSuppliment = OrderProductSupplimentFactory(dbConfig);
 
 export const dbInit = async () => {
   /* RBAC - RELATIONS */
@@ -133,8 +134,12 @@ export const dbInit = async () => {
   Supply.belongsTo(Stockable);
   Stockable.hasMany(Supply);
   /**  stockable-supplier */
-  Stockable.belongsToMany(Supplier, { through: Supply });
-  Supplier.belongsToMany(Stockable, { through: Supply });
+  Stockable.belongsToMany(Supplier, {
+    through: { model: Supply, unique: false },
+  });
+  Supplier.belongsToMany(Stockable, {
+    through: { model: Supply, unique: false },
+  });
   /** HR */
   /**  employee-attendance  */
   Attendance.belongsTo(Employee);
@@ -166,10 +171,10 @@ export const dbInit = async () => {
   Product.hasMany(OrderProduct);
   /**  OrderProduct-suppliment */
   Suppliment.belongsToMany(OrderProduct, {
-    through: 'orderProduct_suppliments',
+    through: OrderProductSuppliment,
   });
   OrderProduct.belongsToMany(Suppliment, {
-    through: 'orderProduct_suppliments',
+    through: OrderProductSuppliment,
   });
   /** PRODUCTION-RBAC RELATIONS */
   /**  user-supply */

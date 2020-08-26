@@ -22,10 +22,6 @@ export default function SupplimentFactory(
       type: DataTypes.NUMBER.UNSIGNED,
       allowNull: false,
     },
-    date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
     toBeArchived: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

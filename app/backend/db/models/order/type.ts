@@ -9,6 +9,7 @@ import {
   Association,
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
+  HasManyAddAssociationsMixin,
 } from 'sequelize';
 import { OrderProduct } from '../orderProducts/type';
 import { User } from '../user/type';
@@ -41,6 +42,8 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes>
   // MODEL ASSOCIATION METHODS
   // OrderProduct-Order
   public getOrderPoducts!: HasManyGetAssociationsMixin<OrderProduct>;
+
+  public addOrderProducts!: HasManyAddAssociationsMixin<OrderProduct, string>;
 
   public createOrderProduct!: HasManyCreateAssociationMixin<OrderProduct>;
 

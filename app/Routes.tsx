@@ -6,7 +6,7 @@ import routes from './constants/routes.json';
 import App from './containers/App';
 // import HomePage from './containers/HomePage';
 import LoginPage from './containers/LoginPage';
-import { selectLoggedIn } from './reducers/authentication.reducer';
+import { selectAuthState } from './reducers/authentication.reducer';
 import MangerPage from './containers/ManagerPage';
 import HomePage from './containers/HomePage';
 
@@ -20,49 +20,73 @@ import HomePage from './containers/HomePage';
 //     <LazyCounterPage {...props} />
 //   </React.Suspense>
 // );
-
-function PrivateRoute({
+function PrivateRoute2({
   children,
-  redirect,
   path,
   ...rest
 }: {
   children: JSX.Element;
   path: string;
-  redirect: string;
-  exact?: boolean;
 }) {
-  const isAuthenticated = useSelector(selectLoggedIn);
+  const authState = useSelector(selectAuthState);
+  const pathHasManager = path.toLowerCase().includes('manager');
   return (
     <Route
       {...rest}
       render={
         () => {
-          const bool =
-            redirect === routes.LOGIN ? isAuthenticated : !isAuthenticated;
-          return bool ? children : <Redirect to={redirect} />;
+          // console.log(authState && authState.loggedIn && ((pathHasManager && authState.asManager) || !pathHasManager));
+          return authState.loggedIn &&
+            ((pathHasManager && authState.asManager) || !pathHasManager) ? (
+            children
+          ) : (
+            <Redirect to={routes.LOGIN} />
+          );
         }
         // eslint-disable-next-line react/jsx-curly-newline
       }
     />
   );
 }
-PrivateRoute.defaultProps = {
-  exact: false,
-};
+
+function LoginRoute({
+  children,
+  path,
+  ...rest
+}: {
+  children: JSX.Element;
+  path: string;
+}) {
+  const authState = useSelector(selectAuthState);
+  return (
+    <Route
+      {...rest}
+      render={() => {
+        return authState.loggedIn ? (
+          <Redirect
+            to={authState.asManager ? routes.MANAGER.root : routes.HOME}
+          />
+        ) : (
+          children
+        );
+      }}
+    />
+  );
+}
 
 export default function Routes() {
   return (
     <App>
       <Switch>
-        {/* <PrivateRoute path={routes.HOME} redirect={routes.LOGIN} exact>
-          <HomePage />
-        </PrivateRoute> */}
-        <PrivateRoute path={routes.LOGIN} redirect={routes.MANAGER.root} exact>
+        <LoginRoute path={routes.LOGIN}>
           <LoginPage />
-        </PrivateRoute>
-        <Route path={routes.HOME} component={HomePage} />
-        <Route path={routes.MANAGER.root} component={MangerPage} />
+        </LoginRoute>
+        <PrivateRoute2 path={routes.MANAGER.root}>
+          <MangerPage />
+        </PrivateRoute2>
+        <PrivateRoute2 path={routes.HOME}>
+          <HomePage />
+        </PrivateRoute2>
         <Route
           path={routes.ROOT}
           render={() => <Redirect to={routes.LOGIN} />}

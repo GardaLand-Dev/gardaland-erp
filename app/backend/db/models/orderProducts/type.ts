@@ -23,6 +23,8 @@ export interface OrderProductAttributes {
   id: string;
   quantity: number;
   note?: string;
+  orderId: string;
+  productId: string;
 }
 export type OrderProductCreationAttributes = Optional<
   OrderProductAttributes,
@@ -36,6 +38,10 @@ export class OrderProduct
   public quantity!: number;
 
   public note: string | undefined;
+
+  public orderId!: string;
+
+  public productId!: string;
 
   // timestamps
   public createdAt!: Date;

@@ -4,18 +4,36 @@ import StationController from '../controllers/production/statics/stationControll
 import FamilyController from '../controllers/production/statics/familyController';
 import ProductController from '../controllers/production/statics/productController';
 import StockableController from '../controllers/production/inventory/stockableController';
+import OrderController from '../controllers/production/order/orderController';
+import SupplimentController from '../controllers/production/statics/supplimentController';
 
 export default class ProductionRoutes {
   public static route(app: Application) {
     const path = '/api';
     /** STATICS */
     // Suppliment
-    app.get(`${path}/suppliment`, getAuthChecker('prod/suppliment:view'));
-    app.post(`${path}/suppliment`, getAuthChecker('prod/suppliment:create'));
+    app.get(
+      `${path}/suppliment`,
+      getAuthChecker('prod/suppliment:view'),
+      SupplimentController.getSuppliment
+    );
+    app.post(
+      `${path}/suppliment`,
+      getAuthChecker('prod/suppliment:create'),
+      SupplimentController.createSuppliment
+    );
     app.put(`${path}/suppliment`, getAuthChecker('prod/suppliment:update'));
-    app.delete(`${path}/suppliment`, getAuthChecker('prod/suppliment:delete'));
+    app.delete(
+      `${path}/suppliment`,
+      getAuthChecker('prod/suppliment:delete'),
+      SupplimentController.deleteSuppliment
+    );
 
-    app.get(`${path}/Suppliments`, getAuthChecker('prod/suppliments:view'));
+    app.get(
+      `${path}/Suppliments`,
+      getAuthChecker('prod/suppliments:view'),
+      SupplimentController.getSuppliments
+    );
 
     // Product
     app.get(
@@ -186,7 +204,11 @@ export default class ProductionRoutes {
     /** ORDERS */
     // Order
     app.get(`${path}/order`, getAuthChecker('orders/order:view'));
-    app.post(`${path}/order`, getAuthChecker('orders/order:create'));
+    app.post(
+      `${path}/order`,
+      getAuthChecker('orders/order:create'),
+      OrderController.createOrder
+    );
     app.put(`${path}/order`, getAuthChecker('orders/order:update'));
     app.delete(`${path}/order`, getAuthChecker('orders/order:delete'));
 
