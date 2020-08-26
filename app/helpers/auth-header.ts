@@ -1,7 +1,17 @@
+import jwt from 'jsonwebtoken';
+
 export default function authHeader() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  if (user && user.token) {
-    return { Authorization: `Bearer ${user.token}` };
+  const token = JSON.parse(localStorage.getItem('jwt'));
+  if (token) {
+    return { Authorization: `Bearer ${token}` };
   }
   return {};
+}
+
+export function getDecoded() {
+  const token = JSON.parse(localStorage.getItem('jwt'));
+  if (token) {
+    return jwt.decode(token);
+  }
+  return false;
 }

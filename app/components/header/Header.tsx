@@ -6,6 +6,7 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import Badge from '@material-ui/core/Badge';
 import MailOutlineOutlinedIcon from '@material-ui/icons/MailOutlineOutlined';
 import { logout } from '../../reducers/authentication.reducer';
+import { getDecoded } from '../../helpers/auth-header';
 
 export default function Header() {
   const dispatch = useDispatch();
@@ -37,6 +38,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => {
+              console.log(getDecoded());
               dispatch(logout());
             }}
           >

@@ -168,20 +168,39 @@ body {
 .theme-gradient {
   color: white;
   background: $theme-gradient;
+  transition: box-shadow 0.3s ease-in-out;
+  &:hover {
+    color: white;
+  }
 }
 
 .theme-gradient-x {
   color: white;
   background: $theme-gradient-x;
+  transition: box-shadow 0.3s ease-in-out;
+  &:hover {
+    color: white;
+  }
 }
 
 .theme-gradient-y {
   color: white;
   background: $theme-gradient-y;
+  transition: box-shadow 0.3s ease-in-out;
+  &:hover {
+    color: white;
+  }
 }
 
 .theme-background {
   background: $theme-background-color;
+}
+.theme-glow {
+  &:hover {
+    // f98148
+    // box-shadow: 0px 0px 71px -13px rgb(251, 215, 214);
+    box-shadow: 0 0 71px -13px #f98148;
+  }
 }
 
 //components

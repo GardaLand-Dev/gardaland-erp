@@ -160,58 +160,57 @@ export default function ListeProduit(): JSX.Element {
         }}
         visible={modalVisible}
         title="Ajouter Produit"
+        onSubmit={() => console.log('submitted')}
       >
-        <form>
-          <div className={useStyles().root}>
-            <Grid container spacing={2} className="my-2">
-              <Grid item xs>
-                <TextField
-                  style={{ width: '100%' }}
-                  id="outlined-basic"
-                  label="Nom de Produit"
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs>
-                <FormControl style={{ width: '100%' }} variant="outlined">
-                  <InputLabel>Amount</InputLabel>
-                  <OutlinedInput
-                    startAdornment={
-                      <InputAdornment position="start">$</InputAdornment>
-                    }
-                    labelWidth={60}
-                  />
-                </FormControl>
-              </Grid>
+        <div className={useStyles().root}>
+          <Grid container spacing={2} className="my-2">
+            <Grid item xs>
+              <TextField
+                style={{ width: '100%' }}
+                id="outlined-basic"
+                label="Nom de Produit"
+                variant="outlined"
+              />
             </Grid>
-          </div>
-          <Autocomplete
-            options={Famille}
-            getOptionLabel={(option) => option.title}
-            style={{ width: '100%' }}
-            renderInput={(params) => (
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              <TextField {...params} label="famille" variant="outlined" />
-            )}
-          />
-          <FormControlLabel
-            control={<Checkbox checked={isChecked} onChange={handleChecked} />}
-            label="isComposed"
-            className="m-2"
-          />
-          {isChecked ? (
-            <>
-              <IconButton color="primary" onClick={handleAddField}>
-                <Add />
-              </IconButton>
-              {[...Array(fieldsNum).keys()].map((index) => (
-                <AddtextField key={index} />
-              ))}
-            </>
-          ) : (
-            ''
+            <Grid item xs>
+              <FormControl style={{ width: '100%' }} variant="outlined">
+                <InputLabel>Amount</InputLabel>
+                <OutlinedInput
+                  startAdornment={
+                    <InputAdornment position="start">$</InputAdornment>
+                  }
+                  labelWidth={60}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+        </div>
+        <Autocomplete
+          options={Famille}
+          getOptionLabel={(option) => option.title}
+          style={{ width: '100%' }}
+          renderInput={(params) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <TextField {...params} label="famille" variant="outlined" />
           )}
-        </form>
+        />
+        <FormControlLabel
+          control={<Checkbox checked={isChecked} onChange={handleChecked} />}
+          label="isComposed"
+          className="m-2"
+        />
+        {isChecked ? (
+          <>
+            <IconButton color="primary" onClick={handleAddField}>
+              <Add />
+            </IconButton>
+            {[...Array(fieldsNum).keys()].map((index) => (
+              <AddtextField key={index} />
+            ))}
+          </>
+        ) : (
+          ''
+        )}
       </SimpleModal>
     </div>
   );

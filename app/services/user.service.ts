@@ -38,8 +38,15 @@ function login(user_name, password) {
   return fetch(`${config.apiUrl}/login`, requestOptions)
     .then(handleResponse)
     .then((user) => {
-      localStorage.setItem('user', JSON.stringify(user));
-      return user;
+      localStorage.setItem('jwt', JSON.stringify(user.token));
+      return <
+        {
+          id: string;
+          userName: string;
+          employeeId: string;
+          roles: { id: string; name: string }[];
+        }
+      >user.data;
     });
 }
 

@@ -7,10 +7,14 @@ type AuthState = {
   loggedIn?: boolean;
   logginIn?: boolean;
   user?: any;
+  hasManagerRole?: boolean;
+  asManager?: boolean;
 };
 
 const user = JSON.parse(localStorage.getItem('user'));
-const initialState: AuthState = user ? { loggedIn: true, user } : {};
+const initialState: AuthState = user
+  ? { loggedIn: true, user, hasManagerRole: false, asManager: false }
+  : {};
 
 const authenticationSlice = createSlice({
   name: 'authentication',
@@ -26,15 +30,25 @@ const authenticationSlice = createSlice({
       state.user = payload;
       // return { loggedIn: true, user: payload };
     },
+    userLoginRolePrompt: (state) => {
+      state.hasManagerRole = true;
+    },
     userLoginFailure: (state) => {
       state.loggedIn = null;
       state.logginIn = null;
       state.user = null;
+      state.asManager = null;
+      state.hasManagerRole = null;
     },
     userLogout: (state) => {
       state.loggedIn = null;
       state.logginIn = null;
       state.user = null;
+      state.asManager = null;
+      state.hasManagerRole = null;
+    },
+    setAsManager: (state) => {
+      state.asManager = true;
     },
   },
 });
@@ -43,8 +57,18 @@ export const {
   userLoginFailure,
   userLoginRequest,
   userLoginSuccess,
+  userLoginRolePrompt,
   userLogout,
+  setAsManager,
 } = authenticationSlice.actions;
+
+export const selectAuthState = (state: RootState) => state.authentication;
+
+export const selectLoggedIn = (state: RootState) =>
+  state.authentication.loggedIn;
+
+export const selecthasManagerRole = (state: RootState) =>
+  state.authentication.hasManagerRole;
 
 export const login = (user_name, password): AppThunk => {
   return (dispatch) => {
@@ -52,12 +76,67 @@ export const login = (user_name, password): AppThunk => {
     userService
       .login(user_name, password)
       .then((userData) => {
-        dispatch(userLoginSuccess(userData));
         // redirecting
-        history.push('/');
+        if (
+          userData &&
+          userData.roles
+            .map((role) => role.name.toLowerCase())
+            .indexOf('admin') > -1
+        ) {
+          dispatch(userLoginRolePrompt());
+        } else {
+          dispatch(userLoginSuccess(userData));
+          history.push('/');
+        }
         return userData;
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
+        dispatch(userLoginFailure());
+      });
+  };
+};
+export const loginAsManager = (user_name, password): AppThunk => {
+  return (dispatch) => {
+    dispatch(userLoginRequest(user_name));
+    userService
+      .login(user_name, password)
+      .then((userData) => {
+        if (
+          userData &&
+          userData.roles
+            .map((role) => role.name.toLowerCase())
+            .indexOf('admin') > -1
+        ) {
+          dispatch(userLoginSuccess(userData));
+          dispatch(setAsManager());
+          history.push('/');
+          return userData;
+        }
+        throw new Error('coudnt sign in');
+      })
+      .catch((e) => {
+        console.log(e);
+        dispatch(userLoginFailure());
+      });
+  };
+};
+
+export const loginAsCaissier = (user_name, password): AppThunk => {
+  return (dispatch) => {
+    dispatch(userLoginRequest(user_name));
+    userService
+      .login(user_name, password)
+      .then((userData) => {
+        if (userData) {
+          dispatch(userLoginSuccess(userData));
+          history.push('/');
+          return userData;
+        }
+        throw new Error('coudnt sign in');
+      })
+      .catch((e) => {
+        console.log(e);
         dispatch(userLoginFailure());
       });
   };
@@ -71,6 +150,3 @@ export const logout = (): AppThunk => {
 };
 
 export default authenticationSlice.reducer;
-
-export const selectLoggedIn = (state: RootState) =>
-  state.authentication.loggedIn;

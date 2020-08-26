@@ -20,15 +20,6 @@ export default class LoginController {
           through: {
             attributes: [],
           },
-          include: [
-            {
-              model: Privilege,
-              attributes: ['name'],
-              through: {
-                attributes: [],
-              },
-            },
-          ],
         },
         attributes: {
           exclude: ['password', 'createdAt', 'updatedAt'],

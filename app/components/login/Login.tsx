@@ -1,12 +1,12 @@
-import React, { FormEvent, ChangeEvent } from 'react';
+import React, { FormEvent, ChangeEvent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+// import { selectLoginState, submit } from '../../reducers/loginComponentSlice';
 import {
-  setUser,
-  setPassword,
-  selectLoginState,
-  submit,
-} from '../../reducers/loginComponentSlice';
-import { login } from '../../reducers/authentication.reducer';
+  login,
+  selecthasManagerRole,
+  loginAsManager,
+  loginAsCaissier,
+} from '../../reducers/authentication.reducer';
 
 export default function Login(): JSX.Element {
   /**
@@ -16,24 +16,32 @@ export default function Login(): JSX.Element {
    */
   const dispatch = useDispatch();
 
-  const state = useSelector(selectLoginState);
+  const [username, setUsername] = useState<string>();
+  const [password, setPassword] = useState<string>();
+  const [submitted, setSubmitted] = useState<boolean>();
+  const [roleSelection, setRoleSelection] = useState<string>();
+  const hasManagerRole = useSelector(selecthasManagerRole);
+  // const state = useSelector(selectLoginState);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // this.setState({ submitted: true });
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { user_name, password } = state;
-    if (user_name && password) {
-      dispatch(login(user_name, password));
+    if (username && password) {
+      if (hasManagerRole) {
+        if (roleSelection === 'Manager') {
+          dispatch(loginAsManager(username, password));
+        } else dispatch(loginAsCaissier(username, password));
+      } else dispatch(login(username, password));
     }
-    dispatch(submit());
+    setSubmitted(true);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
-    if (name === 'user_name') dispatch(setUser(value));
-    if (name === 'password') dispatch(setPassword(value));
+    if (name === 'user_name') setUsername(value);
+    if (name === 'password') setPassword(value);
   };
 
   return (
@@ -47,22 +55,24 @@ export default function Login(): JSX.Element {
             <input
               type="username"
               className={`form-control form-control-user ${
-                state.submitted && !state.user_name ? 'is-invalid' : ''
+                submitted && !username ? 'is-invalid' : ''
               }`}
               name="user_name"
               placeholder="Entrer Nom d'utilisateur .."
               onChange={handleChange}
+              disabled={hasManagerRole}
             />
           </div>
           <div className="form-group">
             <input
               type="password"
               className={`form-control form-control-user ${
-                state.submitted && !state.password ? 'is-invalid' : ''
+                submitted && !password ? 'is-invalid' : ''
               }`}
               name="password"
               placeholder="Mot de pass"
               onChange={handleChange}
+              disabled={hasManagerRole}
             />
           </div>
           {/* <input
@@ -70,8 +80,22 @@ export default function Login(): JSX.Element {
             value="Login"
             className="btn theme-gradient btn-user btn-block "
           /> */}
+          <select
+            className="custom-select mb-3"
+            hidden={!hasManagerRole}
+            onChange={(e) => {
+              setRoleSelection(e.target.value);
+            }}
+            placeholder="Login as"
+          >
+            <option selected value="">
+              Login as
+            </option>
+            <option>Manager</option>
+            <option>Caissier</option>
+          </select>
           <input
-            className="btn theme-gradient btn-user btn-block"
+            className="btn theme-gradient btn-user btn-block theme-glow"
             type="submit"
             value="Login"
           />

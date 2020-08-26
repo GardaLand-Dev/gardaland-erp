@@ -42,10 +42,10 @@ export function unauthorizedRequest(
   });
 }
 
-export function dbError(err: unknown, res: Response) {
+export function dbError(err: Error, res: Response) {
   return res.status(ResponseStatusCodes.internal_server_error).json({
     STATUS: 'FAILURE',
     MESSAGE: 'SQLITE error',
-    DATA: err,
+    DATA: err.message,
   });
 }

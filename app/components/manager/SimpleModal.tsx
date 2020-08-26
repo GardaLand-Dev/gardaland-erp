@@ -12,7 +12,7 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   title: string;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
 };
 
 export default function SimpleModal({
