@@ -27,15 +27,18 @@ export default function Login(): JSX.Element {
     e.preventDefault();
     // this.setState({ submitted: true });
     // eslint-disable-next-line @typescript-eslint/naming-convention
+    setSubmitted(1);
     if (username && password) {
-      if (hasManagerRole && hasManagerRole) {
+      if (hasManagerRole) {
         setSubmitted(2);
-        if (roleSelection === 'Manager') {
-          dispatch(loginAsManager(username, password));
-        } else dispatch(loginAsCaissier(username, password));
+        console.log(submitted);
+        if (roleSelection) {
+          if (roleSelection.toLowerCase() === 'manager') {
+            dispatch(loginAsManager(username, password));
+          } else dispatch(loginAsCaissier(username, password));
+        }
       } else dispatch(login(username, password));
     }
-    setSubmitted(1);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -83,13 +86,12 @@ export default function Login(): JSX.Element {
           /> */}
           <select
             className={`custom-select mb-3 ${
-              submitted === 2 && !roleSelection ? 'invalid' : ''
+              submitted === 2 && !roleSelection ? 'is-invalid' : ''
             }`}
             hidden={!hasManagerRole}
             onChange={(e) => {
               setRoleSelection(e.target.value);
             }}
-            defaultValue="Login as"
           >
             <option disabled selected value="">
               Login as

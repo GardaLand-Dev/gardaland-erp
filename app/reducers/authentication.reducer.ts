@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
 import { RootState, AppThunk, history } from '../store';
 import userService from '../services/user.service';
+import { getDecoded } from '../helpers/auth-header';
 
 type AuthState = {
   loggedIn?: boolean;
@@ -11,9 +12,15 @@ type AuthState = {
   asManager?: boolean;
 };
 
-const user = JSON.parse(localStorage.getItem('user'));
+const user = getDecoded();
+const man = JSON.parse(localStorage.getItem('loggedInfo'));
 const initialState: AuthState = user
-  ? { loggedIn: true, user, hasManagerRole: false, asManager: false }
+  ? {
+      loggedIn: true,
+      user,
+      hasManagerRole: man && man.hasManagerRole,
+      asManager: man && man.asManager,
+    }
   : {};
 
 const authenticationSlice = createSlice({
@@ -110,6 +117,14 @@ export const loginAsManager = (user_name, password): AppThunk => {
         ) {
           dispatch(userLoginSuccess(userData));
           dispatch(setAsManager());
+          // updating localstorage
+          localStorage.setItem(
+            'loggedInfo',
+            JSON.stringify({
+              hasManagerRole: true,
+              asManager: true,
+            })
+          );
           history.push('/');
           return userData;
         }

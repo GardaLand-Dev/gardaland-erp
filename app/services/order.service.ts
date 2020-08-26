@@ -4,10 +4,10 @@ import authHeader from '../helpers/auth-header';
 
 /** family */
 type OrderType = {
-  order_products: {
-    product_id: string;
+  orderProducts: {
+    productId: string;
     quantity: number;
-    suppliments?: { suppliment_id: string; quantity: number }[];
+    suppliments?: { supplimentId: string; quantity: number }[];
   }[];
   num: number;
 };

@@ -10,10 +10,10 @@ import {
 export default class LoginController {
   public static login(req: Request, res: Response) {
     // TODO: password should pass by a hasher
-    if (req.body.userName && req.body.password) {
+    if (req.body.username && req.body.password) {
       // TODO: userdata should have scopes
       User.findOne({
-        where: { userName: req.body.userName, password: req.body.password },
+        where: { userName: req.body.username, password: req.body.password },
         include: {
           model: Role,
           attributes: ['id', 'name'],
@@ -38,7 +38,7 @@ export default class LoginController {
         })
         .catch((err) => {
           console.log(err);
-          unauthorizedRequest(res, 'Username or password is incorrect');
+          unauthorizedRequest(res, 'username or password is incorrect');
         });
     } else insufficientParameters(res);
   }
