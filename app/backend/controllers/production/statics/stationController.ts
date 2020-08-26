@@ -13,13 +13,13 @@ export default class StationController {
   public static createStation(req: Request, res: Response) {
     if (
       req.body.name &&
-      req.body.printerIp &&
+      req.body.printerName &&
       typeof req.body.name === 'string' &&
-      typeof req.body.printerIp === 'string'
+      typeof req.body.printerName === 'string'
     ) {
       const stationParams: StationCreationAttributes = {
         name: (<string>req.body.name).normalize().toLowerCase(),
-        printerIp: (<string>req.body.printerIp).normalize().toLowerCase(),
+        printer: (<string>req.body.printerName).normalize().toLowerCase(),
       };
       console.log(stationParams);
       Station.create(stationParams)
@@ -76,10 +76,10 @@ export default class StationController {
             name: req.body.name
               ? (<string>req.body.name).normalize().toLowerCase()
               : stationData.name,
-            printerIp:
-              req.body.printerIp && typeof req.body.printerIp === 'string'
-                ? (<string>req.body.printerIp).normalize().toLowerCase()
-                : stationData.printerIp,
+            printer:
+              req.body.printerName && typeof req.body.printerName === 'string'
+                ? (<string>req.body.printerName).normalize().toLowerCase()
+                : stationData.printer,
           };
           stationData.setAttributes(stationParams);
           return stationData.save();
