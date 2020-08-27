@@ -18,14 +18,26 @@ const columns = [
   },
 ];
 
-const printers = ['Pizza Printer', 'Sandwich Printer'];
+// const printers = ['Pizza Printer', 'Sandwich Printer'];
 export default function Station(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const [stationName, setStationName] = useState('');
-  const [printerName, setPrinterName] = React.useState<string | null>();
+  const [printerName, setPrinterName] = useState<string | null>();
   const [data, setData] = useState<
     { id: string; name: string; printer: string }[]
   >([]);
+  const [printers, setPrinters] = useState<{ name: string; status: any[] }[]>(
+    []
+  );
+  const loadPrinters = () => {
+    staticService
+      .getPrinters()
+      .then((d) => {
+        console.log(d);
+        return setPrinters(d);
+      })
+      .catch((err) => console.log(err));
+  };
   useEffect(() => {
     staticService
       .getStations()
@@ -35,6 +47,7 @@ export default function Station(): JSX.Element {
         );
       })
       .catch((err) => console.log(err));
+    loadPrinters();
   }, []);
   const handleAddClicked = () => {
     setModalVisible(true);
@@ -74,11 +87,15 @@ export default function Station(): JSX.Element {
           onChange={handleStationValue}
         />
         <Autocomplete
-          onChange={(_event: any, newValue: string | null) => {
-            setPrinterName(newValue);
+          onChange={(
+            _event: any,
+            newValue: { name: string; status: any[] }
+          ) => {
+            setPrinterName(newValue.name);
             console.log(newValue);
           }}
           options={printers}
+          getOptionLabel={(op) => op.name}
           style={{ width: '100%' }}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading

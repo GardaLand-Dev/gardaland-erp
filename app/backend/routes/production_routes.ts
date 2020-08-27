@@ -6,6 +6,7 @@ import ProductController from '../controllers/production/statics/productControll
 import StockableController from '../controllers/production/inventory/stockableController';
 import OrderController from '../controllers/production/order/orderController';
 import SupplimentController from '../controllers/production/statics/supplimentController';
+import PrinterController from '../controllers/production/statics/printerController';
 
 export default class ProductionRoutes {
   public static route(app: Application) {
@@ -115,6 +116,13 @@ export default class ProductionRoutes {
       StationController.getStations
     );
 
+    // printers
+    app.get(
+      `${path}/printers`,
+      getAuthChecker('prod/printers:view'),
+      PrinterController.getPrinters
+    );
+    //
     /** INVENTORY */
     // Stockable
     app.get(

@@ -110,6 +110,7 @@ const defaultInitConf: RBACInitConf = {
         'prod/station:update',
         'prod/station:delete',
         'prod/stations:view',
+        'prod/printers:view',
         //
         'inventory/stockable:view',
         'inventory/stockable:create',

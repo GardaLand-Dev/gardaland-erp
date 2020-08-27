@@ -49,7 +49,7 @@ function getPrinters() {
     .then((res: Response) => res.json())
     .then((data) => {
       if (data.STATUS !== 'SUCCESS') throw new Error(data.MESSAGE);
-      return data.data;
+      return data.DATA;
     })
     .catch((err) => err);
 }
