@@ -16,7 +16,7 @@ export default function StationFactory(
       allowNull: false,
       unique: true,
     },
-    printerIp: {
+    printer: {
       type: DataTypes.STRING(50),
       allowNull: false,
     },

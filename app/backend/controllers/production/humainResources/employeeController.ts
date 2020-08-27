@@ -38,17 +38,17 @@ export default class EmployeeController {
 
   public static getEmployee(req: Request, res: Response) {
     if (
-      (req.body.id && typeof req.body.id === 'string') ||
-      (req.body.fistName &&
-        req.body.lastName &&
-        typeof req.body.firstName === 'string' &&
-        typeof req.body.lastName === 'string')
+      (req.query.id && typeof req.query.id === 'string') ||
+      (req.query.fistName &&
+        req.query.lastName &&
+        typeof req.query.firstName === 'string' &&
+        typeof req.query.lastName === 'string')
     ) {
-      const filter = req.body.id
-        ? { id: req.body.id }
+      const filter = req.query.id
+        ? { id: req.query.id }
         : {
-            firstName: (<string>req.body.firstName).normalize().toLowerCase(),
-            lastName: (<string>req.body.lastName).normalize().toLowerCase(),
+            firstName: (<string>req.query.firstName).normalize().toLowerCase(),
+            lastName: (<string>req.query.lastName).normalize().toLowerCase(),
           };
       const employeeFilter = { where: filter };
       Employee.findOne(employeeFilter)
@@ -124,9 +124,13 @@ export default class EmployeeController {
 
   public static getEmployees(req: Request, res: Response) {
     const limit =
-      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+      typeof req.query.limit === 'number' && req.query.limit > 0
+        ? req.query.limit
+        : DEFAULT_LIMIT;
     const offset =
-      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+      typeof req.query.page === 'number' && req.query.page > 0
+        ? (req.query.page - 1) * limit
+        : 0;
     const options = { limit, offset };
     Employee.findAll(options)
       .then((employeesData) =>

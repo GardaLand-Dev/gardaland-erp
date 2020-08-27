@@ -32,7 +32,12 @@ class Server {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use((req, _res, next) => {
-      console.log(`${req.method}: ${req.path} body is `, req.body);
+      console.log(
+        `${req.method}: ${req.path} body is`,
+        req.body,
+        '\nquery params are',
+        req.query
+      );
       next();
     }); // for debuging
     this.app.use(authCheck);

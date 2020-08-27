@@ -19,19 +19,17 @@ function createStation(name: string, printerName = null) {
     .catch((err) => err);
 }
 function getStations(all = false, limit = null, page = null) {
+  const params = { all, limit, page };
+  const url = new URL(`${config.apiUrl}/stations`);
+  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
   const requestOptions = {
     method: 'GET',
     headers: {
       'Content-type': 'application/json',
       Authorization: authHeader().Authorization,
     },
-    body: JSON.stringify({
-      all,
-      limit,
-      page,
-    }),
   };
-  return fetch(`${config.apiUrl}/stations`, requestOptions)
+  return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
     .catch((err) => err);
 }
@@ -51,19 +49,17 @@ function createFamily(name: string, stationId = null) {
     .catch((err) => err);
 }
 function getFamilies(all = false, limit = null, page = null) {
+  const params = { all, limit, page };
+  const url = new URL(`${config.apiUrl}/families`);
+  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
   const requestOptions = {
     method: 'GET',
     headers: {
       'Content-type': 'application/json',
       Authorization: authHeader().Authorization,
     },
-    body: JSON.stringify({
-      all,
-      limit,
-      page,
-    }),
   };
-  return fetch(`${config.apiUrl}/familiess`, requestOptions)
+  return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
     .catch((err) => err);
 }
@@ -102,19 +98,17 @@ function createProduct(
     .catch((err) => err);
 }
 function getProducts(all = false, limit = null, page = null) {
+  const params = { all, limit, page };
+  const url = new URL(`${config.apiUrl}/products`);
+  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
   const requestOptions = {
     method: 'GET',
     headers: {
       'Content-type': 'application/json',
       Authorization: authHeader().Authorization,
     },
-    body: JSON.stringify({
-      all,
-      limit,
-      page,
-    }),
   };
-  return fetch(`${config.apiUrl}/products`, requestOptions)
+  return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
     .catch((err) => err);
 }
@@ -144,19 +138,17 @@ function createSuppliment(
     .catch((err) => err);
 }
 function getSuppliments(all = false, limit = null, page = null) {
+  const params = { all, limit, page };
+  const url = new URL(`${config.apiUrl}/suppliments`);
+  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
   const requestOptions = {
     method: 'GET',
     headers: {
       'Content-type': 'application/json',
       Authorization: authHeader().Authorization,
     },
-    body: JSON.stringify({
-      all,
-      limit,
-      page,
-    }),
   };
-  return fetch(`${config.apiUrl}/suppliments`, requestOptions)
+  return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
     .catch((err) => err);
 }

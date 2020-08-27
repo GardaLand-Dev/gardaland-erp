@@ -38,13 +38,13 @@ export default class FamilyController {
 
   public static getFamily(req: Request, res: Response) {
     if (
-      (req.body.id && typeof req.body.id === 'string') ||
-      (req.body.name && typeof req.body.name === 'string')
+      (req.query.id && typeof req.query.id === 'string') ||
+      (req.query.name && typeof req.query.name === 'string')
     ) {
-      const filter = req.body.id
-        ? { id: req.body.id }
+      const filter = req.query.id
+        ? { id: req.query.id }
         : {
-            name: (<string>req.body.name).normalize().toLowerCase(),
+            name: (<string>req.query.name).normalize().toLowerCase(),
           };
       const familyFilter = { where: filter };
       Family.findOne(familyFilter)
@@ -116,9 +116,13 @@ export default class FamilyController {
 
   public static getFamilies(req: Request, res: Response) {
     const limit =
-      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+      typeof req.query.limit === 'number' && req.query.limit > 0
+        ? req.query.limit
+        : DEFAULT_LIMIT;
     const offset =
-      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+      typeof req.query.page === 'number' && req.query.page > 0
+        ? (req.query.page - 1) * limit
+        : 0;
     const options: FindOptions<import('../../../db/models/family/type').Family> = {
       limit,
       offset,

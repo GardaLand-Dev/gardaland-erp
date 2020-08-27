@@ -41,11 +41,11 @@ export default class SupplimentController {
   }
 
   public static getSuppliment(req: Request, res: Response) {
-    if (req.body.id || req.body.name) {
-      const filter = req.body.id
-        ? { id: req.body.id }
+    if (req.query.id || req.query.name) {
+      const filter = req.query.id
+        ? { id: req.query.id }
         : {
-            name: (<string>req.body.name).normalize().toLowerCase(),
+            name: (<string>req.query.name).normalize().toLowerCase(),
           };
       const supplimentFilter = { where: filter };
       Suppliment.findOne(supplimentFilter)
@@ -121,9 +121,13 @@ export default class SupplimentController {
 
   public static getSuppliments(req: Request, res: Response) {
     const limit =
-      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+      typeof req.query.limit === 'number' && req.query.limit > 0
+        ? req.query.limit
+        : DEFAULT_LIMIT;
     const offset =
-      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+      typeof req.query.page === 'number' && req.query.page > 0
+        ? (req.query.page - 1) * limit
+        : 0;
     const options: FindOptions<import('../../../db/models/suppliment/type').Suppliment> = {
       limit,
       offset,
