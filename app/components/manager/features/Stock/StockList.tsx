@@ -189,7 +189,7 @@ export default function StockList(): JSX.Element {
           }}
         />
         <TextField
-          className="my-3"
+          className="my-3 mr-1"
           id="outlined-number"
           label="Quantité"
           type="number"
@@ -205,7 +205,7 @@ export default function StockList(): JSX.Element {
           }}
         />
         <TextField
-          className="my-3"
+          className="my-3 ml-2"
           id="outlined-number"
           label="Alert Quantité"
           type="number"
@@ -221,7 +221,7 @@ export default function StockList(): JSX.Element {
           }}
         />
         <FormControlLabel
-          className="m-3"
+          className="my-3 ml-2"
           control={<Checkbox />}
           label="isIngredient"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

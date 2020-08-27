@@ -19,6 +19,7 @@ import Add from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
+import stockSerivce from '../../../../services/stock.service';
 import staticService from '../../../../services/statics.service';
 
 const useStyles = makeStyles(() =>
@@ -89,37 +90,48 @@ const columns = [
     button: true,
   },
 ];
-const ingredient = [
-  { title: 'Viande' },
-  { title: 'Poulet' },
-  { title: 'escalope' },
-  { title: 'merguez' },
-];
-const Famille = ['Pizza', 'Sandwich', 'Tacos', 'Plat'];
+// const ingredient = [
+//   { title: 'Viande' },
+//   { title: 'Poulet' },
+//   { title: 'escalope' },
+//   { title: 'merguez' },
+// ];
+// const Famille = ['Pizza', 'Sandwich', 'Tacos', 'Plat'];
 const AddtextField = ({
   onChange,
   idx,
+  data,
 }: {
   idx: number;
-  onChange: (index: number, name: string, q: number) => void;
+  data: {
+    id: string;
+    name: string;
+    selected: boolean;
+    unit: string;
+    quantity: number;
+  }[];
+  onChange: (id: string, quantity: number, prevId: string) => void;
 }) => {
-  const [ingredientName, setIngredientName] = useState('');
+  const [ingredientId, setIngredientId] = useState('');
   const [quantity, setquantity] = useState(0);
-  const handleChange = (name: string, qt: number) => {
-    onChange(idx, name, qt);
+  // const [ingredient, setIngredient] = useState<
+  //   { id: string; name: string; unit: string; selected: boolean }[]
+  // >([]);
+  const handleChange = (id: string, qt: number) => {
+    onChange(id, qt, ingredientId);
   };
   return (
     <div className={useStyles().root}>
       <Grid container spacing={2}>
         <Grid item xs>
           <Autocomplete
-            options={ingredient}
-            getOptionLabel={(option) => option.title}
+            options={data.filter((i) => !i.selected)}
+            getOptionLabel={(option) => option.name}
             style={{ width: '100%' }}
             onChange={(_event: any, newValue: any | null) => {
-              setIngredientName(newValue.title);
-              handleChange(newValue.title, quantity);
-              console.log(newValue.title);
+              const Value = newValue ? newValue.id : null;
+              handleChange(Value, quantity);
+              setIngredientId(Value);
             }}
             renderInput={(params) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
@@ -139,8 +151,8 @@ const AddtextField = ({
               }}
               onChange={(e) => {
                 const val = parseFloat(e.target.value);
+                handleChange(ingredientId, val);
                 setquantity(val);
-                handleChange(ingredientName, val);
               }}
             />
             <FormHelperText id="standard-quantity-helper-text">
@@ -152,6 +164,7 @@ const AddtextField = ({
     </div>
   );
 };
+
 export default function ListeProduit(): JSX.Element {
   const [data, setData] = useState<
     {
@@ -163,25 +176,6 @@ export default function ListeProduit(): JSX.Element {
       familyId: string;
     }[]
   >([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isChecked, setisChecked] = useState(false);
-  const [fieldsNum, setFieldNum] = useState(1);
-  const [ingredients, setIngredients] = useState<
-    {
-      index: number;
-      ingredientName: string;
-      quantity: number;
-    }[]
-  >([{ index: 0, ingredientName: '', quantity: null }]);
-  const [productParams, setProductParams] = useState<{
-    name: string;
-    priceTTC: number;
-    tva: number;
-    ingredients?: { stockableId: string; quantity: number }[];
-    stockableId: string;
-    isComposed: boolean;
-    familyId: string;
-  }>();
   useEffect(() => {
     staticService
       .getProducts()
@@ -199,35 +193,102 @@ export default function ListeProduit(): JSX.Element {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleIngredients = (
-    index: number,
-    ingredientName: string,
-    quantity: number
-  ) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isChecked, setisChecked] = useState(false);
+  const [fieldsNum, setFieldNum] = useState(1);
+  const [famille, setFamille] = useState<
+    {
+      id: string;
+      name: string;
+    }[]
+  >([]);
+  useEffect(() => {
+    staticService
+      .getFamilies()
+      .then((d) => {
+        return setFamille(d.map((p) => ({ id: p.id, name: p.name })));
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const [ingredients, setIngredients] = useState<
+    {
+      id: string;
+      name: string;
+      quantity: number;
+      unit: string;
+      selected: boolean;
+    }[]
+  >([]);
+  useEffect(() => {
+    stockSerivce
+      .getStockables(true)
+      .then((d) => {
+        return setIngredients(
+          d.map((i) => ({
+            id: i.id,
+            name: i.name,
+            unit: i.unit,
+            selected: false,
+          }))
+        );
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const [productParams, setProductParams] = useState<{
+    name: string;
+    priceTTC: number;
+    tva: number;
+    ingredients?: { stockableId: string; quantity: number }[];
+    stockableId?: string;
+    isComposed: boolean;
+    familyId: string;
+  }>();
+
+  const handleIngredients = (id: string, quantity: number, prevId: string) => {
     setIngredients(
-      ingredients.map((ing, i) => {
-        if (index === i) {
-          console.log('is true');
-          return { index: i, ingredientName, quantity };
+      ingredients.map((ing) => {
+        if (ing.id === id) {
+          return { ...ing, quantity, selected: true };
         }
+        if (ing.id === prevId) return { ...ing, selected: false };
         return ing;
       })
     );
   };
+
   const handleAddField = () => {
-    const index = fieldsNum;
-    setFieldNum(index + 1);
-    setIngredients(
-      ingredients.concat([{ index, ingredientName: '', quantity: null }])
-    );
+    // const index = fieldsNum;
+    setFieldNum(fieldsNum + 1);
+    // setIngredients(
+    //   ingredients.concat([{ index, ingredientName: '', quantity: null }])
+    // );
   };
   const handleAddClicked = () => {
     setModalVisible(true);
   };
   const handleChecked = () => {
     setisChecked(!isChecked);
-    // eslint-disable-next-line no-console
-    console.log(isChecked);
+  };
+  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    staticService
+      .createProduct(
+        productParams.name,
+        productParams.priceTTC,
+        productParams.tva,
+        ingredients
+          .filter((i) => i.selected)
+          .map((i) => ({ stockableId: i.id, quantity: i.quantity })),
+        isChecked,
+        productParams.stockableId,
+        productParams.familyId
+      )
+      // eslint-disable-next-line no-console
+      .then((ok) => console.log('familly added ', ok))
+      // eslint-disable-next-line no-console
+      .catch((err) => console.log(err));
   };
   return (
     <div>
@@ -245,29 +306,47 @@ export default function ListeProduit(): JSX.Element {
         }}
         visible={modalVisible}
         title="Ajouter Produit"
-        onSubmit={() => console.log('submitted', ingredients)}
+        onSubmit={handleCreate}
       >
         <div className={useStyles().root}>
+          <TextField
+            style={{ width: '100%' }}
+            id="outlined-basic"
+            label="Nom de Produit"
+            variant="outlined"
+            onChange={
+              (e) =>
+                setProductParams({
+                  ...productParams,
+                  name: e.target.value,
+                })
+              // a
+            }
+          />
           <Grid container spacing={2} className="my-2">
             <Grid item xs>
-              <TextField
-                style={{ width: '100%' }}
-                id="outlined-basic"
-                label="Nom de Produit"
-                variant="outlined"
-                onChange={
-                  (e) =>
-                    setProductParams({
-                      ...productParams,
-                      name: e.target.value,
-                    })
-                  // a
-                }
-              />
+              <FormControl style={{ width: '100%' }} variant="outlined">
+                <InputLabel>TVA</InputLabel>
+                <OutlinedInput
+                  type="number"
+                  onChange={
+                    (e) =>
+                      setProductParams({
+                        ...productParams,
+                        tva: parseFloat(e.target.value),
+                      })
+                    // eslint-disable-next-line react/jsx-curly-newline
+                  }
+                  endAdornment={
+                    <InputAdornment position="end">DA</InputAdornment>
+                  }
+                  labelWidth={60}
+                />
+              </FormControl>
             </Grid>
             <Grid item xs>
               <FormControl style={{ width: '100%' }} variant="outlined">
-                <InputLabel>Amount</InputLabel>
+                <InputLabel>TTC</InputLabel>
                 <OutlinedInput
                   type="number"
                   onChange={
@@ -289,10 +368,13 @@ export default function ListeProduit(): JSX.Element {
         </div>
         <Autocomplete
           onChange={(_event: any, newValue: any | null) => {
-            setProductParams({ ...productParams, familyId: newValue.id });
+            setProductParams({
+              ...productParams,
+              familyId: newValue ? newValue.id : null,
+            });
           }}
-          options={Famille}
-          getOptionLabel={(option) => option}
+          options={famille}
+          getOptionLabel={(option) => option.name}
           style={{ width: '100%' }}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -303,6 +385,12 @@ export default function ListeProduit(): JSX.Element {
           control={<Checkbox checked={isChecked} onChange={handleChecked} />}
           label="isComposed"
           className="m-2"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setProductParams({
+              ...productParams,
+              isComposed: e.target.checked,
+            });
+          }}
         />
         {isChecked ? (
           <>
@@ -314,6 +402,7 @@ export default function ListeProduit(): JSX.Element {
                 key={index}
                 idx={index}
                 onChange={handleIngredients}
+                data={ingredients}
               />
             ))}
           </>

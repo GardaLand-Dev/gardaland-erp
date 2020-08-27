@@ -24,8 +24,13 @@ function createStockable(
     })
     .catch((err) => err);
 }
-function getStockables(all = false, limit = null, page = null) {
-  const params = { all, limit, page };
+function getStockables(
+  all = false,
+  limit: number = null,
+  page: number = null,
+  ingredient = false
+) {
+  const params = { ingredient, all, limit, page };
   const url = new URL(`${config.apiUrl}/stockables`);
   Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
   const requestOptions = {

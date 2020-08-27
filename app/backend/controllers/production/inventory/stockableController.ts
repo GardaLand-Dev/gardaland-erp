@@ -135,6 +135,7 @@ export default class StockableController {
       limit,
       offset,
     };
+    if (req.query.ingredient === 'true') options.where = { isIngredient: true };
     Stockable.findAll(options)
       .then((stockablesData) =>
         successResponse('users retrieved', stockablesData, res)

@@ -44,20 +44,20 @@ const columns = [
 //     emplacement: 'Tacos Printer',
 //   },
 // ];
-const Emplacement = [
-  {
-    id: 'printer_1',
-    name: 'Pizza Printer',
-  },
-  {
-    id: 'printer_2',
-    name: 'Sandwich Printer',
-  },
-  {
-    id: 'printer_3',
-    name: 'Tacos Printer',
-  },
-];
+// const Emplacement = [
+//   {
+//     id: 'printer_1',
+//     name: 'Pizza Printer',
+//   },
+//   {
+//     id: 'printer_2',
+//     name: 'Sandwich Printer',
+//   },
+//   {
+//     id: 'printer_3',
+//     name: 'Tacos Printer',
+//   },
+// ];
 export default function FamilleList(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const [familyName, setFamilyName] = useState('');
@@ -65,6 +65,15 @@ export default function FamilleList(): JSX.Element {
   const [data, setData] = useState<
     { id: string; name: string; stationId: string }[]
   >([]);
+  const [station, setStation] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    staticService
+      .getStations()
+      .then((d) => {
+        return setStation(d.map((s) => ({ id: s.id, name: s.name })));
+      })
+      .catch((err) => console.log(err));
+  }, []);
   useEffect(() => {
     staticService
       .getFamilies()
@@ -84,7 +93,7 @@ export default function FamilleList(): JSX.Element {
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     staticService
-      .createFamily(familyName)
+      .createFamily(familyName, value)
       .then((ok) => console.log('familly added ', ok))
       .catch((err) => console.log(err));
   };
@@ -121,7 +130,7 @@ export default function FamilleList(): JSX.Element {
             setValue(newValue.id);
             console.log(newValue.id);
           }}
-          options={Emplacement}
+          options={station}
           getOptionLabel={(option) => option.name}
           style={{ width: '100%' }}
           renderInput={(params) => (
