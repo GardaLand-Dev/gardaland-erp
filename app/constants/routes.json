@@ -8,8 +8,9 @@
       "List": "/Manager/vente/list"
     },
     "ProductManagement": {
-      "List": "/Manager/products/list",
-      "FamilleList": "/Manager/product/famillelist"
+      "List": "/Manager/produits/list",
+      "FamilleList": "/Manager/produits/list_famille",
+      "Station": "/Manager/produits/station"
     },
     "StockManagement": {
       "List": "/Manager/stock/list"

@@ -7,6 +7,7 @@ import ProductList from '../components/manager/features/product/ProductList';
 import FamilleList from '../components/manager/features/Famille/FamilleList';
 import VenteList from '../components/manager/features/Vente/VenteList';
 import StockList from '../components/manager/features/Stock/StockList';
+import Station from '../components/manager/features/Station/Station';
 
 export default function MangerPage(): JSX.Element {
   return (
@@ -25,6 +26,10 @@ export default function MangerPage(): JSX.Element {
           <Route
             path={routes.MANAGER.ProductManagement.FamilleList}
             component={FamilleList}
+          />
+          <Route
+            path={routes.MANAGER.ProductManagement.Station}
+            component={Station}
           />
           <Route
             path={routes.MANAGER.VenteManagement.List}

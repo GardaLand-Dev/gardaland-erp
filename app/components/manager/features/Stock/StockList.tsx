@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IconButton,
   TextField,
@@ -8,44 +8,60 @@ import {
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
+import stockSerivce from '../../../../services/stock.service';
 
-const data = [
-  {
-    id: 'Viande',
-    update: '30/08/2020',
-    Quantité: '20 kg',
-  },
-  {
-    id: 'Poulet',
-    update: '04/08/2020',
-    Quantité: '10 kg',
-  },
-  {
-    id: 'coca',
-    update: '30/08/2020',
-    Quantité: '200 kg',
-  },
-  {
-    id: 'fromage',
-    update: '30/08/2020',
-    Quantité: '200 kg',
-  },
-];
+// const data = [
+//   {
+//     id: 'Viande',
+//     update: '30/08/2020',
+//     Quantité: '20 kg',
+//   },
+//   {
+//     id: 'Poulet',
+//     update: '04/08/2020',
+//     Quantité: '10 kg',
+//   },
+//   {
+//     id: 'coca',
+//     update: '30/08/2020',
+//     Quantité: '200 kg',
+//   },
+//   {
+//     id: 'fromage',
+//     update: '30/08/2020',
+//     Quantité: '200 kg',
+//   },
+// ];
 
 const columns = [
   {
-    name: 'Produit',
-    selector: 'id',
+    name: 'Stockable',
+    selector: 'name',
     sortable: true,
   },
   {
     name: 'Quantité',
-    selector: 'Quantité',
+    selector: 'quantity',
+    sortable: true,
+  },
+  {
+    name: 'Unité',
+    selector: 'unit',
+    sortable: true,
+  },
+  {
+    name: 'Alert Quantité',
+    selector: 'alertQuantity',
+    sortable: true,
+  },
+  {
+    name: 'Ingrédient',
+    selector: 'isIngredient',
     sortable: true,
   },
   {
     name: 'last update',
-    selector: 'update',
+    selector: 'updatedAt',
     sortable: true,
   },
   {
@@ -77,8 +93,59 @@ const columns = [
 // ];
 export default function StockList(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
+  const [stockParams, setStockParams] = useState<{
+    name: string;
+    unit: string;
+    quantity: number;
+    isIngredient: boolean;
+    alertQuantity: number;
+  }>();
+  const [data, setData] = useState<
+    {
+      id: string;
+      name: string;
+      quantity: number;
+      unit: string;
+      isIngredient: boolean;
+      alertQuantity: number;
+    }[]
+  >([]);
+  useEffect(() => {
+    stockSerivce
+      .getStockables()
+      .then((d) => {
+        console.log(d);
+        return setData(
+          d.map((s) => ({
+            id: s.id,
+            name: s.name,
+            quantity: s.quantity,
+            unit: s.unit,
+            isIngredient: s.isIngredient ? 'Oui' : 'Non',
+            alertQuantity: s.alertQuantity,
+            updatedAt: new Date(Date.parse(s.updatedAt)).toDateString(),
+          }))
+        );
+      })
+      .catch((err) => console.log(err));
+  }, []);
   const handleAddClicked = () => {
     setModalVisible(true);
+  };
+  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    stockSerivce
+      .createStockable(
+        stockParams.name,
+        stockParams.unit,
+        stockParams.isIngredient,
+        stockParams.alertQuantity,
+        stockParams.quantity
+      )
+      .then((ok) =>
+        console.log('stockable add (exit modal and refresh data)', ok)
+      )
+      .catch((err) => console.log(err));
   };
   return (
     <div>
@@ -93,7 +160,7 @@ export default function StockList(): JSX.Element {
         visible={modalVisible}
         title="Ajouter stock"
         // eslint-disable-next-line no-console
-        onSubmit={(e) => console.log(e)}
+        onSubmit={handleCreate}
       >
         <TextField
           className="my-3"
@@ -101,6 +168,12 @@ export default function StockList(): JSX.Element {
           id="outlined-basic"
           label="Nom"
           variant="outlined"
+          onChange={(e) => {
+            setStockParams({
+              ...stockParams,
+              name: e.target.value,
+            });
+          }}
         />
         <TextField
           className="my-3"
@@ -108,6 +181,12 @@ export default function StockList(): JSX.Element {
           id="outlined-basic"
           label="unité"
           variant="outlined"
+          onChange={(e) => {
+            setStockParams({
+              ...stockParams,
+              unit: e.target.value,
+            });
+          }}
         />
         <TextField
           className="my-3"
@@ -118,11 +197,39 @@ export default function StockList(): JSX.Element {
             shrink: true,
           }}
           variant="outlined"
+          onChange={(e) => {
+            setStockParams({
+              ...stockParams,
+              quantity: parseFloat(e.target.value),
+            });
+          }}
+        />
+        <TextField
+          className="my-3"
+          id="outlined-number"
+          label="Alert Quantité"
+          type="number"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          variant="outlined"
+          onChange={(e) => {
+            setStockParams({
+              ...stockParams,
+              alertQuantity: parseFloat(e.target.value),
+            });
+          }}
         />
         <FormControlLabel
           className="m-3"
           control={<Checkbox />}
           label="isIngredient"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setStockParams({
+              ...stockParams,
+              isIngredient: e.target.checked,
+            });
+          }}
         />
       </SimpleModal>
     </div>

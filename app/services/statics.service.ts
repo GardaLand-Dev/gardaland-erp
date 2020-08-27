@@ -80,7 +80,7 @@ function createProduct(
   ingredients: Array<{
     stockableId: string;
     quantity: number;
-  }>,
+  }> = null,
   isComposed: boolean,
   stockableId: string = null,
   familyId: string

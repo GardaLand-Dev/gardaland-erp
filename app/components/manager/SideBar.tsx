@@ -56,6 +56,10 @@ export default function Sidebar(): JSX.Element {
           id: 'Liste des Familles',
           link: routes.MANAGER.ProductManagement.FamilleList,
         },
+        {
+          id: 'Emplacement',
+          link: routes.MANAGER.ProductManagement.Station,
+        },
       ],
     },
     {

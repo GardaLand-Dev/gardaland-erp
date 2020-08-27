@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IconButton, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
-// import staticService from '../../../../services/statics.service';
+import staticService from '../../../../services/statics.service';
 
 const columns = [
   {
     name: 'famille',
-    selector: 'id',
+    selector: 'name',
     sortable: true,
   },
   {
     name: 'emplacement',
-    selector: 'emplacement',
+    selector: 'stationId',
     sortable: true,
   },
   {
@@ -30,52 +30,65 @@ const columns = [
     button: true,
   },
 ];
-const data = [
-  {
-    id: 'Pizza',
-    emplacement: 'Pizza Printer',
-  },
-  {
-    id: 'Sandwich',
-    emplacement: 'Sandwich printer',
-  },
-  {
-    id: 'Tacos',
-    emplacement: 'Tacos Printer',
-  },
-];
+// const data = [
+//   {
+//     id: 'Pizza',
+//     emplacement: 'Pizza Printer',
+//   },
+//   {
+//     id: 'Sandwich',
+//     emplacement: 'Sandwich printer',
+//   },
+//   {
+//     id: 'Tacos',
+//     emplacement: 'Tacos Printer',
+//   },
+// ];
 const Emplacement = [
   {
-    title: 'Pizza Printer',
+    id: 'printer_1',
+    name: 'Pizza Printer',
   },
   {
-    title: 'Sandwich Printer',
+    id: 'printer_2',
+    name: 'Sandwich Printer',
   },
   {
-    title: 'Tacos Printer',
+    id: 'printer_3',
+    name: 'Tacos Printer',
   },
 ];
 export default function FamilleList(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
-  // const [familyParams, setFamilyParams] = useState({});
+  const [familyName, setFamilyName] = useState('');
+  const [value, setValue] = useState<string | null>();
+  const [data, setData] = useState<
+    { id: string; name: string; stationId: string }[]
+  >([]);
+  useEffect(() => {
+    staticService
+      .getFamilies()
+      .then((d) => {
+        return setData(
+          d.map((f) => ({ id: f.id, name: f.name, stationId: f.stationId }))
+        );
+      })
+      .catch((err) => console.log(err));
+  }, []);
   const handleAddClicked = () => {
     setModalVisible(true);
   };
-  // const handleFamilyValue = (e) => {
-  //   // const a = familyParams;
-  //   setFamilyParams(e.target.value);
-  // };
-  // const handleCreate = () => {
-  // staticService
-  //   .createFamily(familyName)
-  //   .then((ok) => console.log('familly added ', ok))
-  //   .catch((err) => console.log(err));
-  // };
+  const handleFamilyName = (e) => {
+    setFamilyName(e.target.value);
+  };
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // eslint-disable-next-line no-console
-    console.log(e.currentTarget.elements);
+    staticService
+      .createFamily(familyName)
+      .then((ok) => console.log('familly added ', ok))
+      .catch((err) => console.log(err));
   };
+
   return (
     <div>
       <CustomTable
@@ -98,10 +111,18 @@ export default function FamilleList(): JSX.Element {
           id="pizza"
           label="Nom de famille"
           variant="outlined"
+          onChange={handleFamilyName}
         />
         <Autocomplete
+          onChange={(
+            _event: any,
+            newValue: { id: string; name: string } | null
+          ) => {
+            setValue(newValue.id);
+            console.log(newValue.id);
+          }}
           options={Emplacement}
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => option.name}
           style={{ width: '100%' }}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
