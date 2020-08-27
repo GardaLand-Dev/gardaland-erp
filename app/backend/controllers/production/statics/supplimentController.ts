@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions, Includeable } from 'sequelize/types';
 import { SupplimentCreationAttributes } from '../../../db/models/suppliment/type';
 import {
   successResponse,
@@ -7,7 +7,7 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Suppliment } from '../../../db/models';
+import { DEFAULT_LIMIT, Suppliment, Stockable } from '../../../db/models';
 
 export default class SupplimentController {
   public static createSuppliment(req: Request, res: Response) {
@@ -131,7 +131,10 @@ export default class SupplimentController {
     const options: FindOptions<import('../../../db/models/suppliment/type').Suppliment> = {
       limit,
       offset,
+      include: [],
     };
+    if (req.query.incStockable === 'true')
+      (<Includeable[]>options.include).push({ model: Stockable });
     if (!(req.body.all === true)) options.where = { toBeArchived: false };
     Suppliment.findAll(options)
       .then((supplimentsData) =>

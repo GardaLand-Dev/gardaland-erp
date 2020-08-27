@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions, Includeable } from 'sequelize/types';
 import { StationCreationAttributes } from '../../../db/models/station/type';
-import { Station, DEFAULT_LIMIT } from '../../../db/models';
+import { Station, DEFAULT_LIMIT, Family } from '../../../db/models';
 import {
   successResponse,
   dbError,
@@ -118,7 +118,10 @@ export default class StationController {
     const options: FindOptions<import('../../../db/models/station/type').Station> = {
       limit,
       offset,
+      include: [],
     };
+    if (req.query.incFamilies === 'true')
+      (<Includeable[]>options.include).push({ model: Family });
     Station.findAll(options)
       .then((stationsData) =>
         successResponse('users retrieved', stationsData, res)

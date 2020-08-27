@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions, Includeable } from 'sequelize/types';
 import { FamilyCreationAttributes } from '../../../db/models/family/type';
 import {
   successResponse,
@@ -7,7 +7,7 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Station, Family } from '../../../db/models';
+import { DEFAULT_LIMIT, Station, Family, Product } from '../../../db/models';
 
 export default class FamilyController {
   public static createFamily(req: Request, res: Response) {
@@ -126,7 +126,12 @@ export default class FamilyController {
     const options: FindOptions<import('../../../db/models/family/type').Family> = {
       limit,
       offset,
+      include: [],
     };
+    if (req.query.incStation === 'true')
+      (<Includeable[]>options.include).push({ model: Station });
+    if (req.query.incProducts === 'true')
+      (<Includeable[]>options.include).push({ model: Product });
     Family.findAll(options)
       .then((familiesData) =>
         successResponse('families retrieved', familiesData, res)

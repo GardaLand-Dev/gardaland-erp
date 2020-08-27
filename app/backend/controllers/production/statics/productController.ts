@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize';
+import { FindOptions, Includeable } from 'sequelize';
 import { ProductCreationAttributes } from '../../../db/models/product/type';
 import {
   successResponse,
@@ -11,6 +11,8 @@ import dbConfig, {
   DEFAULT_LIMIT,
   ProductStockable,
   Product,
+  Family,
+  Stockable,
 } from '../../../db/models';
 
 export default class ProductController {
@@ -186,14 +188,16 @@ export default class ProductController {
     const options: FindOptions<import('../../../db/models/product/type').Product> = {
       limit,
       offset,
-      // where: {
-      //   toBeArchived:
-      //     req.body.archived && typeof req.body.archived === 'boolean'
-      //       ? req.body.archived
-      //       : false,
-      // },
+      include: [],
     };
-    if (!(req.body.all === true)) options.where = { toBeArchived: false };
+    if (req.query.incFamily === 'true')
+      (<Includeable[]>options.include).push({ model: Family });
+    if (req.query.incStockables === 'true')
+      (<Includeable[]>options.include).push({
+        model: Stockable,
+        through: { attributes: ['quantity'] },
+      });
+    if (!(req.query.all === 'true')) options.where = { toBeArchived: false };
     Product.findAll(options)
       .then((productsData) =>
         successResponse('users retrieved', productsData, res)
