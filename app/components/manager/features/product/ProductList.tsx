@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IconButton,
   FormControl,
@@ -19,6 +19,7 @@ import Add from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
+import staticService from '../../../../services/statics.service';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -28,46 +29,51 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const data = [
-  {
-    id: 'Pizza Viande',
-    famille: 'Pizza',
-    prix: '300 DA',
-    Quantité: '200',
-  },
-  {
-    id: 'Pizza Poulet',
-    famille: 'Pizza',
-    prix: '300 DA',
-    Quantité: '200',
-  },
-  {
-    id: 'Sandwich Viande',
-    famille: 'Sandwich',
-    prix: '200 DA',
-    Quantité: '150',
-  },
-];
+// const data = [
+//   {
+//     id: 'Pizza Viande',
+//     famille: 'Pizza',
+//     prix: '300 DA',
+//     Quantité: '200',
+//   },
+//   {
+//     id: 'Pizza Poulet',
+//     famille: 'Pizza',
+//     prix: '300 DA',
+//     Quantité: '200',
+//   },
+//   {
+//     id: 'Sandwich Viande',
+//     famille: 'Sandwich',
+//     prix: '200 DA',
+//     Quantité: '150',
+//   },
+// ];
 
 const columns = [
   {
     name: 'Produit',
-    selector: 'id',
+    selector: 'name',
     sortable: true,
   },
   {
     name: 'Famille',
-    selector: 'famille',
-    sortable: true,
-  },
-  {
-    name: 'Prix',
-    selector: 'prix',
+    selector: 'familyId',
     sortable: true,
   },
   {
     name: 'Quantité',
-    selector: 'Quantité',
+    selector: 'quantity',
+    sortable: true,
+  },
+  {
+    name: 'Prix TTC',
+    selector: 'priceTTC',
+    sortable: true,
+  },
+  {
+    name: 'TVA',
+    selector: 'tva',
     sortable: true,
   },
   {
@@ -89,14 +95,20 @@ const ingredient = [
   { title: 'escalope' },
   { title: 'merguez' },
 ];
-const Famille = [
-  { title: 'Pizza' },
-  { title: 'Sandwich' },
-  { title: 'Tacos' },
-  { title: 'Plat' },
-];
-const AddtextField = () => (
-  <>
+const Famille = ['Pizza', 'Sandwich', 'Tacos', 'Plat'];
+const AddtextField = ({
+  onChange,
+  idx,
+}: {
+  idx: number;
+  onChange: (index: number, name: string, q: number) => void;
+}) => {
+  const [ingredientName, setIngredientName] = useState('');
+  const [quantity, setquantity] = useState(0);
+  const handleChange = (name: string, qt: number) => {
+    onChange(idx, name, qt);
+  };
+  return (
     <div className={useStyles().root}>
       <Grid container spacing={2}>
         <Grid item xs>
@@ -104,6 +116,11 @@ const AddtextField = () => (
             options={ingredient}
             getOptionLabel={(option) => option.title}
             style={{ width: '100%' }}
+            onChange={(_event: any, newValue: any | null) => {
+              setIngredientName(newValue.title);
+              handleChange(newValue.title, quantity);
+              console.log(newValue.title);
+            }}
             renderInput={(params) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
               <TextField {...params} label="ingredient" variant="outlined" />
@@ -113,28 +130,96 @@ const AddtextField = () => (
         <Grid item xs>
           <FormControl style={{ width: '100%' }}>
             <Input
-              id="standard-adornment-weight"
+              type="number"
+              id="standard-adornment-quantity"
               endAdornment={<InputAdornment position="end">Kg</InputAdornment>}
-              aria-describedby="standard-weight-helper-text"
+              aria-describedby="standard-quantity-helper-text"
               inputProps={{
-                'aria-label': 'weight',
+                'aria-label': 'quantity',
+              }}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                setquantity(val);
+                handleChange(ingredientName, val);
               }}
             />
-            <FormHelperText id="standard-weight-helper-text">
-              Weight
+            <FormHelperText id="standard-quantity-helper-text">
+              quantity
             </FormHelperText>
           </FormControl>
         </Grid>
       </Grid>
     </div>
-  </>
-);
+  );
+};
 export default function ListeProduit(): JSX.Element {
+  const [data, setData] = useState<
+    {
+      id: string;
+      name: string;
+      tva: number;
+      priceTTC: number;
+      isComposed: boolean;
+      familyId: string;
+    }[]
+  >([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isChecked, setisChecked] = useState(false);
   const [fieldsNum, setFieldNum] = useState(1);
+  const [ingredients, setIngredients] = useState<
+    {
+      index: number;
+      ingredientName: string;
+      quantity: number;
+    }[]
+  >([{ index: 0, ingredientName: '', quantity: null }]);
+  const [productParams, setProductParams] = useState<{
+    name: string;
+    priceTTC: number;
+    tva: number;
+    ingredients?: { stockableId: string; quantity: number }[];
+    stockableId: string;
+    isComposed: boolean;
+    familyId: string;
+  }>();
+  useEffect(() => {
+    staticService
+      .getProducts()
+      .then((d) => {
+        return setData(
+          d.map((p) => ({
+            id: p.id,
+            name: p.name,
+            tva: p.tva,
+            priceTTC: p.priceTTC,
+            familyId: p.familyId,
+          }))
+        );
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const handleIngredients = (
+    index: number,
+    ingredientName: string,
+    quantity: number
+  ) => {
+    setIngredients(
+      ingredients.map((ing, i) => {
+        if (index === i) {
+          console.log('is true');
+          return { index: i, ingredientName, quantity };
+        }
+        return ing;
+      })
+    );
+  };
   const handleAddField = () => {
-    setFieldNum(fieldsNum + 1);
+    const index = fieldsNum;
+    setFieldNum(index + 1);
+    setIngredients(
+      ingredients.concat([{ index, ingredientName: '', quantity: null }])
+    );
   };
   const handleAddClicked = () => {
     setModalVisible(true);
@@ -160,7 +245,7 @@ export default function ListeProduit(): JSX.Element {
         }}
         visible={modalVisible}
         title="Ajouter Produit"
-        onSubmit={() => console.log('submitted')}
+        onSubmit={() => console.log('submitted', ingredients)}
       >
         <div className={useStyles().root}>
           <Grid container spacing={2} className="my-2">
@@ -170,14 +255,31 @@ export default function ListeProduit(): JSX.Element {
                 id="outlined-basic"
                 label="Nom de Produit"
                 variant="outlined"
+                onChange={
+                  (e) =>
+                    setProductParams({
+                      ...productParams,
+                      name: e.target.value,
+                    })
+                  // a
+                }
               />
             </Grid>
             <Grid item xs>
               <FormControl style={{ width: '100%' }} variant="outlined">
                 <InputLabel>Amount</InputLabel>
                 <OutlinedInput
-                  startAdornment={
-                    <InputAdornment position="start">$</InputAdornment>
+                  type="number"
+                  onChange={
+                    (e) =>
+                      setProductParams({
+                        ...productParams,
+                        priceTTC: parseFloat(e.target.value),
+                      })
+                    // eslint-disable-next-line react/jsx-curly-newline
+                  }
+                  endAdornment={
+                    <InputAdornment position="end">DA</InputAdornment>
                   }
                   labelWidth={60}
                 />
@@ -186,8 +288,11 @@ export default function ListeProduit(): JSX.Element {
           </Grid>
         </div>
         <Autocomplete
+          onChange={(_event: any, newValue: any | null) => {
+            setProductParams({ ...productParams, familyId: newValue.id });
+          }}
           options={Famille}
-          getOptionLabel={(option) => option.title}
+          getOptionLabel={(option) => option}
           style={{ width: '100%' }}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -205,7 +310,11 @@ export default function ListeProduit(): JSX.Element {
               <Add />
             </IconButton>
             {[...Array(fieldsNum).keys()].map((index) => (
-              <AddtextField key={index} />
+              <AddtextField
+                key={index}
+                idx={index}
+                onChange={handleIngredients}
+              />
             ))}
           </>
         ) : (
