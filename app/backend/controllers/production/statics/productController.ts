@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions } from 'sequelize';
 import { ProductCreationAttributes } from '../../../db/models/product/type';
 import {
   successResponse,
@@ -28,8 +28,6 @@ export default class ProductController {
       req.body.familyId &&
       typeof req.body.familyId === 'string'
     ) {
-      // verify stockable(s) exist(s)
-
       const t = await dbConfig.transaction();
       try {
         const productParams: ProductCreationAttributes = {

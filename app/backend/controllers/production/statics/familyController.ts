@@ -129,7 +129,7 @@ export default class FamilyController {
     };
     Family.findAll(options)
       .then((familiesData) =>
-        successResponse('users retrieved', familiesData, res)
+        successResponse('families retrieved', familiesData, res)
       )
       .catch((err) => failureResponse('couldnt retrieve users', err, res));
   }

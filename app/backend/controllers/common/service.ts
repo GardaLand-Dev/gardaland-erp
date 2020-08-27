@@ -43,6 +43,8 @@ export function unauthorizedRequest(
 }
 
 export function dbError(err: Error, res: Response) {
+  // eslint-disable-next-line no-console
+  console.log(err); // debug
   return res.status(ResponseStatusCodes.internal_server_error).json({
     STATUS: 'FAILURE',
     MESSAGE: 'SQLITE error',

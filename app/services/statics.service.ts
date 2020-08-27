@@ -37,7 +37,22 @@ function getStations(all = false, limit = null, page = null) {
     })
     .catch((err) => err);
 }
-
+function getPrinters() {
+  const requestOptions = {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json',
+      Authorization: authHeader().Authorization,
+    },
+  };
+  return fetch(`${config.apiUrl}/printers`, requestOptions)
+    .then((res: Response) => res.json())
+    .then((data) => {
+      if (data.STATUS !== 'SUCCESS') throw new Error(data.MESSAGE);
+      return data.data;
+    })
+    .catch((err) => err);
+}
 /** family */
 function createFamily(name: string, stationId = null) {
   const requestOptions = {
@@ -78,7 +93,7 @@ function createProduct(
   priceTtc: number,
   tva: number = null,
   ingredients: Array<{
-    stockableId: string;
+    id: string;
     quantity: number;
   }> = null,
   isComposed: boolean,
@@ -96,7 +111,7 @@ function createProduct(
       priceTtc,
       tva,
       isComposed,
-      ingredients,
+      stockables: ingredients,
       stockableId,
       familyId,
     }),
@@ -172,6 +187,7 @@ function getSuppliments(all = false, limit = null, page = null) {
 const staticService = {
   createStation,
   getStations,
+  getPrinters,
   createFamily,
   getFamilies,
   createProduct,

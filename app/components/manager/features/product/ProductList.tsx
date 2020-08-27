@@ -99,10 +99,8 @@ const columns = [
 // const Famille = ['Pizza', 'Sandwich', 'Tacos', 'Plat'];
 const AddtextField = ({
   onChange,
-  idx,
   data,
 }: {
-  idx: number;
   data: {
     id: string;
     name: string;
@@ -190,6 +188,7 @@ export default function ListeProduit(): JSX.Element {
           }))
         );
       })
+      // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
   }, []);
 
@@ -208,6 +207,7 @@ export default function ListeProduit(): JSX.Element {
       .then((d) => {
         return setFamille(d.map((p) => ({ id: p.id, name: p.name })));
       })
+      // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
   }, []);
 
@@ -233,6 +233,7 @@ export default function ListeProduit(): JSX.Element {
           }))
         );
       })
+      // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
   }, []);
 
@@ -280,7 +281,7 @@ export default function ListeProduit(): JSX.Element {
         productParams.tva,
         ingredients
           .filter((i) => i.selected)
-          .map((i) => ({ stockableId: i.id, quantity: i.quantity })),
+          .map((i) => ({ id: i.id, quantity: i.quantity })),
         isChecked,
         productParams.stockableId,
         productParams.familyId
@@ -400,7 +401,6 @@ export default function ListeProduit(): JSX.Element {
             {[...Array(fieldsNum).keys()].map((index) => (
               <AddtextField
                 key={index}
-                idx={index}
                 onChange={handleIngredients}
                 data={ingredients}
               />
