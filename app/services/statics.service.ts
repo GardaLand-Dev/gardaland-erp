@@ -31,6 +31,10 @@ function getStations(all = false, limit = null, page = null) {
   };
   return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
+    .then((data) => {
+      if (data.STATUS !== 'SUCCESS') throw new Error(data.MESSAGE);
+      return data.DATA;
+    })
     .catch((err) => err);
 }
 
@@ -61,6 +65,10 @@ function getFamilies(all = false, limit = null, page = null) {
   };
   return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
+    .then((data) => {
+      if (data.STATUS !== 'SUCCESS') throw new Error(data.MESSAGE);
+      return data.DATA;
+    })
     .catch((err) => err);
 }
 
@@ -110,6 +118,10 @@ function getProducts(all = false, limit = null, page = null) {
   };
   return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
+    .then((data) => {
+      if (data.STATUS !== 'SUCCESS') throw new Error(data.MESSAGE);
+      return data.DATA;
+    })
     .catch((err) => err);
 }
 
@@ -150,6 +162,10 @@ function getSuppliments(all = false, limit = null, page = null) {
   };
   return fetch(url.href, requestOptions)
     .then((res: Response) => res.json())
+    .then((data) => {
+      if (data.STATUS !== 'SUCCESS') throw new Error(data.MESSAGE);
+      return data.DATA;
+    })
     .catch((err) => err);
 }
 
