@@ -1,0 +1,41 @@
+.colorButton {
+  border-radius: 8px !important;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+  &:hover {
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
+  }
+  &.active {
+    opacity: 1;
+    background: $theme-gradient;
+    -webkit-background-clip: none;
+    -webkit-text-fill-color: white;
+  }
+}
+.btnsuccess {
+  background-color: green !important;
+}
+.tabnum {
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 8px !important;
+  border: none;
+  width: 20% !important;
+  height: 50px;
+  &:focus {
+    border: none;
+  }
+  &:hover {
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
+  }
+  &:active {
+    background: $theme-gradient;
+    color: white;
+  }
+  &.active {
+    background: $theme-gradient;
+    color: white;
+  }
+}
+.custButton {
+  border-radius: 8px !important;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+}

@@ -1,16 +1,19 @@
 .sidebarButton {
   border-color: transparent;
   border-radius: 8px;
-  background-color: transparent;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.075);
+  background: $theme-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   &:hover {
-    background: #dfdfdf;
-    color: black;
     box-shadow: 0 0 20px 0 rgb(216, 216, 216);
   }
   &:active {
     background: $theme-gradient;
     color: white;
-    box-shadow: 0 0 71px -13px rgba(251, 215, 214, 1);
+    box-shadow: 0 0 71px -13px rgba(251, 215, 214, 2);
+    -webkit-background-clip: none;
+    -webkit-text-fill-color: white;
   }
   &:focus {
     outline: none;
@@ -18,6 +21,8 @@
   &.active {
     background: $theme-gradient;
     color: white;
-    box-shadow: 0 0 71px -13px rgba(251, 215, 214, 1);
+    box-shadow: 0 0 71px -13px rgba(251, 215, 214, 2);
+    -webkit-background-clip: none;
+    -webkit-text-fill-color: white;
   }
 }
