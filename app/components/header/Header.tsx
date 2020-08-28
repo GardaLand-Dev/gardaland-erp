@@ -6,12 +6,11 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import Badge from '@material-ui/core/Badge';
 import MailOutlineOutlinedIcon from '@material-ui/icons/MailOutlineOutlined';
 import { logout } from '../../reducers/authentication.reducer';
-import { getDecoded } from '../../helpers/auth-header';
 
 export default function Header() {
   const dispatch = useDispatch();
   return (
-    <div className="test d-flex flex-row justify-content-end align-items-center bg-white mx-3 mt-3 mb-0 p-3 rounded-xlg ">
+    <div className="d-flex flex-row justify-content-end align-items-center bg-white mx-3 mt-3 mb-0 p-3 rounded-xlg ">
       <div className="d-flex flex-row align-items-center theme-gradient rounded mx-2 p-3">
         <FontAwesomeIcon icon={faUserCircle} size="2x" className="mr-4" />
         <span className="align-top text-capitalize">benzaamia rabie</span>
@@ -38,7 +37,6 @@ export default function Header() {
           <button
             type="button"
             onClick={() => {
-              console.log(getDecoded());
               dispatch(logout());
             }}
           >

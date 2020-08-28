@@ -116,7 +116,7 @@ export default function CartRow({
               <div className="quant-icon">
                 <button
                   // onClick={this.decreaseQunatity}
-                  className="btn text-white-50 py-1"
+                  className="btn text-white py-1"
                   type="button"
                   onClick={decrClicked}
                 >

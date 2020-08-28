@@ -16,7 +16,7 @@ export default function MenuArticles() {
       <Article key={art.id} id={art.id} callback={cb} />
     ));
   return (
-    <div className="row ml-n3 mr-0 pb-3 row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
+    <div className="row ml-n3 mr-0 pb-3 row-cols-3 row-cols-sm-3 row-cols-md-4 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6">
       {articles}
     </div>
   );

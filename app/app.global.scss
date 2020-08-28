@@ -202,14 +202,18 @@ body {
     box-shadow: 0 0 71px -13px #f98148;
   }
 }
-
+.color-gradient {
+  background: $theme-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 //components
 @import './components/article/Article.scss';
 @import './components/login/Login.scss';
-@import './components/sidebar/Sidebar.scss';
 @import './components/sidebar/SideBarButton.scss';
 @import './components/manager/Logo.scss';
-@import './components/manager/ManagerSidebar.scss';
+@import './components/cart/Cart.scss';
+
 // @import './components/cart/Cart.scss';
 //containers
 @import './containers/HomePage.scss';
