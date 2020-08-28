@@ -18,5 +18,9 @@
     "postinstall": "yarn electron-rebuild"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@journeyapps/sqlcipher": "^4.1.0",
+    "@thiagoelg/node-printer": "^0.5.3",
+    "sequelize": "^6.3.4"
+  }
 }
