@@ -5,7 +5,7 @@ import { OrderProductSuppliment } from './type';
 export default function OrderProductSupplimentFactory(
   sequilize: Sequelize
 ): ModelCtor<OrderProductSuppliment> {
-  return sequilize.define('product_stockable_suppliments', {
+  return sequilize.define('order_product_suppliments', {
     // productId: {
     //   type: DataTypes.UUID,
     //   allowNull: false,

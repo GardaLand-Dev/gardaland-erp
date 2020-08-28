@@ -1,9 +1,12 @@
 import {
   Model,
+  Association,
   // BelongsToGetAssociationMixin,
   // BelongsToSetAssociationMixin,
   // Association,
 } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { Suppliment } from '../suppliment/type';
 
 export interface OrderProductSupplimentAttributes {
   quantity: number;
@@ -33,10 +36,11 @@ export class OrderProductSuppliment
 
   // public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
 
-  // // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
-  // public readonly employee?: Employee;
+  // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly suppliment?: Suppliment;
 
-  // public static associations: {
-  //   employee: Association<Employee, OrderProductSuppliment>;
-  // };
+  public static associations: {
+    // employee: Association<Employee, OrderProductSuppliment>;
+    suppliment: Association<Suppliment, OrderProductSuppliment>;
+  };
 }

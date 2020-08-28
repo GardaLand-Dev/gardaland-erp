@@ -218,9 +218,17 @@ export default class ProductionRoutes {
       OrderController.createOrder
     );
     app.put(`${path}/order`, getAuthChecker('orders/order:update'));
-    app.delete(`${path}/order`, getAuthChecker('orders/order:delete'));
+    app.delete(
+      `${path}/order`,
+      getAuthChecker('orders/order:delete'),
+      OrderController.deleteOrder
+    );
 
-    app.get(`${path}/orders`, getAuthChecker('orders/orders:view'));
+    app.get(
+      `${path}/orders`,
+      getAuthChecker('orders/orders:view'),
+      OrderController.getOrders
+    );
 
     // OrderProduct
     app.get(`${path}/orderproduct`, getAuthChecker('orders/orderproduct:view'));

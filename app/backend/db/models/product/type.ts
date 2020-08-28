@@ -20,6 +20,7 @@ import { Family } from '../family/type';
 import { Stockable } from '../stockable/type';
 // eslint-disable-next-line import/no-cycle
 import { OrderProduct } from '../orderProducts/type';
+import { ProductStockable } from '../productStockables/type';
 
 export interface ProductAttributes {
   id: string;
@@ -89,9 +90,12 @@ export class Product extends Model<ProductAttributes, ProductCreationAttributes>
 
   public readonly OrderProducts?: OrderProduct[];
 
+  public readonly productStockables?: ProductStockable[];
+
   public static associations: {
     family: Association<Family, Product>;
     stockables: Association<Stockable, Product>;
     orderProducts: Association<OrderProduct, Product>;
+    productStockables: Association<ProductStockable, Product>;
   };
 }

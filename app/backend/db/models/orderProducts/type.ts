@@ -18,6 +18,8 @@ import {
 import { Suppliment } from '../suppliment/type';
 // eslint-disable-next-line import/no-cycle
 import { Product } from '../product/type';
+// eslint-disable-next-line import/no-cycle
+import { OrderProductSuppliment } from '../orderProductSuppliments/type';
 
 export interface OrderProductAttributes {
   id: string;
@@ -83,8 +85,11 @@ export class OrderProduct
 
   public readonly product?: Product;
 
+  public readonly orderProductSuppliments?: OrderProductSuppliment[];
+
   public static assotations: {
     suppliments: Association<Suppliment, OrderProduct>;
     product: Association<Product, OrderProduct>;
+    orderProductSuppliments: Association<OrderProductSuppliment, OrderProduct>;
   };
 }

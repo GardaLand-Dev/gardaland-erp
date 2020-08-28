@@ -162,6 +162,9 @@ export const dbInit = async () => {
   /**  product-stockable */
   Product.belongsToMany(Stockable, { through: ProductStockable });
   Stockable.belongsToMany(Product, { through: ProductStockable });
+  /**  Product-ProductStockable */
+  Product.hasMany(ProductStockable, { as: 'productStockables' });
+  ProductStockable.belongsTo(Product);
   /**  stockable-suppliment */
   Suppliment.belongsTo(Stockable);
   Stockable.hasMany(Suppliment);
@@ -176,6 +179,14 @@ export const dbInit = async () => {
   OrderProduct.belongsToMany(Suppliment, {
     through: OrderProductSuppliment,
   });
+  /**  OrderProduct-OrderProductSuppliment */
+  OrderProduct.hasMany(OrderProductSuppliment, {
+    as: 'orderProductSuppliments',
+  });
+  OrderProductSuppliment.belongsTo(OrderProduct);
+  /** orderProductSuppliment-Suppliment */
+  Suppliment.hasMany(OrderProductSuppliment);
+  OrderProductSuppliment.belongsTo(Suppliment);
   /** PRODUCTION-RBAC RELATIONS */
   /**  user-supply */
   Supply.belongsTo(User);

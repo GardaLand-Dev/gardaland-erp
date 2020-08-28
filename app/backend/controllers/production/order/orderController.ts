@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions, Op } from 'sequelize';
 import objectHash from 'object-hash';
-import { OrderCreationAttributes } from '../../../db/models/order/type';
+import {
+  OrderCreationAttributes,
+  OrderAttributes,
+} from '../../../db/models/order/type';
 import {
   successResponse,
   dbError,
@@ -13,7 +16,11 @@ import dbConfig, {
   Order,
   OrderProduct,
   OrderProductSuppliment,
+  Product,
+  ProductStockable,
+  Suppliment,
 } from '../../../db/models';
+import StockableHelper from '../../../db/helpers/stockable.helper';
 
 export default class OrderController {
   public static async createOrder(req: Request, res: Response) {
@@ -24,20 +31,6 @@ export default class OrderController {
         const orderParams: OrderCreationAttributes = {
           num: req.body.num, // req.body.num,
         };
-        // const tempdebug = {
-        //   order_products: [
-        //     {
-        //       product_id: '1425c5a8-c595-4cb8-ad2e-fb7c08f0682d',
-        //       quantity: 1,
-        //       suppliments: [
-        //         { suppliment_id: 'sid1', quantity: 1 },
-        //         { suppliment_id: 'sid2', quantity: 1 },
-        //         { suppliment_id: 'sid3', quantity: 1 },
-        //       ],
-        //     },
-        //   ],
-        // };
-
         // create order
         const o = await Order.create(orderParams, { transaction: t });
         if (!o) throw new Error('coudnt create user');
@@ -45,9 +38,9 @@ export default class OrderController {
         const opDict: { [opQtHash: string]: string[] } = {};
         const ops = await OrderProduct.bulkCreate(
           req.body.orderProducts.map(
-            (op: { product_id: string; quantity: number }) => ({
+            (op: { productId: string; quantity: number }) => ({
               orderId: o.id,
-              productId: op.product_id,
+              productId: op.productId,
               quantity: op.quantity,
             })
           ),
@@ -71,13 +64,13 @@ export default class OrderController {
               quantity: number;
             }[],
             value: {
-              product_id: string;
+              productId: string;
               quantity: number;
-              suppliments?: { suppliment_id: string; quantity: number }[];
+              suppliments?: { supplimentId: string; quantity: number }[];
             }
           ) => {
             const hash = objectHash({
-              productId: value.product_id,
+              productId: value.productId,
               quantity: value.quantity,
             });
             const opid = opDict[hash].pop();
@@ -85,7 +78,7 @@ export default class OrderController {
               return acc.concat(
                 value.suppliments.map((sp) => ({
                   orderProductId: opid,
-                  supplimentId: sp.suppliment_id,
+                  supplimentId: sp.supplimentId,
                   quantity: sp.quantity,
                 }))
               );
@@ -94,16 +87,47 @@ export default class OrderController {
           },
           []
         );
-        // eslint-disable-next-line no-console
-        console.log(opspsIns);
         const opsps = await OrderProductSuppliment.bulkCreate(opspsIns, {
           transaction: t,
         });
         if (!opsps) throw new Error('coudnt create orderProductSuppliment');
         t.commit()
-          .then(() =>
-            successResponse('order created successfully', o.toJSON(), res)
-          )
+          .then(async () => {
+            successResponse('order created successfully', o.toJSON(), res);
+            const opsInc = await OrderProduct.findAll({
+              where: {
+                id: { [Op.in]: ops.map((e) => e.id) },
+              },
+              include: [
+                {
+                  model: OrderProductSuppliment,
+                  as: 'orderProductSuppliments',
+                  include: [Suppliment],
+                },
+                {
+                  model: Product,
+                  include: [
+                    { model: ProductStockable, as: 'productStockables' },
+                  ],
+                },
+              ],
+            });
+            const stockablesDict: { [id: string]: number } = {};
+            opsInc.forEach((e) => {
+              e.product.productStockables.forEach((ee) => {
+                stockablesDict[ee.stockableId] =
+                  stockablesDict[ee.stockableId] - e.quantity * ee.quantity ||
+                  0 - e.quantity * ee.quantity;
+              });
+              e.orderProductSuppliments.forEach((ee) => {
+                stockablesDict[ee.suppliment.stockableId] =
+                  stockablesDict[ee.suppliment.stockableId] -
+                    e.quantity * ee.quantity * ee.suppliment.quantity ||
+                  0 - e.quantity * ee.quantity * ee.suppliment.quantity;
+              });
+            });
+            return StockableHelper.updateStockables(stockablesDict);
+          })
           .catch((err) => dbError(err, res));
       } catch (err) {
         console.log('ERRRR COUGHT', err);
@@ -188,20 +212,64 @@ export default class OrderController {
   //   }
   // }
 
-  // public static deleteOrder(req: Request, res: Response) {
-  //   if (req.body.id) {
-  //     const orderFilter = { where: { id: req.body.id } };
-  //     Order.findOne(orderFilter)
-  //       .then((orderData) => {
-  //         if (!orderData) throw new Error('cant find order');
-  //         orderData.toBeArchived = true;
-  //         return orderData.save();
-  //       })
-  //       .catch((err) => dbError(err, res));
-  //   } else {
-  //     insufficientParameters(res);
-  //   }
-  // }
+  public static async deleteOrder(req: Request, res: Response) {
+    if (req.body.id) {
+      const t = await dbConfig.transaction();
+      // TODO: dont need all attributes use attributes param
+      const orderFilter: FindOptions<OrderAttributes> = {
+        where: { id: req.body.id },
+        include: [
+          {
+            model: OrderProduct,
+            include: [
+              {
+                model: OrderProductSuppliment,
+                as: 'orderProductSuppliments',
+                include: [Suppliment],
+              },
+              {
+                model: Product,
+                include: [{ model: ProductStockable, as: 'productStockables' }],
+              },
+            ],
+          },
+        ],
+        transaction: t,
+      };
+      try {
+        const orderData = await Order.findOne(orderFilter);
+        if (!orderData) throw new Error('cant find order');
+        // readjust the stock values
+        // i need stockable-quantity(op.quantity)
+        // successResponse('TEST didnt delete just getting', orderData, res);
+        const stockableQtDict: { [index: string]: number } = {};
+        orderData.orderProducts.forEach((op) => {
+          op.product.productStockables.forEach((ps) => {
+            stockableQtDict[ps.stockableId] =
+              stockableQtDict[ps.stockableId] + op.quantity * ps.quantity ||
+              op.quantity * ps.quantity;
+          });
+          op.orderProductSuppliments.forEach((ops) => {
+            stockableQtDict[ops.suppliment.stockableId] =
+              stockableQtDict[ops.suppliment.stockableId] +
+                ops.quantity * ops.suppliment.quantity * op.quantity ||
+              ops.quantity * ops.suppliment.quantity * op.quantity;
+          });
+        });
+        t.commit();
+        successResponse('TEST didnt delete just getting', stockableQtDict, res);
+        // Print Cancel to adequate printers
+        await StockableHelper.updateStockables(stockableQtDict);
+        // .catch((err) => dbError(err, res));
+      } catch (err) {
+        t.rollback();
+        console.log(err);
+        failureResponse('failed to delete order', err, res);
+      }
+    } else {
+      insufficientParameters(res);
+    }
+  }
 
   public static getOrders(req: Request, res: Response) {
     const limit =

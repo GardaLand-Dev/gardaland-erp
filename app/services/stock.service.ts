@@ -32,7 +32,13 @@ function getStockables(
 ) {
   const params = { ingredient, all, limit, page };
   const url = new URL(`${config.apiUrl}/stockables`);
-  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
+  Object.entries(params).forEach((p) =>
+    url.searchParams.set(
+      p[0],
+      // eslint-disable-next-line no-nested-ternary
+      typeof p[1] === 'boolean' ? (p[1] ? 'true' : 'false') : String(p[1])
+    )
+  );
   const requestOptions = {
     method: 'GET',
     headers: {
