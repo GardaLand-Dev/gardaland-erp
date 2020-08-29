@@ -17,6 +17,7 @@ import { User } from '../user/type';
 export interface OrderAttributes {
   id: string;
   num: number;
+  type: string;
   modified: boolean;
   canceled: boolean;
 }
@@ -29,6 +30,8 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes>
   public id!: string;
 
   public num!: number;
+
+  public type!: string;
 
   public modified!: boolean;
 

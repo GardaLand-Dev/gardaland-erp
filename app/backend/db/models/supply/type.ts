@@ -18,8 +18,14 @@ export interface SupplyAttributes {
   quantity: number;
   price: number;
   deliveredOn: Date;
+  supplierId: string;
+  stockableId: string;
+  toBeArchived: boolean;
 }
-export type SupplyCreationAttributes = Optional<SupplyAttributes, 'id'>;
+export type SupplyCreationAttributes = Optional<
+  SupplyAttributes,
+  'id' | 'deliveredOn' | 'toBeArchived'
+>;
 export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   implements SupplyAttributes {
   public id!: string;
@@ -27,6 +33,12 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   public quantity!: number;
 
   public price!: number;
+
+  public supplierId!: string;
+
+  public stockableId!: string;
+
+  public toBeArchived!: boolean;
 
   public deliveredOn!: Date;
 

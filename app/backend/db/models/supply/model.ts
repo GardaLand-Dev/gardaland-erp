@@ -19,6 +19,12 @@ export default function SupplyFactory(sequelize: Sequelize): ModelCtor<Supply> {
     },
     deliveredOn: {
       type: DataTypes.DATEONLY,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
+    },
+    toBeArchived: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
       allowNull: false,
     },
   });

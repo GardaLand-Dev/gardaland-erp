@@ -25,11 +25,12 @@ import StockableHelper from '../../../db/helpers/stockable.helper';
 export default class OrderController {
   public static async createOrder(req: Request, res: Response) {
     // eslint-disable-next-line no-constant-condition
-    if (req.body.orderProducts && req.body.num) {
+    if (req.body.orderProducts && req.body.num && req.body.type) {
       const t = await dbConfig.transaction();
       try {
         const orderParams: OrderCreationAttributes = {
           num: req.body.num, // req.body.num,
+          type: req.body.type,
         };
         // create order
         const o = await Order.create(orderParams, { transaction: t });

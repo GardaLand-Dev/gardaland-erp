@@ -13,6 +13,10 @@ export default function OrderFactory(sequelize: Sequelize): ModelCtor<Order> {
       type: DataTypes.INTEGER,
       autoIncrement: true,
     },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     modified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
