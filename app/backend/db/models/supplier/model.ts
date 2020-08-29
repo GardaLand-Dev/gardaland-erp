@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
+import { DataTypes, Sequelize, ModelCtor, UUIDV4, Deferrable } from 'sequelize';
 import { Supplier } from './type';
 
 export default function SupplierFactory(
@@ -15,6 +15,9 @@ export default function SupplierFactory(
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
+      validate: {
+        isAlpha: true,
+      },
     },
     address: {
       type: DataTypes.STRING(255),
@@ -23,6 +26,9 @@ export default function SupplierFactory(
     tel: {
       type: DataTypes.STRING(15),
       allowNull: true,
+      validate: {
+        is: /\d{9,10}$/i,
+      },
     },
   });
 }

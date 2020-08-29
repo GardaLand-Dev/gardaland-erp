@@ -13,8 +13,12 @@ export interface AttendanceAttributes {
   checkIn: Date;
   checkOut: Date;
   dayDate: Date;
+  employeeId: string;
 }
-export type AttendanceCreationAttributes = Optional<AttendanceAttributes, 'id'>;
+export type AttendanceCreationAttributes = Optional<
+  AttendanceAttributes,
+  'id' | 'checkOut'
+>;
 export class Attendance
   extends Model<AttendanceAttributes, AttendanceCreationAttributes>
   implements AttendanceAttributes {
@@ -25,6 +29,8 @@ export class Attendance
   public checkOut!: Date;
 
   public dayDate!: Date;
+
+  public employeeId!: string;
 
   // timestamps
   public createdAt!: Date;
