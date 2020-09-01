@@ -18,6 +18,20 @@ import {
 } from '../../reducers/cartSlice';
 import TabButton from './TabButton';
 import data from '../../services/api';
+// svgs
+import {
+  EmporterSvg,
+  EmporterWhiteSvg,
+  SaleWhiteSvg,
+  SaleSvg,
+  DeliveryWhiteSvg,
+  DeliverySvg,
+  KitchenSvg,
+  AddSvg,
+  DeleteSvg,
+  MoneySvg,
+} from '../../assets/svgs';
+//
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -127,17 +141,13 @@ export default function Cart(): JSX.Element {
             classes={{ root: useStyles().button, label: useStyles().label }}
             onClick={(e) => setSelected(e.currentTarget.id)}
           >
-            {selected === 'sale' ? (
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              <Icon className={useStyles().icon}>
-                <img className="pb-5" alt="edit" src="sale-white.svg" />
-              </Icon>
-            ) : (
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              <Icon className={useStyles().icon}>
-                <img className="pb-5" alt="edit" src="sale.svg" />
-              </Icon>
-            )}
+            <Icon className={useStyles().icon}>
+              <img
+                className="pb-5"
+                alt="edit"
+                src={selected === 'sale' ? SaleWhiteSvg : SaleSvg}
+              />
+            </Icon>
             sale
           </Button>
         </Grid>
@@ -150,15 +160,13 @@ export default function Cart(): JSX.Element {
             classes={{ root: useStyles().button, label: useStyles().label }}
             onClick={(e) => setSelected(e.currentTarget.id)}
           >
-            {selected === 'emporter' ? (
-              <Icon className={useStyles().icon}>
-                <img className="pb-5" alt="edit" src="emporter-white.svg" />
-              </Icon>
-            ) : (
-              <Icon className={useStyles().icon}>
-                <img className="pb-5" alt="edit" src="emporter.svg" />
-              </Icon>
-            )}
+            <Icon className={useStyles().icon}>
+              <img
+                className="pb-5"
+                alt="edit"
+                src={selected === 'emporter' ? EmporterWhiteSvg : EmporterSvg}
+              />
+            </Icon>
             Emporter
           </Button>
         </Grid>
@@ -171,15 +179,13 @@ export default function Cart(): JSX.Element {
             classes={{ root: useStyles().button, label: useStyles().label }}
             onClick={(e) => setSelected(e.currentTarget.id)}
           >
-            {selected === 'delivery' ? (
-              <Icon className={useStyles().icon}>
-                <img className="pb-5" alt="edit" src="delivery-white.svg" />
-              </Icon>
-            ) : (
-              <Icon className={useStyles().icon}>
-                <img className="pb-5" alt="edit" src="delivery.svg" />
-              </Icon>
-            )}
+            <Icon className={useStyles().icon}>
+              <img
+                className="pb-5"
+                alt="edit"
+                src={selected === 'delivery' ? DeliveryWhiteSvg : DeliverySvg}
+              />
+            </Icon>
             Delivery
           </Button>
         </Grid>
@@ -189,7 +195,7 @@ export default function Cart(): JSX.Element {
         <Grid item xs>
           <Button className="custButton color-gradient">
             <Icon fontSize="large" className="mx-2">
-              <img className="pb-5" alt="edit" src="add.svg" />
+              <img className="pb-5" alt="edit" src={AddSvg} />
             </Icon>
             Add Customer
           </Button>
@@ -197,7 +203,7 @@ export default function Cart(): JSX.Element {
         <Grid item xs>
           <Button className="custButton color-gradient">
             <Icon fontSize="large" className="mx-2">
-              <img className="pb-5" alt="edit" src="kitchen.svg" />
+              <img className="pb-5" alt="edit" src={KitchenSvg} />
             </Icon>
             Add Table
           </Button>
@@ -231,7 +237,7 @@ export default function Cart(): JSX.Element {
             onClick={delListClicked}
           >
             <Icon fontSize="small" className="mx-2">
-              <img className="pb-5" alt="edit" src="delete.svg" />
+              <img className="pb-5" alt="edit" src={DeleteSvg} />
             </Icon>
             <span>Supprimer</span>
           </Button>
@@ -239,7 +245,7 @@ export default function Cart(): JSX.Element {
         <Grid item xs>
           <Button className="btnsuccess  mt-5 mb-3 py-3 px-4">
             <Icon fontSize="small" className="mx-2">
-              <img className="pb-5" alt="edit" src="money.svg" />
+              <img className="pb-5" alt="edit" src={MoneySvg} />
             </Icon>
             <span className="text-white">Pay Now</span>
           </Button>

@@ -132,6 +132,20 @@ body {
   height: 100%;
 }
 
+.noScrollBar {
+  &::-webkit-scrollbar-track {
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    display: none;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+    // background-color: #F5F5F5;
+  }
+  &::-webkit-scrollbar-thumb {
+    display: none;
+  }
+}
+
 .customScrollBar {
   &::-webkit-scrollbar-track {
     // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -140,6 +154,7 @@ body {
   }
   &::-webkit-scrollbar {
     width: 5px;
+    height: 5px;
     z-index: 10;
     // background-color: #F5F5F5;
   }

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Grid } from '@material-ui/core';
 import data from '../../services/api';
 import SideBarButton from './sideBarButton';
 // TODO: redisign this shit is ugly
@@ -11,16 +10,16 @@ export default function Sidebar({ callback, selectedFam }: Props): JSX.Element {
   const families = data.families.map((family) => family.id);
 
   return (
-    <Grid container justify="start" className="my-3">
-      {families.map((fam) => (
-        <Grid item key={fam} className="mr-3">
-          <SideBarButton
-            famId={fam}
-            selected={fam === selectedFam}
-            callback={callback}
-          />
-        </Grid>
+    <div className="d-flex flex-row w-100 p-0">
+      {families.map((fam, i) => (
+        <SideBarButton
+          key={fam}
+          famId={fam}
+          selected={fam === selectedFam}
+          callback={callback}
+          className={i === families.length - 1 ? '' : 'mr-2'}
+        />
       ))}
-    </Grid>
+    </div>
   );
 }

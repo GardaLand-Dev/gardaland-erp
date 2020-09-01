@@ -177,7 +177,7 @@ export default merge(baseConfig, {
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         use: {
-          loader: 'url-loader',
+          loader: 'file-loader',
           options: {
             limit: 10000,
             mimetype: 'image/svg+xml',
@@ -187,7 +187,7 @@ export default merge(baseConfig, {
       // Common Image Formats
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-        use: 'url-loader',
+        use: 'file-loader',
       },
     ],
   },
