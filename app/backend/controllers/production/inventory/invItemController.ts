@@ -24,7 +24,7 @@ export default class InvItemController {
         name: (<string>req.body.name).normalize().toLowerCase(),
         unit: (<string>req.body.unit).normalize().toLowerCase(),
         isIngredient: req.body.isIngredient,
-        inStock: req.body.quantity,
+        inStock: req.body.inStock,
         alertQuantity: req.body.alertQuantity,
       };
       InvItem.create(invItemParams)
@@ -86,8 +86,8 @@ export default class InvItemController {
                 ? req.body.isIngredient
                 : invItemData.isIngredient,
             inStock:
-              req.body.quantity && typeof req.body.quantity === 'number'
-                ? req.body.quantity
+              req.body.inStock && typeof req.body.inStock === 'number'
+                ? req.body.inStock
                 : invItemData.inStock,
             alertQuantity:
               req.body.alertQuantity &&

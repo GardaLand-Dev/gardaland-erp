@@ -13,17 +13,17 @@ export default class SupplyController {
   public static createSupply(req: Request, res: Response) {
     if (
       req.body.quantity &&
-      req.body.price &&
+      req.body.cost &&
       req.body.supplierId &&
       req.body.invItemId &&
       typeof req.body.quantity === 'number' &&
-      typeof req.body.price === 'number' &&
+      typeof req.body.cost === 'number' &&
       typeof req.body.supplierId === 'string' &&
       typeof req.body.invItemId === 'string'
     ) {
       const supplyParams: SupplyCreationAttributes = {
         quantity: req.body.quantity,
-        cost: req.body.price,
+        cost: req.body.cost,
         supplierId: req.body.supplierId,
         invItemId: req.body.invItemId,
         deliveredOn: req.body.deliveredOn,
@@ -73,8 +73,8 @@ export default class SupplyController {
                 ? req.body.quantity
                 : supplyData.quantity,
             cost:
-              req.body.price && typeof req.body.price === 'number'
-                ? req.body.price
+              req.body.cost && typeof req.body.cost === 'number'
+                ? req.body.cost
                 : supplyData.cost,
             deliveredOn: req.body.deliveredOn
               ? req.body.deliveredOn
