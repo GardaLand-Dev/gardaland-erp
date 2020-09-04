@@ -1,26 +1,26 @@
 import { Sequelize } from 'sequelize';
 import path from 'path';
-import UserFactory from './user/model';
-import RoleFactory from './role/model';
-import PrivilegeFactory from './privilege/model';
-import OperationFactory from './operation/model';
-import ResourceFactory from './resource/model';
-import ProductFactory from './product/model';
-import FamilyFactory from './family/model';
-import StationFactory from './station/model';
-import SupplimentFactory from './suppliment/model';
-import StockableFactory from './stockable/model';
-import SupplyFactory from './supply/model';
-import SupplierFactory from './supplier/model';
-import EmployeeFactory from './employee/model';
-import TitleFactory from './title/model';
-import SalaryFactory from './salary/model';
-import PayrollFactory from './payroll/model';
-import AttendanceFactory from './attendance/model';
-import OrderFactory from './order/model';
-import OrderProductFactory from './orderProducts/model';
-import ProductStockableFactory from './productStockables/model';
-import OrderProductSupplimentFactory from './orderProductSuppliments/model';
+import UserFactory from './rbac/user/model';
+import RoleFactory from './rbac/role/model';
+import PrivilegeFactory from './rbac/privilege/model';
+import OperationFactory from './rbac/operation/model';
+import ResourceFactory from './rbac/resource/model';
+import ProductFactory from './products/product/model';
+import FamilyFactory from './products/family/model';
+import StationFactory from './products/station/model';
+import SupplimentFactory from './products/suppliment/model';
+import ProductStockableFactory from './products/productStockables/model';
+import StockableFactory from './inventory/stockable/model';
+import SupplyFactory from './inventory/supply/model';
+import SupplierFactory from './inventory/supplier/model';
+import EmployeeFactory from './humanResources/employee/model';
+import TitleFactory from './humanResources/title/model';
+import SalaryFactory from './humanResources/salary/model';
+import PayrollFactory from './humanResources/payroll/model';
+import AttendanceFactory from './humanResources/attendance/model';
+import OrderFactory from './sales/order/model';
+import OrderProductFactory from './sales/orderProducts/model';
+import OrderProductSupplimentFactory from './sales/orderProductSuppliments/model';
 
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
