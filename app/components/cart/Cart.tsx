@@ -33,7 +33,7 @@ import {
 } from '../../assets/svgs';
 //
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     button: {
       height: 95,
@@ -111,11 +111,8 @@ export default function Cart(): JSX.Element {
         <div>
           {tabs}
           {/* <i className=" fa fa-plus-square fa-2x" /> */}
-          <IconButton size="small">
-            <AddCircleOutlineOutlinedIcon
-              fontSize="large"
-              onClick={addTabClicked}
-            />
+          <IconButton size="small" onClick={addTabClicked}>
+            <AddCircleOutlineOutlinedIcon fontSize="large" />
           </IconButton>
           {/*  */}
         </div>
