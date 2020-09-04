@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
-import { AttendanceCreationAttributes } from '../../../db/models/attendance/type';
+import { AttendanceCreationAttributes } from '../../../db/models/humanResources/attendance/type';
 import {
   successResponse,
   dbError,
@@ -103,7 +103,7 @@ export default class AttendanceController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/attendance/type').Attendance> = {
+    const options: FindOptions<import('../../../db/models/humanResources/attendance/type').Attendance> = {
       limit,
       offset,
       include: [],

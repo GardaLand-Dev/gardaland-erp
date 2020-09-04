@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
-import { SupplierCreationAttributes } from '../../../db/models/supplier/type';
+import { SupplierCreationAttributes } from '../../../db/models/inventory/supplier/type';
 import {
   successResponse,
   dbError,
@@ -96,7 +96,7 @@ export default class SupplierController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/supplier/type').Supplier> = {
+    const options: FindOptions<import('../../../db/models/inventory/supplier/type').Supplier> = {
       limit,
       offset,
       include: [],

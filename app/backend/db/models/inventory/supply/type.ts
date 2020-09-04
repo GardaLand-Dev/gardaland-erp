@@ -11,7 +11,6 @@ import {
 import { InvItem } from '../invItem/type';
 // eslint-disable-next-line import/no-cycle
 import { Supplier } from '../supplier/type';
-import { User } from '../../rbac/user/type';
 
 export interface SupplyAttributes {
   id: string;
@@ -68,21 +67,13 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
 
   public createSuppliet!: BelongsToCreateAssociationMixin<Supplier>;
 
-  // User-Supply
-  public getUser!: BelongsToGetAssociationMixin<User>;
-
-  public setUser!: BelongsToSetAssociationMixin<User, string>;
-
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
   public readonly invItem?: InvItem;
 
   public readonly supplier?: Supplier;
 
-  public readonly user?: User;
-
   public static associations: {
     invItem: Association<InvItem, Supply>;
     supplier: Association<Supplier, Supply>;
-    user: Association<User, Supply>;
   };
 }

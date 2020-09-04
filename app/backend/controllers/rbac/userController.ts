@@ -7,7 +7,7 @@ import {
   failureResponse,
 } from '../common/service';
 import { User, Role, DEFAULT_LIMIT } from '../../db/models';
-import { UserCreationAttributes } from '../../db/models/user/type';
+import { UserCreationAttributes } from '../../db/models/rbac/user/type';
 
 export default class UserController {
   public static createUser(req: Request, res: Response) {
@@ -141,7 +141,7 @@ export default class UserController {
       req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
     const offset =
       req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
-    const options: FindOptions<import('../../db/models/user/type').User> = {
+    const options: FindOptions<import('../../db/models/rbac/user/type').User> = {
       limit,
       offset,
       attributes: { exclude: ['password'] },

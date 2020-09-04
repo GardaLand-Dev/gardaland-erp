@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
-import { SupplimentCreationAttributes } from '../../../db/models/suppliment/type';
+import { SupplimentCreationAttributes } from '../../../db/models/products/suppliment/type';
 import {
   successResponse,
   dbError,
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Suppliment, Stockable } from '../../../db/models';
+import { DEFAULT_LIMIT, Suppliment, InvItem } from '../../../db/models';
 
 export default class SupplimentController {
   public static createSuppliment(req: Request, res: Response) {
@@ -15,13 +15,13 @@ export default class SupplimentController {
       req.body.name &&
       req.body.quantity &&
       req.body.price &&
-      req.body.stockableId
+      req.body.invItemId
     ) {
       const supplimentParams: SupplimentCreationAttributes = {
         name: (<string>req.body.name).normalize().toLowerCase(),
         quantity: req.body.quantity,
         price: req.body.price,
-        stockableId: req.body.stockableId,
+        invItemId: req.body.invItemId,
       };
       Suppliment.create(supplimentParams)
         .then((supplimentData) =>
@@ -128,13 +128,13 @@ export default class SupplimentController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/suppliment/type').Suppliment> = {
+    const options: FindOptions<import('../../../db/models/products/suppliment/type').Suppliment> = {
       limit,
       offset,
       include: [],
     };
-    if (req.query.incStockable === 'true')
-      (<Includeable[]>options.include).push({ model: Stockable });
+    if (req.query.incInvItem === 'true')
+      (<Includeable[]>options.include).push({ model: InvItem });
     if (!(req.body.all === true)) options.where = { toBeArchived: false };
     Suppliment.findAll(options)
       .then((supplimentsData) =>

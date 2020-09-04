@@ -6,7 +6,7 @@ import {
   failureResponse,
 } from '../common/service';
 import { Role, DEFAULT_LIMIT } from '../../db/models';
-import { RoleCreationAttributes } from '../../db/models/role/type';
+import { RoleCreationAttributes } from '../../db/models/rbac/role/type';
 
 export default class RoleController {
   public static createRole(req: Request, res: Response) {

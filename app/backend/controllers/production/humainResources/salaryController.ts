@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import {
   // SalaryCreationAttributes,
   Salary,
-} from '../../../db/models/salary/type';
+} from '../../../db/models/humanResources/salary/type';
 import {
   successResponse,
   // dbError,
