@@ -1,17 +1,17 @@
 import { ModelCtor, Sequelize, DataTypes } from 'sequelize';
-import { ProductStockable } from './type';
+import { ProductInvItem } from './type';
 // import { Product } from '..';
 
-export default function ProductStockableFactory(
+export default function ProductInvItemFactory(
   sequilize: Sequelize
-): ModelCtor<ProductStockable> {
-  return sequilize.define('product_stockables', {
+): ModelCtor<ProductInvItem> {
+  return sequilize.define('product_invItems', {
     // productId: {
     //   type: DataTypes.UUID,
     //   allowNull: false,
     //   references: Product.ref
     // },
-    // stockableId: {
+    // invItemId: {
     //   type: DataTypes.UUID,
     //   allowNull: false,
     // }

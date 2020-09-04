@@ -9,7 +9,7 @@ import {
   BelongsToManyGetAssociationsMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
-import { Stockable } from '../../inventory/stockable/type';
+import { InvItem } from '../../inventory/invItem/type';
 // eslint-disable-next-line import/no-cycle
 import { OrderProduct } from '../../sales/orderProducts/type';
 
@@ -19,7 +19,7 @@ export interface SupplimentAttributes {
   price: number;
   quantity: number;
   toBeArchived: boolean;
-  stockableId: string;
+  invItemId: string;
   inStock: number;
 }
 export type SupplimentCreationAttributes = Optional<
@@ -39,7 +39,7 @@ export class Suppliment
 
   public toBeArchived!: boolean;
 
-  public stockableId!: string;
+  public invItemId!: string;
 
   public inStock!: number;
 
@@ -49,23 +49,23 @@ export class Suppliment
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
-  // Stockable-Suppliment
-  public getStockable!: BelongsToGetAssociationMixin<Stockable>;
+  // InvItem-Suppliment
+  public getInvItem!: BelongsToGetAssociationMixin<InvItem>;
 
-  public setStockable!: BelongsToSetAssociationMixin<Stockable, string>;
+  public setInvItem!: BelongsToSetAssociationMixin<InvItem, string>;
 
-  public createStockable!: BelongsToCreateAssociationMixin<Stockable>;
+  public createInvItem!: BelongsToCreateAssociationMixin<InvItem>;
 
   // OrderProduct-Suppliment
   public getOrderProduct!: BelongsToManyGetAssociationsMixin<OrderProduct>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
-  public readonly stockable?: Stockable;
+  public readonly invItem?: InvItem;
 
   public readonly orderProducts?: OrderProduct[];
 
   public static associations: {
-    stockable: Association<Stockable, Suppliment>;
+    invItem: Association<InvItem, Suppliment>;
     orderProducts: Association<OrderProduct, Suppliment>;
   };
 }

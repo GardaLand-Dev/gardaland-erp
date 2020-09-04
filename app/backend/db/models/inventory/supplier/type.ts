@@ -13,7 +13,7 @@ import {
 // eslint-disable-next-line import/no-cycle
 import { Supply } from '../supply/type';
 // eslint-disable-next-line import/no-cycle
-import { Stockable } from '../stockable/type';
+import { InvItem } from '../invItem/type';
 
 export interface SupplierAttributes {
   id: string;
@@ -47,22 +47,22 @@ export class Supplier
 
   public createSupply!: HasManyCreateAssociationMixin<Supply>;
 
-  // Stockable-Supplier
-  public getStockables!: BelongsToManyGetAssociationsMixin<Stockable>;
+  // InvItem-Supplier
+  public getInvItems!: BelongsToManyGetAssociationsMixin<InvItem>;
 
-  public hasStockable!: BelongsToManyHasAssociationMixin<Stockable, string>;
+  public hasInvItem!: BelongsToManyHasAssociationMixin<InvItem, string>;
 
-  public hasStockables!: BelongsToManyHasAssociationsMixin<Stockable, string>;
+  public hasInvItems!: BelongsToManyHasAssociationsMixin<InvItem, string>;
 
-  public countStockables!: BelongsToManyCountAssociationsMixin;
+  public countInvItems!: BelongsToManyCountAssociationsMixin;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
   public readonly supplies?: Supply[];
 
-  public readonly stockables?: Stockable[];
+  public readonly invItems?: InvItem[];
 
   public static associations: {
     supplies: Association<Supply, Supplier>;
-    stockables: Association<Stockable, Supplier>;
+    invItems: Association<InvItem, Supplier>;
   };
 }

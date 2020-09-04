@@ -1,10 +1,10 @@
 import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
-import { Stockable } from './type';
+import { InvItem } from './type';
 
-export default function StockableFactory(
+export default function InvItemFactory(
   sequelize: Sequelize
-): ModelCtor<Stockable> {
-  return sequelize.define('stockables', {
+): ModelCtor<InvItem> {
+  return sequelize.define('invItems', {
     id: {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
@@ -25,7 +25,7 @@ export default function StockableFactory(
       allowNull: false,
       defaultValue: false,
     },
-    quantity: {
+    inStock: {
       type: DataTypes.NUMBER.UNSIGNED,
       allowNull: false,
       defaultValue: 0,

@@ -8,7 +8,7 @@ import {
   Association,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
-import { Stockable } from '../stockable/type';
+import { InvItem } from '../invItem/type';
 // eslint-disable-next-line import/no-cycle
 import { Supplier } from '../supplier/type';
 import { User } from '../../rbac/user/type';
@@ -16,15 +16,17 @@ import { User } from '../../rbac/user/type';
 export interface SupplyAttributes {
   id: string;
   quantity: number;
-  price: number;
   deliveredOn: Date;
+  cost: number;
   supplierId: string;
-  stockableId: string;
+  invItemId: string;
   toBeArchived: boolean;
+  remaining: number;
+  consumedOn: Date;
 }
 export type SupplyCreationAttributes = Optional<
   SupplyAttributes,
-  'id' | 'deliveredOn' | 'toBeArchived'
+  'id' | 'deliveredOn' | 'toBeArchived' | 'remaining' | 'consumedOn'
 >;
 export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   implements SupplyAttributes {
@@ -32,15 +34,19 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
 
   public quantity!: number;
 
-  public price!: number;
+  public deliveredOn!: Date;
+
+  public cost!: number;
 
   public supplierId!: string;
 
-  public stockableId!: string;
+  public invItemId!: string;
+
+  public remaining!: number;
+
+  public consumedOn!: Date | undefined;
 
   public toBeArchived!: boolean;
-
-  public deliveredOn!: Date;
 
   // timestamps
   public createdAt!: Date;
@@ -48,12 +54,12 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
-  // Stockable-Supply
-  public getStockable!: BelongsToGetAssociationMixin<Stockable>;
+  // InvItem-Supply
+  public getInvItem!: BelongsToGetAssociationMixin<InvItem>;
 
-  public setStockable!: BelongsToSetAssociationMixin<Stockable, string>;
+  public setInvItem!: BelongsToSetAssociationMixin<InvItem, string>;
 
-  public createStockable!: BelongsToCreateAssociationMixin<Stockable>;
+  public createInvItem!: BelongsToCreateAssociationMixin<InvItem>;
 
   // Supplier-Supply
   public getSupplier!: BelongsToGetAssociationMixin<Supplier>;
@@ -68,14 +74,14 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   public setUser!: BelongsToSetAssociationMixin<User, string>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
-  public readonly stockable?: Stockable;
+  public readonly invItem?: InvItem;
 
   public readonly supplier?: Supplier;
 
   public readonly user?: User;
 
   public static associations: {
-    stockable: Association<Stockable, Supply>;
+    invItem: Association<InvItem, Supply>;
     supplier: Association<Supplier, Supply>;
     user: Association<User, Supply>;
   };

@@ -13,14 +13,23 @@ export default function SupplyFactory(sequelize: Sequelize): ModelCtor<Supply> {
       type: DataTypes.NUMBER.UNSIGNED,
       allowNull: false,
     },
-    price: {
-      type: DataTypes.NUMBER.UNSIGNED,
-      allowNull: false,
-    },
     deliveredOn: {
       type: DataTypes.DATEONLY,
       defaultValue: DataTypes.NOW,
       allowNull: false,
+    },
+    cost: {
+      type: DataTypes.NUMBER.UNSIGNED,
+      allowNull: false,
+    },
+    remaining: {
+      type: DataTypes.NUMBER.UNSIGNED,
+      allowNull: true,
+      defaultValue: null,
+    },
+    consumedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     toBeArchived: {
       type: DataTypes.BOOLEAN,

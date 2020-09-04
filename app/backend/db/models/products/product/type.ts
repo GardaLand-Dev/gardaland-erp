@@ -17,10 +17,10 @@ import {
 // eslint-disable-next-line import/no-cycle
 import { Family } from '../family/type';
 // eslint-disable-next-line import/no-cycle
-import { Stockable } from '../../inventory/stockable/type';
+import { InvItem } from '../../inventory/invItem/type';
 // eslint-disable-next-line import/no-cycle
 import { OrderProduct } from '../../sales/orderProducts/type';
-import { ProductStockable } from '../productStockables/type';
+import { ProductInvItem } from '../productIngredients/type';
 
 export interface ProductAttributes {
   id: string;
@@ -64,23 +64,20 @@ export class Product extends Model<ProductAttributes, ProductCreationAttributes>
 
   public createFamily!: BelongsToCreateAssociationMixin<Family>;
 
-  // Product-Stockable
-  public getStockables!: BelongsToManyGetAssociationsMixin<Stockable>;
+  // Product-InvItem
+  public getInvItems!: BelongsToManyGetAssociationsMixin<InvItem>;
 
-  public addStockable!: BelongsToManyAddAssociationMixin<Stockable, string>;
+  public addInvItem!: BelongsToManyAddAssociationMixin<InvItem, string>;
 
-  public addStockables!: BelongsToManyAddAssociationsMixin<Stockable, string>;
+  public addInvItems!: BelongsToManyAddAssociationsMixin<InvItem, string>;
 
-  public removeStockable!: BelongsToManyRemoveAssociationMixin<
-    Stockable,
-    string
-  >;
+  public removeInvItem!: BelongsToManyRemoveAssociationMixin<InvItem, string>;
 
-  public hasStockable!: BelongsToManyHasAssociationMixin<Stockable, string>;
+  public hasInvItem!: BelongsToManyHasAssociationMixin<InvItem, string>;
 
-  public countStockable!: BelongsToManyCountAssociationsMixin;
+  public countInvItem!: BelongsToManyCountAssociationsMixin;
 
-  public createStockable!: BelongsToManyCreateAssociationMixin<Stockable>;
+  public createInvItem!: BelongsToManyCreateAssociationMixin<InvItem>;
 
   // Product-OrderProduct
 
@@ -89,16 +86,16 @@ export class Product extends Model<ProductAttributes, ProductCreationAttributes>
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
   public readonly family?: Family;
 
-  public readonly stockables?: Stockable[];
+  public readonly invItems?: InvItem[];
 
   public readonly OrderProducts?: OrderProduct[];
 
-  public readonly productStockables?: ProductStockable[];
+  public readonly productInvItems?: ProductInvItem[];
 
   public static associations: {
     family: Association<Family, Product>;
-    stockables: Association<Stockable, Product>;
+    invItems: Association<InvItem, Product>;
     orderProducts: Association<OrderProduct, Product>;
-    productStockables: Association<ProductStockable, Product>;
+    productInvItems: Association<ProductInvItem, Product>;
   };
 }

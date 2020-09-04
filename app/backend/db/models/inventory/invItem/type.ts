@@ -21,21 +21,20 @@ import { Supply } from '../supply/type';
 // eslint-disable-next-line import/no-cycle
 import { Supplier } from '../supplier/type';
 
-export interface StockableAttributes {
+export interface InvItemAttributes {
   id: string;
   name: string;
   unit: string;
   isIngredient: boolean;
-  quantity: number;
+  inStock: number;
   alertQuantity: number;
 }
-export type StockableCreationAttributes = Optional<
-  StockableAttributes,
-  'id' | 'quantity'
+export type InvItemCreationAttributes = Optional<
+  InvItemAttributes,
+  'id' | 'inStock'
 >;
-export class Stockable
-  extends Model<StockableAttributes, StockableCreationAttributes>
-  implements StockableAttributes {
+export class InvItem extends Model<InvItemAttributes, InvItemCreationAttributes>
+  implements InvItemAttributes {
   public id!: string;
 
   public name!: string;
@@ -44,7 +43,7 @@ export class Stockable
 
   public isIngredient!: boolean;
 
-  public quantity!: number;
+  public inStock!: number;
 
   public alertQuantity!: number;
 
@@ -54,7 +53,7 @@ export class Stockable
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
-  // Product-Stockable
+  // Product-InvItem
   public getProducts!: BelongsToManyGetAssociationsMixin<Product>;
 
   public hasProduct!: BelongsToManyHasAssociationMixin<Product, string>;
@@ -63,7 +62,7 @@ export class Stockable
 
   public countProducts!: BelongsToManyCountAssociationsMixin;
 
-  // Suppliment-Stockable
+  // Suppliment-InvItem
   public getSuppliments!: HasManyGetAssociationsMixin<Suppliment>;
 
   public hasSuppliment!: HasManyHasAssociationMixin<Suppliment, string>;
@@ -72,10 +71,10 @@ export class Stockable
 
   public countSuppliments!: HasManyCountAssociationsMixin;
 
-  // Supply-Stockable
+  // Supply-InvItem
   public getSupplies!: HasManyGetAssociationsMixin<Supply>;
 
-  // Supplier-Stockable
+  // Supplier-InvItem
   public getSuppliers!: BelongsToManyGetAssociationsMixin<Supplier>;
 
   public hasSupplier!: BelongsToManyHasAssociationMixin<Supplier, string>;
@@ -94,9 +93,9 @@ export class Stockable
   public readonly suppliers?: Supplier[];
 
   public static associations: {
-    products: Association<Product, Stockable>;
-    suppliments: Association<Suppliment, Stockable>;
-    supplies: Association<Supply, Stockable>;
-    suppliers: Association<Supplier, Stockable>;
+    products: Association<Product, InvItem>;
+    suppliments: Association<Suppliment, InvItem>;
+    supplies: Association<Supply, InvItem>;
+    suppliers: Association<Supplier, InvItem>;
   };
 }

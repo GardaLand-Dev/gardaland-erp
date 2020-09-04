@@ -5,18 +5,18 @@ import {
   // Association,
 } from 'sequelize';
 
-export interface ProductStockableAttributes {
+export interface ProductInvItemAttributes {
   quantity: number;
   productId: string;
-  stockableId: string;
+  invItemId: string;
 }
-export type ProductStockableCreationAttributes = ProductStockableAttributes;
-export class ProductStockable
-  extends Model<ProductStockableAttributes, ProductStockableCreationAttributes>
-  implements ProductStockableAttributes {
+export type ProductInvItemCreationAttributes = ProductInvItemAttributes;
+export class ProductInvItem
+  extends Model<ProductInvItemAttributes, ProductInvItemCreationAttributes>
+  implements ProductInvItemAttributes {
   public productId!: string;
 
-  public stockableId!: string;
+  public invItemId!: string;
 
   public quantity!: number;
 
@@ -34,6 +34,6 @@ export class ProductStockable
   // public readonly employee?: Employee;
 
   // public static associations: {
-  //   employee: Association<Employee, ProductStockable>;
+  //   employee: Association<Employee, ProductInvItem>;
   // };
 }

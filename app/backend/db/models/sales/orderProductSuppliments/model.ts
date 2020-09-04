@@ -11,7 +11,7 @@ export default function OrderProductSupplimentFactory(
     //   allowNull: false,
     //   references: Product.ref
     // },
-    // stockableId: {
+    // invItemId: {
     //   type: DataTypes.UUID,
     //   allowNull: false,
     // }

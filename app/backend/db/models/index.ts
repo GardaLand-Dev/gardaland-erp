@@ -9,8 +9,8 @@ import ProductFactory from './products/product/model';
 import FamilyFactory from './products/family/model';
 import StationFactory from './products/station/model';
 import SupplimentFactory from './products/suppliment/model';
-import ProductStockableFactory from './products/productStockables/model';
-import StockableFactory from './inventory/stockable/model';
+import ProductInvItemFactory from './products/productIngredients/model';
+import InvItemFactory from './inventory/invItem/model';
 import SupplyFactory from './inventory/supply/model';
 import SupplierFactory from './inventory/supplier/model';
 import EmployeeFactory from './humanResources/employee/model';
@@ -70,10 +70,10 @@ export const Family = FamilyFactory(dbConfig);
 export const Station = StationFactory(dbConfig);
 export const Suppliment = SupplimentFactory(dbConfig);
 /** Inventory */
-export const Stockable = StockableFactory(dbConfig);
+export const InvItem = InvItemFactory(dbConfig);
 export const Supply = SupplyFactory(dbConfig);
 export const Supplier = SupplierFactory(dbConfig);
-export const ProductStockable = ProductStockableFactory(dbConfig);
+export const ProductInvItem = ProductInvItemFactory(dbConfig);
 /** Humain Resources */
 export const Employee = EmployeeFactory(dbConfig);
 export const Title = TitleFactory(dbConfig);
@@ -131,14 +131,14 @@ export const dbInit = async () => {
   /**  supplier-supply */
   Supply.belongsTo(Supplier);
   Supplier.hasMany(Supply);
-  /**  stockable-supply */
-  Supply.belongsTo(Stockable);
-  Stockable.hasMany(Supply);
-  /**  stockable-supplier */
-  Stockable.belongsToMany(Supplier, {
+  /**  invItem-supply */
+  Supply.belongsTo(InvItem);
+  InvItem.hasMany(Supply);
+  /**  invItem-supplier */
+  InvItem.belongsToMany(Supplier, {
     through: { model: Supply, unique: false },
   });
-  Supplier.belongsToMany(Stockable, {
+  Supplier.belongsToMany(InvItem, {
     through: { model: Supply, unique: false },
   });
   /** HR */
@@ -160,15 +160,15 @@ export const dbInit = async () => {
   Order.hasMany(OrderProduct);
 
   /** STATIC-INVENTORY RELATIONS */
-  /**  product-stockable */
-  Product.belongsToMany(Stockable, { through: ProductStockable });
-  Stockable.belongsToMany(Product, { through: ProductStockable });
-  /**  Product-ProductStockable */
-  Product.hasMany(ProductStockable, { as: 'productStockables' });
-  ProductStockable.belongsTo(Product);
-  /**  stockable-suppliment */
-  Suppliment.belongsTo(Stockable);
-  Stockable.hasMany(Suppliment);
+  /**  product-invItem */
+  Product.belongsToMany(InvItem, { through: ProductInvItem });
+  InvItem.belongsToMany(Product, { through: ProductInvItem });
+  /**  Product-ProductInvItem */
+  Product.hasMany(ProductInvItem, { as: 'productInvItems' });
+  ProductInvItem.belongsTo(Product);
+  /**  invItem-suppliment */
+  Suppliment.belongsTo(InvItem);
+  InvItem.hasMany(Suppliment);
   /** STATIC-ORDER RELATIONS */
   /**  product-orderProduct */
   OrderProduct.belongsTo(Product);
