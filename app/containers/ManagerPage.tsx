@@ -12,7 +12,7 @@ import Station from '../components/manager/features/Station/Station';
 export default function MangerPage(): JSX.Element {
   return (
     <div className="d-flex flex-row w-100 h-100 ">
-      <div className="h-100 managerSideBar">
+      <div className="h-100 managerSideBar of-x-auto">
         <SideBar />
       </div>
       <div className="d-flex flex-column flex-grow-1 h-100 theme-background">
