@@ -11,6 +11,8 @@ import {
 import { InvItem } from '../invItem/type';
 // eslint-disable-next-line import/no-cycle
 import { Supplier } from '../supplier/type';
+// eslint-disable-next-line import/no-cycle
+import { Invoice } from '../../finance/invoice/type';
 
 export interface SupplyAttributes {
   id: string;
@@ -22,6 +24,7 @@ export interface SupplyAttributes {
   toBeArchived: boolean;
   remaining: number;
   consumedOn: Date;
+  invoiceId: string;
 }
 export type SupplyCreationAttributes = Optional<
   SupplyAttributes,
@@ -47,6 +50,8 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
 
   public toBeArchived!: boolean;
 
+  public invoiceId!: string;
+
   // timestamps
   public createdAt!: Date;
 
@@ -61,11 +66,11 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   public createInvItem!: BelongsToCreateAssociationMixin<InvItem>;
 
   // Supplier-Supply
-  public getSupplier!: BelongsToGetAssociationMixin<Supplier>;
+  public getInvoice!: BelongsToGetAssociationMixin<Invoice>;
 
-  public setSupplier!: BelongsToSetAssociationMixin<Supplier, string>;
+  public setInvoice!: BelongsToSetAssociationMixin<Invoice, string>;
 
-  public createSuppliet!: BelongsToCreateAssociationMixin<Supplier>;
+  public createInvoice!: BelongsToCreateAssociationMixin<Invoice>;
 
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
   public readonly invItem?: InvItem;

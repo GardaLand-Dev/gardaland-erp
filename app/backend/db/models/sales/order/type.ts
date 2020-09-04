@@ -10,9 +10,11 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   HasManyAddAssociationsMixin,
+  BelongsToCreateAssociationMixin,
 } from 'sequelize';
 import { OrderProduct } from '../orderProducts/type';
 import { User } from '../../rbac/user/type';
+import { FinancialTransaction } from '../../finance/financialTransaction/type';
 
 export interface OrderAttributes {
   id: string;
@@ -20,6 +22,8 @@ export interface OrderAttributes {
   type: string;
   modified: boolean;
   canceled: boolean;
+  transactionId: string;
+  createdBy: string;
 }
 export type OrderCreationAttributes = Optional<
   OrderAttributes,
@@ -36,6 +40,10 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes>
   public modified!: boolean;
 
   public canceled!: boolean;
+
+  public transactionId: string;
+
+  public createdBy!: string;
 
   // timestamps
   public createdAt!: Date;
@@ -57,7 +65,21 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes>
 
   public countOrderProducts!: HasManyCountAssociationsMixin;
 
-  // User-OrderProduct
+  // FT-order
+  public getFinancialTransaction!: BelongsToGetAssociationMixin<
+    FinancialTransaction
+  >;
+
+  public setFinancialTransaction!: BelongsToSetAssociationMixin<
+    FinancialTransaction,
+    string
+  >;
+
+  public createFinancialTransaction!: BelongsToCreateAssociationMixin<
+    FinancialTransaction
+  >;
+
+  // User-order
   public getUser!: BelongsToGetAssociationMixin<User>;
 
   public setUser!: BelongsToSetAssociationMixin<User, string>;

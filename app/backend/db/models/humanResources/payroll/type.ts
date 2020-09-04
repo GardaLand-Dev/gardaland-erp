@@ -5,10 +5,13 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   Association,
+  BelongsToCreateAssociationMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { Employee } from '../employee/type';
+// eslint-disable-next-line import/no-cycle
 import { User } from '../../rbac/user/type';
+import { FinancialTransaction } from '../../finance/financialTransaction/type';
 
 export interface PayrollAttributes {
   id: string;
@@ -17,8 +20,13 @@ export interface PayrollAttributes {
   workedDays: number;
   absentDays: number;
   amount: number;
+  financialTransactionId: string;
+  createdBy: string;
 }
-export type PayrollCreationAttributes = Optional<PayrollAttributes, 'id'>;
+export type PayrollCreationAttributes = Optional<
+  PayrollAttributes,
+  'id' | 'financialTransactionId'
+>;
 export class Payroll extends Model<PayrollAttributes, PayrollCreationAttributes>
   implements PayrollAttributes {
   public id!: string;
@@ -33,6 +41,10 @@ export class Payroll extends Model<PayrollAttributes, PayrollCreationAttributes>
 
   public amount!: number;
 
+  public financialTransactionId!: string;
+
+  public createdBy!: string;
+
   // timestamps
   public createdAt!: Date;
 
@@ -43,6 +55,20 @@ export class Payroll extends Model<PayrollAttributes, PayrollCreationAttributes>
   public getEmployee!: BelongsToGetAssociationMixin<Employee>;
 
   public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
+
+  // FT-payroll
+  public getFinancialTransaction!: BelongsToGetAssociationMixin<
+    FinancialTransaction
+  >;
+
+  public setFinancialTransaction!: BelongsToSetAssociationMixin<
+    FinancialTransaction,
+    string
+  >;
+
+  public createFinancialTransaction!: BelongsToCreateAssociationMixin<
+    FinancialTransaction
+  >;
 
   // User-Payroll
   public getUser!: BelongsToGetAssociationMixin<User>;

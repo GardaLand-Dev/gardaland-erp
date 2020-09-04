@@ -1,11 +1,13 @@
 import {
   // Optional,
   Model,
-  // BelongsToGetAssociationMixin,
-  // BelongsToSetAssociationMixin,
-  // Association,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  Association,
 } from 'sequelize';
+import { Order } from '../../sales/order/type';
 // eslint-disable-next-line import/no-cycle
+import { Client } from '../client/type';
 
 export interface ClientOrderAttributes {
   orderId: string;
@@ -28,14 +30,21 @@ export class ClientOrder
   public updatedAt!: Date;
 
   // MODEL ASSOCATION METHODS
-  // public getEmployee!: BelongsToGetAssociationMixin<Employee>;
+  public getOrder!: BelongsToGetAssociationMixin<Order>;
 
-  // public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
+  public setOrder!: BelongsToSetAssociationMixin<Order, string>;
 
-  // // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
-  // public readonly employee?: Employee;
+  public getClient!: BelongsToGetAssociationMixin<Client>;
 
-  // public static associations: {
-  //   employee: Association<Employee, ClientOrder>;
-  // };
+  public setClient!: BelongsToSetAssociationMixin<Client, string>;
+
+  // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly order?: Order;
+
+  public readonly client?: Client;
+
+  public static associations: {
+    order: Association<Order, ClientOrder>;
+    client: Association<Client, ClientOrder>;
+  };
 }

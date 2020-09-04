@@ -1,10 +1,16 @@
 import {
   Optional,
   Model,
-  // BelongsToGetAssociationMixin,
-  // BelongsToSetAssociationMixin,
-  // Association,
+  Association,
+  HasManyGetAssociationsMixin,
+  HasManyCountAssociationsMixin,
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyCreateAssociationMixin,
 } from 'sequelize';
+// eslint-disable-next-line import/no-cycle
+import { ClientOrder } from '../clientOrder/type';
 // eslint-disable-next-line import/no-cycle
 
 export interface ClientAttributes {
@@ -39,14 +45,22 @@ export class Client extends Model<ClientAttributes, ClientCreationAttributes>
   public updatedAt!: Date;
 
   // MODEL ASSOCATION METHODS
-  // public getEmployee!: BelongsToGetAssociationMixin<ClietnOrder>;
+  public getClientOrders!: HasManyGetAssociationsMixin<ClientOrder>;
 
-  // public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
+  public countClientOrders!: HasManyCountAssociationsMixin;
 
-  // // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
-  // public readonly employee?: Employee;
+  public addClientOrder!: HasManyAddAssociationMixin<ClientOrder, string>;
 
-  // public static associations: {
-  //   employee: Association<Employee, Client>;
-  // };
+  public addClientOrders!: HasManyAddAssociationsMixin<ClientOrder, string>;
+
+  public removeClientOrder!: HasManyRemoveAssociationMixin<ClientOrder, string>;
+
+  public createClientOrder!: HasManyCreateAssociationMixin<ClientOrder>;
+
+  // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  public readonly clientOrder?: ClientOrder;
+
+  public static associations: {
+    clientOrder?: Association<ClientOrder, Client>;
+  };
 }

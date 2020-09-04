@@ -9,11 +9,14 @@ import {
   BelongsToManyHasAssociationMixin,
   BelongsToManyHasAssociationsMixin,
   BelongsToManyCountAssociationsMixin,
+  HasManyCountAssociationsMixin,
 } from 'sequelize';
 // eslint-disable-next-line import/no-cycle
 import { Supply } from '../supply/type';
 // eslint-disable-next-line import/no-cycle
 import { InvItem } from '../invItem/type';
+// eslint-disable-next-line import/no-cycle
+import { Invoice } from '../../finance/invoice/type';
 
 export interface SupplierAttributes {
   id: string;
@@ -42,10 +45,13 @@ export class Supplier
   public updatedAt!: Date;
 
   // MODEL ASSOCIATION METHODS
-  // Supply-Supplier
-  public getSupplies!: HasManyGetAssociationsMixin<Supply>;
 
-  public createSupply!: HasManyCreateAssociationMixin<Supply>;
+  // Supply-Supplier
+  public getInvoices!: HasManyGetAssociationsMixin<Invoice>;
+
+  public countInvoices!: HasManyCountAssociationsMixin;
+
+  public createInvoice!: HasManyCreateAssociationMixin<Invoice>;
 
   // InvItem-Supplier
   public getInvItems!: BelongsToManyGetAssociationsMixin<InvItem>;
