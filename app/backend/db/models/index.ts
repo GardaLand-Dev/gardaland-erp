@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import path from 'path';
 import UserFactory from './user/model';
 import RoleFactory from './role/model';
 import PrivilegeFactory from './privilege/model';
@@ -37,7 +38,7 @@ const dbConfig = (() => {
     {
       dialect: 'sqlite',
       dialectModulePath: '@journeyapps/sqlcipher',
-      storage: 'db.sqlite',
+      storage: path.join(__dirname, 'db.sqlite'),
       logging: () => {},
     }
   );
