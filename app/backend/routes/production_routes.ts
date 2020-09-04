@@ -3,7 +3,7 @@ import { getAuthChecker } from '../middlewares/rbac';
 import StationController from '../controllers/production/statics/stationController';
 import FamilyController from '../controllers/production/statics/familyController';
 import ProductController from '../controllers/production/statics/productController';
-import InvItemController from '../controllers/production/inventory/stockableController';
+import InvItemController from '../controllers/production/inventory/invItemController';
 import OrderController from '../controllers/production/order/orderController';
 import SupplimentController from '../controllers/production/statics/supplimentController';
 import PrinterController from '../controllers/production/statics/printerController';
