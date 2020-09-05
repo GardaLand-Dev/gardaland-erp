@@ -28,8 +28,8 @@ export default function SimpleModal({
       onClose={onClose}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title" className="theme-gradient">
-        {title}
+      <DialogTitle id="form-dialog-title">
+        <span className="Dialog-title">{title}</span>
       </DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent dividers>{children}</DialogContent>
@@ -40,7 +40,7 @@ export default function SimpleModal({
           <Button
             color="primary"
             type="submit"
-            className="theme-gradient text-white"
+            className="theme-gradient text-white mx-4 px-4 py-2"
           >
             Valider
           </Button>

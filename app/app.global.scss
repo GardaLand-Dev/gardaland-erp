@@ -223,6 +223,12 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.Dialog-title {
+  background: $theme-gradient;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 //components
 @import './components/article/Article.scss';
 @import './components/login/Login.scss';

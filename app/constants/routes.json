@@ -5,15 +5,34 @@
   "MANAGER": {
     "root": "/Manager",
     "VenteManagement": {
-      "List": "/Manager/vente/list"
+      "root": "/Manager/vente"
     },
     "ProductManagement": {
-      "List": "/Manager/produits/list",
-      "FamilleList": "/Manager/produits/list_famille",
+      "ProductList": "/Manager/produits/produits_liste",
+      "FamilleList": "/Manager/produits/familles_liste",
       "Station": "/Manager/produits/station"
     },
+    "Achat": {
+      "Expense": "/Manager/achat/depense",
+      "Facture": "/Manager/achat/factures_liste"
+    },
     "StockManagement": {
-      "List": "/Manager/stock/list"
+      "List": "/Manager/stock/liste",
+      "Facture": "/Manager/stock/factures_liste",
+      "Damaged": "/Manager/stock/Damaged_stock"
+    },
+    "FinanceManagement": {
+      "Account": "/Manager/finance/compte"
+    },
+    "PersonnesManagement": {
+      "Users": "/Manager/personnes/utilisateur",
+      "Clients": "/Manager/personnes/utilisateurs",
+      "Fournisseurs": "/Manager/personnes/fournisseurs"
+    },
+    "HumanResourceManagement": {
+      "Employee": "/Manager/grh/employee",
+      "Payroll": "/Manager/grh/la-paie",
+      "Attendance": "/Manager/grh/presence"
     }
   }
 }
