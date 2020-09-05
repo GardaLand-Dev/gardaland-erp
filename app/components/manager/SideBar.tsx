@@ -23,8 +23,12 @@ function SidebarButton({
     <List component="nav" aria-labelledby="nested-list-subheader">
       <ListItem button onClick={handleClick}>
         <ListItemIcon />
-        <ListItemText primary={feature.id} />
-        {open ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+        <ListItemText primary={feature.id} className="text-white" />
+        {open ? (
+          <KeyboardArrowDownIcon className="text-white" />
+        ) : (
+          <KeyboardArrowRightIcon className="text-white" />
+        )}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className="ml-3">
@@ -34,7 +38,7 @@ function SidebarButton({
               key={listfeature.id}
               onClick={() => history.push(listfeature.link)}
             >
-              <ListItemText primary={listfeature.id} />
+              <ListItemText className="text-white" primary={listfeature.id} />
             </ListItem>
           ))}
         </List>
@@ -72,11 +76,87 @@ export default function Sidebar(): JSX.Element {
       ],
     },
     {
+      id: 'Finance',
+      listFeatures: [
+        {
+          id: 'Finance',
+          link: '',
+        },
+        {
+          id: 'List des Depences',
+          link: '',
+        },
+      ],
+    },
+    {
       id: 'Stock',
       listFeatures: [
         {
           id: 'List de Stock',
           link: routes.MANAGER.StockManagement.List,
+        },
+      ],
+    },
+    {
+      id: 'Utilisateurs',
+      listFeatures: [
+        {
+          id: 'List des Utilisateurs',
+          link: '',
+        },
+        {
+          id: 'List des Fournisseur',
+          link: '',
+        },
+        {
+          id: 'List des Clients',
+          link: '',
+        },
+      ],
+    },
+    {
+      id: 'GRH',
+      listFeatures: [
+        {
+          id: 'Employés',
+          link: '',
+        },
+        {
+          id: 'Paie',
+          link: '',
+        },
+        {
+          id: 'Présence',
+          link: '',
+        },
+      ],
+    },
+    {
+      id: 'Rapport',
+      listFeatures: [
+        {
+          id: 'Rapport sommaire',
+          link: '',
+        },
+        {
+          id: 'Rapport des Produits',
+          link: '',
+        },
+        {
+          id: 'Rapport des Ventes',
+          link: '',
+        },
+        {
+          id: 'Rapport des Achats',
+          link: '',
+        },
+        {
+          id: 'Rapport des Fournisseur',
+          link: '',
+        },
+        {
+          id: 'Rapport de Finance',
+          link: '',
         },
       ],
     },

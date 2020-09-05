@@ -4,8 +4,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 type Props = {
   children?: unknown;
@@ -22,23 +20,28 @@ export default function SimpleModal({
   title,
   onSubmit,
 }: Props) {
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   return (
     <Dialog
-      fullScreen={fullScreen}
+      fullWidth
+      maxWidth="sm"
       open={visible}
       onClose={onClose}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="form-dialog-title" className="theme-gradient">
+        {title}
+      </DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent dividers>{children}</DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="primary">
+          {/* <Button onClick={onClose} color="primary">
             Cancel
-          </Button>
-          <Button color="primary" type="submit">
+          </Button> */}
+          <Button
+            color="primary"
+            type="submit"
+            className="theme-gradient text-white"
+          >
             Valider
           </Button>
         </DialogActions>

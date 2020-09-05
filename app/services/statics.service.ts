@@ -120,8 +120,8 @@ function createProduct(
     .then((res: Response) => res.ok)
     .catch((err) => err);
 }
-function getProducts(all = false, limit = null, page = null) {
-  const params = { all, limit, page };
+function getProducts(all = false, limit = null, page = null, incFamily = true) {
+  const params = { all, limit, page, incFamily };
   const url = new URL(`${config.apiUrl}/products`);
   Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
   const requestOptions = {
