@@ -54,7 +54,7 @@ export default function Sidebar(): JSX.Element {
       listFeatures: [
         {
           id: 'List des Produits',
-          link: routes.MANAGER.ProductManagement.List,
+          link: routes.MANAGER.ProductManagement.ProductList,
         },
         {
           id: 'Liste des Familles',
@@ -71,7 +71,20 @@ export default function Sidebar(): JSX.Element {
       listFeatures: [
         {
           id: 'List des ventes',
-          link: routes.MANAGER.VenteManagement.List,
+          link: routes.MANAGER.VenteManagement.root,
+        },
+      ],
+    },
+    {
+      id: 'Achat',
+      listFeatures: [
+        {
+          id: 'Dépenses',
+          link: routes.MANAGER.Achat.Expense,
+        },
+        {
+          id: 'Facture',
+          link: routes.MANAGER.Achat.Facture,
         },
       ],
     },
@@ -80,11 +93,7 @@ export default function Sidebar(): JSX.Element {
       listFeatures: [
         {
           id: 'Finance',
-          link: '',
-        },
-        {
-          id: 'List des Depences',
-          link: '',
+          link: routes.MANAGER.FinanceManagement.Account,
         },
       ],
     },
@@ -95,22 +104,30 @@ export default function Sidebar(): JSX.Element {
           id: 'List de Stock',
           link: routes.MANAGER.StockManagement.List,
         },
+        {
+          id: 'Facture',
+          link: routes.MANAGER.StockManagement.Facture,
+        },
+        {
+          id: 'Stock Endommager',
+          link: routes.MANAGER.StockManagement.Damaged,
+        },
       ],
     },
     {
-      id: 'Utilisateurs',
+      id: 'Personnes',
       listFeatures: [
         {
-          id: 'List des Utilisateurs',
-          link: '',
+          id: 'Utilisateurs',
+          link: routes.MANAGER.PersonnesManagement.Users,
         },
         {
-          id: 'List des Fournisseur',
-          link: '',
+          id: 'Clients',
+          link: routes.MANAGER.PersonnesManagement.Clients,
         },
         {
-          id: 'List des Clients',
-          link: '',
+          id: 'Fournisseurs',
+          link: routes.MANAGER.PersonnesManagement.Fournisseurs,
         },
       ],
     },
@@ -119,15 +136,15 @@ export default function Sidebar(): JSX.Element {
       listFeatures: [
         {
           id: 'Employés',
-          link: '',
+          link: routes.MANAGER.HumanResourceManagement.Employee,
         },
         {
           id: 'Paie',
-          link: '',
+          link: routes.MANAGER.HumanResourceManagement.Payroll,
         },
         {
           id: 'Présence',
-          link: '',
+          link: routes.MANAGER.HumanResourceManagement.Attendance,
         },
       ],
     },

@@ -11,8 +11,7 @@ import {
   Input,
   FormHelperText,
   Grid,
-  makeStyles,
-  createStyles,
+  withStyles,
 } from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -23,13 +22,36 @@ import CustomTable from '../../CustomTable';
 import stockSerivce from '../../../../services/stock.service';
 import staticService from '../../../../services/statics.service';
 
-// const useStyles = makeStyles(() =>
-//   createStyles({
-//     root: {
-//       flexGrow: 1,
-//     },
-//   })
-// );
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: '#ffa076', // lkatba focused
+    },
+    '& .MuiOutlinedInput-root': {
+      '&:hover fieldset': {
+        borderColor: '#ffbb9e', // bordure hover
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#ffa076', // bordure focused
+      },
+    },
+  },
+})(TextField);
+const CssInputField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: '#ffa076',
+    },
+    '& .MuiOutlinedInput-root': {
+      '&:hover fieldset': {
+        borderColor: '#ffbb9e',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#ffa076',
+      },
+    },
+  },
+})(FormControl);
 
 // const data = [
 //   {
@@ -51,7 +73,6 @@ import staticService from '../../../../services/statics.service';
 //     Quantité: '150',
 //   },
 // ];
-
 const columns = [
   {
     name: 'Produit',
@@ -129,6 +150,7 @@ const AddtextField = ({
         <Autocomplete
           options={data.filter((i) => !i.selected)}
           getOptionLabel={(option) => option.name}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onChange={(_event: any, newValue: any | null) => {
             const Value = newValue ? newValue.id : null;
             handleChange(Value, quantity);
@@ -337,11 +359,13 @@ export default function ListeProduit(): JSX.Element {
         title="Ajouter Produit"
         onSubmit={handleCreate}
       >
-        <TextField
+        <CssTextField
+          autoFocus
           style={{ width: '100%' }}
           id="outlined-basic"
           label="Nom de Produit"
           variant="outlined"
+          required
           onChange={
             (e) =>
               setProductParams({
@@ -353,7 +377,7 @@ export default function ListeProduit(): JSX.Element {
         />
         <Grid container spacing={2} className="my-2">
           <Grid item xs>
-            <FormControl style={{ width: '100%' }} variant="outlined">
+            <CssInputField style={{ width: '100%' }} variant="outlined">
               <InputLabel>TVA</InputLabel>
               <OutlinedInput
                 type="number"
@@ -368,10 +392,14 @@ export default function ListeProduit(): JSX.Element {
                 endAdornment={<InputAdornment position="end">%</InputAdornment>}
                 labelWidth={60}
               />
-            </FormControl>
+            </CssInputField>
           </Grid>
           <Grid item xs>
-            <FormControl style={{ width: '100%' }} variant="outlined">
+            <CssInputField
+              required
+              style={{ width: '100%' }}
+              variant="outlined"
+            >
               <InputLabel>TTC</InputLabel>
               <OutlinedInput
                 type="number"
@@ -388,7 +416,7 @@ export default function ListeProduit(): JSX.Element {
                 }
                 labelWidth={60}
               />
-            </FormControl>
+            </CssInputField>
           </Grid>
         </Grid>
 
@@ -404,7 +432,13 @@ export default function ListeProduit(): JSX.Element {
           style={{ width: '100%' }}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
-            <TextField {...params} label="famille" variant="outlined" />
+            <CssTextField
+              required
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...params}
+              label="famille"
+              variant="outlined"
+            />
           )}
         />
         <FormControlLabel
