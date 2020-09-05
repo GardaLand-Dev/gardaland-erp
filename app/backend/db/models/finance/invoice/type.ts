@@ -19,10 +19,11 @@ export interface InvoiceAttributes {
   createdBy: string;
   isPaid: boolean;
   note: string;
+  financialTransactionId: string;
 }
 export type InvoiceCreationAttributes = Optional<
   InvoiceAttributes,
-  'id' | 'isPaid' | 'note'
+  'id' | 'isPaid' | 'note' | 'financialTransactionId'
 >;
 export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   implements InvoiceAttributes {
@@ -39,6 +40,8 @@ export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   public isPaid!: boolean;
 
   public note!: string | undefined;
+
+  public financialTransactionId!: string;
 
   // timestamps
   public createdAt!: Date;

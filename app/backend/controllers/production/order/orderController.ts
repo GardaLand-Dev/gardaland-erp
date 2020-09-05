@@ -21,9 +21,10 @@ import dbConfig, {
   Suppliment,
 } from '../../../db/models';
 import InvItemHelper from '../../../db/helpers/invItem.helper';
+import { JwtRequest } from '../../../middlewares/authCheck';
 
 export default class OrderController {
-  public static async createOrder(req: Request, res: Response) {
+  public static async createOrder(req: JwtRequest, res: Response) {
     // eslint-disable-next-line no-constant-condition
     if (req.body.orderProducts && req.body.num && req.body.type) {
       const t = await dbConfig.transaction();
@@ -31,6 +32,7 @@ export default class OrderController {
         const orderParams: OrderCreationAttributes = {
           num: req.body.num, // req.body.num,
           type: req.body.type,
+          createdBy: req.auth.id,
         };
         // create order
         const o = await Order.create(orderParams, { transaction: t });
@@ -112,19 +114,24 @@ export default class OrderController {
               ],
             });
             const invItemsDict: { [id: string]: number } = {};
+            let total = 0;
             opsInc.forEach((e) => {
+              total += e.product.priceTTC * e.quantity;
               e.product.productInvItems.forEach((ee) => {
                 invItemsDict[ee.invItemId] =
                   invItemsDict[ee.invItemId] - e.quantity * ee.quantity ||
                   0 - e.quantity * ee.quantity;
               });
               e.orderProductSuppliments.forEach((ee) => {
+                total += ee.suppliment.price * e.quantity * ee.quantity;
                 invItemsDict[ee.suppliment.invItemId] =
                   invItemsDict[ee.suppliment.invItemId] -
                     e.quantity * ee.quantity * ee.suppliment.quantity ||
                   0 - e.quantity * ee.quantity * ee.suppliment.quantity;
               });
             });
+            o.totalPrice = total;
+            await o.save();
             return InvItemHelper.updateInvItems(invItemsDict);
           })
           .catch((err) => dbError(err, res));

@@ -1,9 +1,12 @@
+/* eslint-disable import/no-cycle */
 import {
   Model,
   // BelongsToGetAssociationMixin,
   // BelongsToSetAssociationMixin,
-  // Association,
+  Association,
 } from 'sequelize';
+import { InvItem } from '../../inventory/invItem/type';
+import { Product } from '../product/type';
 
 export interface ProductInvItemAttributes {
   quantity: number;
@@ -26,14 +29,19 @@ export class ProductInvItem
   public updatedAt!: Date;
 
   // MODEL ASSOCATION METHODS
+
   // public getEmployee!: BelongsToGetAssociationMixin<Employee>;
 
   // public setEmployee!: BelongsToSetAssociationMixin<Employee, string>;
 
-  // // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
+  // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
   // public readonly employee?: Employee;
+  public readonly invItem?: InvItem;
 
-  // public static associations: {
-  //   employee: Association<Employee, ProductInvItem>;
-  // };
+  public readonly product?: Product;
+
+  public static associations: {
+    invItem: Association<InvItem, ProductInvItem>;
+    product: Association<Product, ProductInvItem>;
+  };
 }

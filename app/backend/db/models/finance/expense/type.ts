@@ -13,8 +13,12 @@ export interface ExpenseAttributes {
   id: string;
   amount: number;
   createdBy: string;
+  financialTransactionId: string;
 }
-export type ExpenseCreationAttributes = Optional<ExpenseAttributes, 'id'>;
+export type ExpenseCreationAttributes = Optional<
+  ExpenseAttributes,
+  'id' | 'financialTransactionId'
+>;
 export class Expense extends Model<ExpenseAttributes, ExpenseCreationAttributes>
   implements ExpenseAttributes {
   public id!: string;
@@ -22,6 +26,8 @@ export class Expense extends Model<ExpenseAttributes, ExpenseCreationAttributes>
   public amount!: number;
 
   public createdBy!: string;
+
+  public financialTransactionId!: string;
 
   // timestamps
   public createdAt!: Date;

@@ -203,7 +203,7 @@ export const createPrivilege = async (privilegeName: string) => {
 export const createPrivilegeByIds = async (
   resourceId: string,
   operationId: string
-): Promise<import('../db/models/privilege/type').Privilege> => {
+): Promise<import('../db/models/rbac/privilege/type').Privilege> => {
   if (!resourceId || !operationId) throw new Error('Ids cant be null');
 
   const rs = await Resource.findByPk(resourceId);
@@ -213,7 +213,7 @@ export const createPrivilegeByIds = async (
   return Privilege.findOrCreate({
     where: { operationId, resourceId },
     defaults: { resourceId, operationId, name: `${rs.name}:${op.name}` },
-  }).then((priv): import('../db/models/privilege/type').Privilege => {
+  }).then((priv): import('../db/models/rbac/privilege/type').Privilege => {
     if (!priv[1]) throw new Error('Privilege already exists');
     return priv[0];
   });

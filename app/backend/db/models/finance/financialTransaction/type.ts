@@ -9,7 +9,7 @@ export interface FinancialTransactionAttributes {
 }
 export type FinancialTransactionCreationAttributes = Optional<
   FinancialTransactionAttributes,
-  'id'
+  'id' | 'caisseValue'
 >;
 export class FinancialTransaction
   extends Model<

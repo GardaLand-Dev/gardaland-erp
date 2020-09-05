@@ -27,5 +27,8 @@ export default function OrderFactory(sequelize: Sequelize): ModelCtor<Order> {
       allowNull: false,
       defaultValue: false,
     },
+    totalPrice: {
+      type: DataTypes.NUMBER,
+    },
   });
 }

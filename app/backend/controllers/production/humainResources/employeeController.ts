@@ -9,7 +9,7 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT } from '../../../db/models';
+import { DEFAULT_LIMIT, User } from '../../../db/models';
 
 export default class EmployeeController {
   public static createEmployee(req: Request, res: Response) {
@@ -26,10 +26,30 @@ export default class EmployeeController {
         email: (<string>req.body.email)?.normalize().toLowerCase(),
         tel: (<string>req.body.tel)?.normalize().toLowerCase(),
       };
+      let id = '';
       Employee.create(employeeParams)
-        .then((employeeData) =>
-          successResponse('create employee successfull', employeeData, res)
-        )
+        .then((employeeData) => {
+          id = employeeData.id;
+          return successResponse(
+            'create employee successfull',
+            employeeData,
+            res
+          );
+        })
+        .then(() => {
+          if (
+            req.body.user &&
+            req.body.user.username &&
+            req.body.user.password
+          ) {
+            return User.create({
+              userName: req.body.user.username,
+              password: req.body.user.password,
+              employeeId: id,
+            });
+          }
+          return null;
+        })
         .catch((err) => dbError(err, res));
     } else {
       insufficientParameters(res);

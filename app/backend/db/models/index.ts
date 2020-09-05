@@ -237,6 +237,9 @@ export const dbInit = async () => {
   /**  Product-ProductInvItem */
   Product.hasMany(ProductInvItem, { as: 'productInvItems' });
   ProductInvItem.belongsTo(Product);
+  /**  ProductInvItem-InvItem */
+  ProductInvItem.belongsTo(InvItem);
+
   /**  invItem-suppliment */
   Suppliment.belongsTo(InvItem);
   InvItem.hasMany(Suppliment);
@@ -276,6 +279,169 @@ export const dbInit = async () => {
     foreignKeyConstraint: true,
   });
   User.hasMany(Order);
+  // ############################################################
+  // HOOKS
+  // ############################################################
+  // FinancialAccount Auto update
+  FinancialTransaction.addHook('afterCreate', (fTData) => {
+    FinancialAccount.findOne()
+      .then(async (fAData) => {
+        fTData.setDataValue('caisseValue', fAData.value);
+        await fTData.save();
+        const typeId = await TransactionType.findByPk(
+          fTData.getDataValue('transactionTypeId')
+        );
+        if (typeId.sign === 'POS') {
+          return fAData.increment('value', {
+            by: fTData.getDataValue('value'),
+          });
+        }
+        return fAData.decrement('value', { by: fTData.getDataValue('value') });
+      })
+      .catch(log.error);
+  });
+  FinancialTransaction.addHook('beforeDestroy', (fTData) => {
+    FinancialAccount.findOne()
+      .then(async (fAData) => {
+        const tType = await TransactionType.findByPk(
+          fTData.getDataValue('transactionTypeId')
+        );
+        if (tType.sign === 'NEG') {
+          return fAData.increment('value', {
+            by: fTData.getDataValue('value'),
+          });
+        }
+        return fAData.decrement('value', { by: fTData.getDataValue('value') });
+      })
+      .catch(log.error);
+  });
+
+  // FinancialTransaction auto create
+  Order.addHook('afterCreate', async (orderData) => {
+    const tType = await TransactionType.findOne({ where: { source: 'order' } });
+    const fTData = await FinancialTransaction.create({
+      transactionTypeId: tType.id,
+      value: orderData.getDataValue('totalPrice'),
+    });
+    orderData.setDataValue('financialTransactionId', fTData.id);
+    orderData.save();
+  });
+  Payroll.addHook('beforeCreate', async (payrollData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'payroll' },
+    });
+    const fTData = await FinancialTransaction.create({
+      transactionTypeId: tType.id,
+      value: payrollData.getDataValue('amount'),
+    });
+    payrollData.setDataValue('financialTransactionId', fTData.id);
+  });
+  Expense.addHook('beforeCreate', async (expenseData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'expense' },
+    });
+    const fTData = await FinancialTransaction.create({
+      transactionTypeId: tType.id,
+      value: expenseData.getDataValue('amount'),
+    });
+    expenseData.setDataValue('financialTransactionId', fTData.id);
+  });
+  Invoice.addHook('beforeCreate', async (invoiceData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'expense' },
+    });
+    if (invoiceData.getDataValue('isPaid') === true) {
+      const fTData = await FinancialTransaction.create({
+        transactionTypeId: tType.id,
+        value: invoiceData.getDataValue('amount'),
+      });
+      invoiceData.setDataValue('financialTransactionId', fTData.id);
+    }
+  });
+  Invoice.addHook('afterUpdate', async (invoiceData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'expense' },
+    });
+    if (
+      invoiceData.getDataValue('isPaid') === true &&
+      !invoiceData.getDataValue('financialTransactionId')
+    ) {
+      const fTData = await FinancialTransaction.create({
+        transactionTypeId: tType.id,
+        value: invoiceData.getDataValue('amount'),
+      });
+      invoiceData.setDataValue('financialTransactionId', fTData.id);
+    }
+  });
+
+  // maxQuantity autoupdate
+  Product.addHook('afterCreate', async (productData) => {
+    const pi = await Product.findByPk(productData.getDataValue('id'), {
+      include: [{ model: ProductInvItem, include: [InvItem] }],
+    });
+    const maxQ = pi.productInvItems.reduce((max, pIIData) => {
+      return max > pIIData.invItem.inStock
+        ? Math.floor(pIIData.invItem.inStock / pIIData.quantity)
+        : max;
+    }, Infinity);
+    productData.setDataValue('maxQuantity', maxQ);
+  });
+  Product.addHook('afterUpdate', async (productData) => {
+    const pi = await Product.findByPk(productData.getDataValue('id'), {
+      include: [{ model: ProductInvItem, include: [InvItem] }],
+    });
+    const maxQ = pi.productInvItems.reduce((max, pIIData) => {
+      return max > pIIData.invItem.inStock
+        ? Math.floor(pIIData.invItem.inStock / pIIData.quantity)
+        : max;
+    }, Infinity);
+    productData.setDataValue('maxQuantity', maxQ);
+  });
+  InvItem.addHook('beforeSave', async (invItemData) => {
+    const pIIsData = await ProductInvItem.findAll({
+      where: { invItemId: invItemData.getDataValue('id') },
+      include: Product,
+    });
+    const prevQ = (await InvItem.findByPk(invItemData.getDataValue('id')))
+      .inStock;
+    if (pIIsData && pIIsData.length > 0) {
+      pIIsData.forEach((pIIData) => {
+        const qq = Math.floor(
+          invItemData.getDataValue('inStock') / pIIData.quantity
+        );
+        if (
+          prevQ > invItemData.getDataValue('inStock') &&
+          pIIData.product.maxQuantity > qq
+        )
+          pIIData.product.setAttributes('maxQuantity', qq);
+        if (
+          prevQ < invItemData.getDataValue('inStock') &&
+          pIIData.product.maxQuantity === Math.floor(prevQ / pIIData.quantity)
+        )
+          pIIData.product.setAttributes('maxQuantity', qq);
+      });
+    }
+  });
+
+  // inStock auto update
+  Damages.addHook('afterCreate', (damagesData) => {
+    InvItem.findByPk(damagesData.getDataValue('id'))
+      .then((invItemData) =>
+        invItemData.decrement('inStock', {
+          by: damagesData.getDataValue('quantity'),
+        })
+      )
+      .catch(log.error);
+  });
+  Supply.addHook('afterCreate', (supplyData) => {
+    InvItem.findByPk(supplyData.getDataValue('invItemId'))
+      .then((invItemData) =>
+        invItemData.increment('inStock', {
+          by: supplyData.getDataValue('quantity'),
+        })
+      )
+      .catch(log.error);
+  });
 
   /* SYNCING */
   await dbConfig

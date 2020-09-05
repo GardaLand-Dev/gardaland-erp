@@ -22,12 +22,13 @@ export interface OrderAttributes {
   type: string;
   modified: boolean;
   canceled: boolean;
-  transactionId: string;
+  financialTransactionId: string;
   createdBy: string;
+  totalPrice: number;
 }
 export type OrderCreationAttributes = Optional<
   OrderAttributes,
-  'id' | 'canceled' | 'modified'
+  'id' | 'canceled' | 'modified' | 'financialTransactionId' | 'totalPrice'
 >;
 export class Order extends Model<OrderAttributes, OrderCreationAttributes>
   implements OrderAttributes {
@@ -41,9 +42,11 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes>
 
   public canceled!: boolean;
 
-  public transactionId: string;
+  public financialTransactionId: string;
 
   public createdBy!: string;
+
+  public totalPrice!: number;
 
   // timestamps
   public createdAt!: Date;

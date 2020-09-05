@@ -16,10 +16,12 @@ export default class SupplyController {
       req.body.cost &&
       req.body.supplierId &&
       req.body.invItemId &&
+      req.body.invoiceId &&
       typeof req.body.quantity === 'number' &&
       typeof req.body.cost === 'number' &&
       typeof req.body.supplierId === 'string' &&
-      typeof req.body.invItemId === 'string'
+      typeof req.body.invItemId === 'string' &&
+      typeof req.body.invoiceId === 'string'
     ) {
       const supplyParams: SupplyCreationAttributes = {
         quantity: req.body.quantity,
@@ -27,6 +29,7 @@ export default class SupplyController {
         supplierId: req.body.supplierId,
         invItemId: req.body.invItemId,
         deliveredOn: req.body.deliveredOn,
+        invoiceId: req.body.invoiceId,
       };
       Supply.create(supplyParams)
         .then(async (supplyData) => {
@@ -87,6 +90,7 @@ export default class SupplyController {
               req.body.invItemId && typeof req.body.invItemId === 'string'
                 ? req.body.invItemId
                 : supplyData.invItemId,
+            invoiceId: supplyData.invoiceId,
           };
           supplyData.setAttributes(supplyParams);
           return supplyData.save();
