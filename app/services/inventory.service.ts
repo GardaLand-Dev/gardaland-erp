@@ -2,13 +2,13 @@
 import config from '../config';
 import authHeader from '../helpers/auth-header';
 
-/** stockable */
-function createStockable(
+/** invItem */
+function createInvItem(
   name: string,
   unit: string,
   isIngredient: boolean,
   alertQuantity: number,
-  quantity: number = null
+  inStock: number = null
 ) {
   const requestOptions = {
     method: 'POST',
@@ -16,22 +16,22 @@ function createStockable(
       'Content-type': 'application/json',
       Authorization: authHeader().Authorization,
     },
-    body: JSON.stringify({ name, unit, isIngredient, alertQuantity, quantity }),
+    body: JSON.stringify({ name, unit, isIngredient, alertQuantity, inStock }),
   };
-  return fetch(`${config.apiUrl}/stockable`, requestOptions)
+  return fetch(`${config.apiUrl}/invItem`, requestOptions)
     .then((res: Response) => {
       return res.ok;
     })
     .catch((err) => err);
 }
-function getStockables(
+function getInvItems(
   all = false,
   limit: number = null,
   page: number = null,
   ingredient = false
 ) {
   const params = { ingredient, all, limit, page };
-  const url = new URL(`${config.apiUrl}/stockables`);
+  const url = new URL(`${config.apiUrl}/invItems`);
   Object.entries(params).forEach((p) =>
     url.searchParams.set(
       p[0],
@@ -55,8 +55,8 @@ function getStockables(
     .catch((err) => err);
 }
 
-const stockSerivce = {
-  createStockable,
-  getStockables,
+const inventorySerivce = {
+  createInvItem,
+  getInvItems,
 };
-export default stockSerivce;
+export default inventorySerivce;

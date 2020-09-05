@@ -67,10 +67,17 @@ function createFamily(name: string, stationId = null) {
     .then((res: Response) => res.ok)
     .catch((err) => err);
 }
-function getFamilies(all = false, limit = null, page = null) {
-  const params = { all, limit, page };
+function getFamilies(
+  all = false,
+  limit: number = null,
+  page: number = null,
+  incStation = true
+) {
+  const params = { all, limit, page, incStation };
   const url = new URL(`${config.apiUrl}/families`);
-  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
+  Object.entries(params).forEach((p) =>
+    url.searchParams.set(p[0], p[1]?.toString())
+  );
   const requestOptions = {
     method: 'GET',
     headers: {
@@ -97,7 +104,7 @@ function createProduct(
     quantity: number;
   }> = null,
   isComposed: boolean,
-  stockableId: string = null,
+  invItemId: string = null,
   familyId: string
 ) {
   const requestOptions = {
@@ -111,8 +118,8 @@ function createProduct(
       priceTtc,
       tva,
       isComposed,
-      stockables: ingredients,
-      stockableId,
+      invItems: ingredients,
+      invItemId,
       familyId,
     }),
   };
@@ -120,10 +127,17 @@ function createProduct(
     .then((res: Response) => res.ok)
     .catch((err) => err);
 }
-function getProducts(all = false, limit = null, page = null, incFamily = true) {
+function getProducts(
+  all = false,
+  limit: number = null,
+  page: number = null,
+  incFamily = true
+) {
   const params = { all, limit, page, incFamily };
   const url = new URL(`${config.apiUrl}/products`);
-  Object.entries(params).forEach((p) => url.searchParams.set(p[0], p[1]));
+  Object.entries(params).forEach((p) =>
+    url.searchParams.set(p[0], p[1]?.toString())
+  );
   const requestOptions = {
     method: 'GET',
     headers: {
@@ -145,7 +159,7 @@ function createSuppliment(
   name: string,
   price: number,
   quantity: number,
-  stockableId: string
+  invItemId: string
 ) {
   const requestOptions = {
     method: 'POST',
@@ -157,7 +171,7 @@ function createSuppliment(
       name,
       quantity,
       price,
-      stockableId,
+      invItemId,
     }),
   };
   return fetch(`${config.apiUrl}/suppliment`, requestOptions)

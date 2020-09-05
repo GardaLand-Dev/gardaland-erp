@@ -14,7 +14,7 @@ const columns = [
   },
   {
     name: 'emplacement',
-    selector: 'stationId',
+    selector: 'stationName',
     sortable: true,
   },
   {
@@ -79,7 +79,12 @@ export default function FamilleList(): JSX.Element {
       .getFamilies()
       .then((d) => {
         return setData(
-          d.map((f) => ({ id: f.id, name: f.name, stationId: f.stationId }))
+          d.map((f) => ({
+            id: f.id,
+            name: f.name,
+            stationId: f.stationId,
+            stationName: f.station?.name,
+          }))
         );
       })
       .catch((err) => console.log(err));

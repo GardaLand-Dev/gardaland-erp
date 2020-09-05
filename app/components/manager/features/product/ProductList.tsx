@@ -19,7 +19,7 @@ import Add from '@material-ui/icons/Add';
 import { Autocomplete } from '@material-ui/lab';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
-import stockSerivce from '../../../../services/stock.service';
+import inventoryService from '../../../../services/inventory.service';
 import staticService from '../../../../services/statics.service';
 
 const CssTextField = withStyles({
@@ -86,7 +86,7 @@ const columns = [
   },
   {
     name: 'Quantité',
-    selector: 'quantity',
+    selector: 'maxQuantity',
     sortable: true,
   },
   {
@@ -221,6 +221,7 @@ export default function ListeProduit(): JSX.Element {
             tva: p.tva,
             priceTTC: p.priceTTC,
             familyName: p.family.name,
+            maxQuantity: p.maxQuantity,
           }))
         );
       })
@@ -261,8 +262,8 @@ export default function ListeProduit(): JSX.Element {
     }[]
   >([]);
   useEffect(() => {
-    stockSerivce
-      .getStockables(true)
+    inventoryService
+      .getInvItems(true)
       .then((d) => {
         return setIngredients(
           d.map((i) => ({
@@ -281,8 +282,8 @@ export default function ListeProduit(): JSX.Element {
     name: string;
     priceTTC: number;
     tva: number;
-    ingredients?: { stockableId: string; quantity: number }[];
-    stockableId?: string;
+    ingredients?: { invItemId: string; quantity: number }[];
+    invItemId?: string;
     isComposed: boolean;
     familyId: string;
   }>();
@@ -332,7 +333,7 @@ export default function ListeProduit(): JSX.Element {
           .filter((i) => i.selected)
           .map((i) => ({ id: i.id, quantity: i.quantity })),
         isChecked,
-        productParams.stockableId,
+        productParams.invItemId,
         productParams.familyId
       )
       // eslint-disable-next-line no-console

@@ -8,7 +8,7 @@ import {
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
-import stockSerivce from '../../../../services/stock.service';
+import inventoryService from '../../../../services/inventory.service';
 
 // const data = [
 //   {
@@ -35,7 +35,7 @@ import stockSerivce from '../../../../services/stock.service';
 
 const columns = [
   {
-    name: 'Stockable',
+    name: 'InvItem',
     selector: 'name',
     sortable: true,
   },
@@ -111,8 +111,8 @@ export default function StockList(): JSX.Element {
     }[]
   >([]);
   useEffect(() => {
-    stockSerivce
-      .getStockables()
+    inventoryService
+      .getInvItems()
       .then((d) => {
         console.log(d);
         return setData(
@@ -134,8 +134,8 @@ export default function StockList(): JSX.Element {
   };
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    stockSerivce
-      .createStockable(
+    inventoryService
+      .createInvItem(
         stockParams.name,
         stockParams.unit,
         stockParams.isIngredient,
@@ -143,7 +143,7 @@ export default function StockList(): JSX.Element {
         stockParams.quantity
       )
       .then((ok) =>
-        console.log('stockable add (exit modal and refresh data)', ok)
+        console.log('invItem add (exit modal and refresh data)', ok)
       )
       .catch((err) => console.log(err));
   };
