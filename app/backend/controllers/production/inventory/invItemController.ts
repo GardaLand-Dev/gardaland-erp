@@ -24,9 +24,10 @@ export default class InvItemController {
         name: (<string>req.body.name).normalize().toLowerCase(),
         unit: (<string>req.body.unit).normalize().toLowerCase(),
         isIngredient: req.body.isIngredient,
-        inStock: req.body.inStock,
         alertQuantity: req.body.alertQuantity,
       };
+      if (req.body.inStock !== null && typeof req.body.inStock === 'number')
+        invItemParams.inStock = req.body.inStock;
       InvItem.create(invItemParams)
         .then((invItemData) =>
           successResponse('create invItem successfull', invItemData, res)
