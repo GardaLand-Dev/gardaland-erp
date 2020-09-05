@@ -12,7 +12,9 @@ const config = {
 
 export interface JwtRequest extends Request {
   // eslint-disable-next-line @typescript-eslint/ban-types
-  [reqProp]?: string | object;
+  [reqProp]?: {
+    id: string;
+  };
 }
 
 export default ejwt(config).unless({

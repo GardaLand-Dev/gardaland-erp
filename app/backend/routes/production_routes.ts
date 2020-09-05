@@ -3,7 +3,7 @@ import { getAuthChecker } from '../middlewares/rbac';
 import StationController from '../controllers/production/statics/stationController';
 import FamilyController from '../controllers/production/statics/familyController';
 import ProductController from '../controllers/production/statics/productController';
-import StockableController from '../controllers/production/inventory/stockableController';
+import InvItemController from '../controllers/production/inventory/invItemController';
 import OrderController from '../controllers/production/order/orderController';
 import SupplimentController from '../controllers/production/statics/supplimentController';
 import PrinterController from '../controllers/production/statics/printerController';
@@ -124,32 +124,32 @@ export default class ProductionRoutes {
     );
     //
     /** INVENTORY */
-    // Stockable
+    // InvItem
     app.get(
-      `${path}/stockable`,
-      getAuthChecker('inventory/stockable:view'),
-      StockableController.getStockable
+      `${path}/invItem`,
+      getAuthChecker('inventory/invItem:view'),
+      InvItemController.getInvItem
     );
     app.post(
-      `${path}/stockable`,
-      getAuthChecker('inventory/stockable:create'),
-      StockableController.createStockable
+      `${path}/invItem`,
+      getAuthChecker('inventory/invItem:create'),
+      InvItemController.createInvItem
     );
     app.put(
-      `${path}/stockable`,
-      getAuthChecker('inventory/stockable:update'),
-      StockableController.updateStockable
+      `${path}/invItem`,
+      getAuthChecker('inventory/invItem:update'),
+      InvItemController.updateInvItem
     );
     app.delete(
-      `${path}/stockable`,
-      getAuthChecker('inventory/stockable:delete'),
-      StockableController.deleteStockable
+      `${path}/invItem`,
+      getAuthChecker('inventory/invItem:delete'),
+      InvItemController.deleteInvItem
     );
 
     app.get(
-      `${path}/stockables`,
-      getAuthChecker('inventory/stockables:view'),
-      StockableController.getStockables
+      `${path}/invItems`,
+      getAuthChecker('inventory/invItems:view'),
+      InvItemController.getInvItems
     );
 
     // Supplier

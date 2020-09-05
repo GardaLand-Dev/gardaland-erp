@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
-import { FamilyCreationAttributes } from '../../../db/models/family/type';
+import { FamilyCreationAttributes } from '../../../db/models/products/family/type';
 import {
   successResponse,
   dbError,
@@ -123,7 +123,7 @@ export default class FamilyController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/family/type').Family> = {
+    const options: FindOptions<import('../../../db/models/products/family/type').Family> = {
       limit,
       offset,
       include: [],

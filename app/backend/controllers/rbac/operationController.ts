@@ -6,7 +6,7 @@ import {
   failureResponse,
 } from '../common/service';
 import { Operation, DEFAULT_LIMIT } from '../../db/models';
-import { OperationCreationAttributes } from '../../db/models/operation/type';
+import { OperationCreationAttributes } from '../../db/models/rbac/operation/type';
 
 export default class OperationController {
   public static createOperation(req: Request, res: Response) {

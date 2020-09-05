@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
-import { StationCreationAttributes } from '../../../db/models/station/type';
+import { StationCreationAttributes } from '../../../db/models/products/station/type';
 import { Station, DEFAULT_LIMIT, Family } from '../../../db/models';
 import {
   successResponse,
@@ -115,7 +115,7 @@ export default class StationController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/station/type').Station> = {
+    const options: FindOptions<import('../../../db/models/products/station/type').Station> = {
       limit,
       offset,
       include: [],

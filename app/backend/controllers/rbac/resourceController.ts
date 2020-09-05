@@ -6,7 +6,7 @@ import {
   failureResponse,
 } from '../common/service';
 import { Resource, DEFAULT_LIMIT } from '../../db/models';
-import { ResourceCreationAttributes } from '../../db/models/resource/type';
+import { ResourceCreationAttributes } from '../../db/models/rbac/resource/type';
 
 export default class ResourceController {
   public static createResource(req: Request, res: Response) {

@@ -1,37 +1,40 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
-import { SupplyCreationAttributes } from '../../../db/models/supply/type';
+import { SupplyCreationAttributes } from '../../../db/models/inventory/supply/type';
 import {
   successResponse,
   dbError,
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Supply, Supplier, Stockable } from '../../../db/models';
+import { DEFAULT_LIMIT, Supply, Supplier, InvItem } from '../../../db/models';
 
 export default class SupplyController {
   public static createSupply(req: Request, res: Response) {
     if (
       req.body.quantity &&
-      req.body.price &&
+      req.body.cost &&
       req.body.supplierId &&
-      req.body.stockableId &&
+      req.body.invItemId &&
+      req.body.invoiceId &&
       typeof req.body.quantity === 'number' &&
-      typeof req.body.price === 'number' &&
+      typeof req.body.cost === 'number' &&
       typeof req.body.supplierId === 'string' &&
-      typeof req.body.stockableId === 'string'
+      typeof req.body.invItemId === 'string' &&
+      typeof req.body.invoiceId === 'string'
     ) {
       const supplyParams: SupplyCreationAttributes = {
         quantity: req.body.quantity,
-        price: req.body.price,
+        cost: req.body.cost,
         supplierId: req.body.supplierId,
-        stockableId: req.body.stockableId,
+        invItemId: req.body.invItemId,
         deliveredOn: req.body.deliveredOn,
+        invoiceId: req.body.invoiceId,
       };
       Supply.create(supplyParams)
         .then(async (supplyData) => {
           successResponse('create supply successfull', supplyData, res);
-          return (await supplyData.getStockable()).increment('quantity', {
+          return (await supplyData.getInvItem()).increment('inStock', {
             by: supplyData.quantity,
           });
         })
@@ -62,8 +65,8 @@ export default class SupplyController {
       Supply.findOne(supplyFilter)
         .then(async (supplyData) => {
           if (!supplyData) throw new Error("couldn't find supply");
-          if (supplyData.stockableId !== req.body.stockableId) {
-            await (await supplyData.getStockable()).decrement('quantity', {
+          if (supplyData.invItemId !== req.body.invItemId) {
+            await (await supplyData.getInvItem()).decrement('inStock', {
               by: supplyData.quantity,
             });
           }
@@ -72,10 +75,10 @@ export default class SupplyController {
               req.body.quantity && typeof req.body.quantity === 'number'
                 ? req.body.quantity
                 : supplyData.quantity,
-            price:
-              req.body.price && typeof req.body.price === 'number'
-                ? req.body.price
-                : supplyData.price,
+            cost:
+              req.body.cost && typeof req.body.cost === 'number'
+                ? req.body.cost
+                : supplyData.cost,
             deliveredOn: req.body.deliveredOn
               ? req.body.deliveredOn
               : supplyData.deliveredOn,
@@ -83,10 +86,11 @@ export default class SupplyController {
               req.body.supplierId && typeof req.body.supplierId === 'string'
                 ? req.body.supplierId
                 : supplyData.supplierId,
-            stockableId:
-              req.body.stockableId && typeof req.body.stockableId === 'string'
-                ? req.body.stockableId
-                : supplyData.stockableId,
+            invItemId:
+              req.body.invItemId && typeof req.body.invItemId === 'string'
+                ? req.body.invItemId
+                : supplyData.invItemId,
+            invoiceId: supplyData.invoiceId,
           };
           supplyData.setAttributes(supplyParams);
           return supplyData.save();
@@ -112,7 +116,7 @@ export default class SupplyController {
               supplyData.toBeArchived = true;
               return supplyData.save();
             }
-            (await supplyData.getStockable()).decrement('quantity', {
+            (await supplyData.getInvItem()).decrement('inStock', {
               by: supplyData.quantity,
             });
             return supplyData.destroy();
@@ -133,7 +137,7 @@ export default class SupplyController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/supply/type').Supply> = {
+    const options: FindOptions<import('../../../db/models/inventory/supply/type').Supply> = {
       limit,
       offset,
       order: [],
@@ -141,8 +145,8 @@ export default class SupplyController {
     };
     if (req.query.incSupplier === 'true')
       (<Includeable[]>options.include).push({ model: Supplier });
-    if (req.query.incStockable === 'true')
-      (<Includeable[]>options.include).push({ model: Stockable });
+    if (req.query.incInvItem === 'true')
+      (<Includeable[]>options.include).push({ model: InvItem });
     if (req.query.orderDateDesc === 'true')
       (<Array<any>>options.order).push(['createdAt', 'DESC']);
     if (req.query.archived !== 'true')

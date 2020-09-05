@@ -1,32 +1,41 @@
 import { Sequelize } from 'sequelize';
 import path from 'path';
-import UserFactory from './user/model';
-import RoleFactory from './role/model';
-import PrivilegeFactory from './privilege/model';
-import OperationFactory from './operation/model';
-import ResourceFactory from './resource/model';
-import ProductFactory from './product/model';
-import FamilyFactory from './family/model';
-import StationFactory from './station/model';
-import SupplimentFactory from './suppliment/model';
-import StockableFactory from './stockable/model';
-import SupplyFactory from './supply/model';
-import SupplierFactory from './supplier/model';
-import EmployeeFactory from './employee/model';
-import TitleFactory from './title/model';
-import SalaryFactory from './salary/model';
-import PayrollFactory from './payroll/model';
-import AttendanceFactory from './attendance/model';
-import OrderFactory from './order/model';
-import OrderProductFactory from './orderProducts/model';
-import ProductStockableFactory from './productStockables/model';
-import OrderProductSupplimentFactory from './orderProductSuppliments/model';
+import log from 'electron-log';
+import UserFactory from './rbac/user/model';
+import RoleFactory from './rbac/role/model';
+import PrivilegeFactory from './rbac/privilege/model';
+import OperationFactory from './rbac/operation/model';
+import ResourceFactory from './rbac/resource/model';
+import RestaurantCredsFactory from './rbac/restaurantCreds/model';
+import ProductFactory from './products/product/model';
+import FamilyFactory from './products/family/model';
+import StationFactory from './products/station/model';
+import SupplimentFactory from './products/suppliment/model';
+import ProductInvItemFactory from './products/productIngredients/model';
+import InvItemFactory from './inventory/invItem/model';
+import SupplyFactory from './inventory/supply/model';
+import SupplierFactory from './inventory/supplier/model';
+import DamagesFactory from './inventory/damages/model';
+import EmployeeFactory from './humanResources/employee/model';
+import TitleFactory from './humanResources/title/model';
+import SalaryFactory from './humanResources/salary/model';
+import PayrollFactory from './humanResources/payroll/model';
+import AttendanceFactory from './humanResources/attendance/model';
+import OrderFactory from './sales/order/model';
+import OrderProductFactory from './sales/orderProducts/model';
+import OrderProductSupplimentFactory from './sales/orderProductSuppliments/model';
+import ClientFactory from './clients/client/model';
+import ClientOrderFactory from './clients/clientOrder/model';
+import FinancialTransactionFactory from './finance/financialTransaction/model';
+import TransactionTypeFactory from './finance/transactionType/model';
+import FinancialAccountFactory from './finance/financialAccount/model';
+import ExpenseFactory from './finance/expense/model';
+import InvoiceFactory from './finance/invoice/model';
 
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
  * default/basic RBAC tables i.e. Privileges, Operations, Resources and Roles
  * then itialize with a Dev User.
- * FIXME: multiple validation errors at initialisation
  * */
 export const DEFAULT_LIMIT = 10;
 
@@ -63,27 +72,38 @@ export const Resource = ResourceFactory(dbConfig);
 export const Privilege = PrivilegeFactory(dbConfig);
 export const Role = RoleFactory(dbConfig);
 export const User = UserFactory(dbConfig);
+export const RestaurantCreds = RestaurantCredsFactory(dbConfig);
 /* PRODUCTION */
-/** Statics */
+/** products */
 export const Product = ProductFactory(dbConfig);
 export const Family = FamilyFactory(dbConfig);
 export const Station = StationFactory(dbConfig);
 export const Suppliment = SupplimentFactory(dbConfig);
 /** Inventory */
-export const Stockable = StockableFactory(dbConfig);
+export const InvItem = InvItemFactory(dbConfig);
 export const Supply = SupplyFactory(dbConfig);
 export const Supplier = SupplierFactory(dbConfig);
-export const ProductStockable = ProductStockableFactory(dbConfig);
+export const ProductInvItem = ProductInvItemFactory(dbConfig);
+export const Damages = DamagesFactory(dbConfig);
 /** Humain Resources */
 export const Employee = EmployeeFactory(dbConfig);
 export const Title = TitleFactory(dbConfig);
 export const Salary = SalaryFactory(dbConfig);
 export const Payroll = PayrollFactory(dbConfig);
 export const Attendance = AttendanceFactory(dbConfig);
-/** Orders */
+/** sales */
 export const Order = OrderFactory(dbConfig);
 export const OrderProduct = OrderProductFactory(dbConfig);
 export const OrderProductSuppliment = OrderProductSupplimentFactory(dbConfig);
+/** Client */
+export const Client = ClientFactory(dbConfig);
+export const ClientOrder = ClientOrderFactory(dbConfig);
+/** Finance */
+export const FinancialTransaction = FinancialTransactionFactory(dbConfig);
+export const FinancialAccount = FinancialAccountFactory(dbConfig);
+export const TransactionType = TransactionTypeFactory(dbConfig);
+export const Expense = ExpenseFactory(dbConfig);
+export const Invoice = InvoiceFactory(dbConfig);
 
 export const dbInit = async () => {
   /* RBAC - RELATIONS */
@@ -118,29 +138,23 @@ export const dbInit = async () => {
   /** resource-operation */
   // Resource.belongsToMany(Operation, { through: Privilege });
   // Operation.belongsToMany(Resource, { through: Privilege });
-
   /* PRODUCTION - RELATIONS */
-  /*  STATICS */
+  /*  PRODUCTS */
   /**  product-family */
   Product.belongsTo(Family);
   Family.hasMany(Product);
   /**  family-station */
   Family.belongsTo(Station);
   Station.hasMany(Family);
+
   /** INVENTORY */
-  /**  supplier-supply */
-  Supply.belongsTo(Supplier);
-  Supplier.hasMany(Supply);
-  /**  stockable-supply */
-  Supply.belongsTo(Stockable);
-  Stockable.hasMany(Supply);
-  /**  stockable-supplier */
-  Stockable.belongsToMany(Supplier, {
-    through: { model: Supply, unique: false },
-  });
-  Supplier.belongsToMany(Stockable, {
-    through: { model: Supply, unique: false },
-  });
+  /**  invItem-supply */
+  Supply.belongsTo(InvItem);
+  InvItem.hasMany(Supply);
+  /**  invItem-damages */
+  Damages.belongsTo(InvItem);
+  InvItem.hasMany(Damages);
+
   /** HR */
   /**  employee-attendance  */
   Attendance.belongsTo(Employee);
@@ -154,22 +168,91 @@ export const dbInit = async () => {
   /**  employee-title  */
   Title.belongsTo(Employee);
   Employee.hasMany(Title);
+
   /** ORDERS */
   /**  order-orderProduct */
   OrderProduct.belongsTo(Order);
   Order.hasMany(OrderProduct);
 
-  /** STATIC-INVENTORY RELATIONS */
-  /**  product-stockable */
-  Product.belongsToMany(Stockable, { through: ProductStockable });
-  Stockable.belongsToMany(Product, { through: ProductStockable });
-  /**  Product-ProductStockable */
-  Product.hasMany(ProductStockable, { as: 'productStockables' });
-  ProductStockable.belongsTo(Product);
-  /**  stockable-suppliment */
-  Suppliment.belongsTo(Stockable);
-  Stockable.hasMany(Suppliment);
-  /** STATIC-ORDER RELATIONS */
+  /** FINANCE */
+  /**  financialTransaction-transactionType */
+  FinancialTransaction.belongsTo(TransactionType);
+  TransactionType.hasMany(FinancialTransaction);
+  /** expense-financialTransaction */
+  Expense.belongsTo(FinancialTransaction);
+
+  // ############################################################
+  // ############################################################
+  /** CLIENT-SALES RELATIONS */
+  /** orders-clientOrder */
+  ClientOrder.belongsTo(Order);
+  /** clientOrder-client */
+  ClientOrder.belongsTo(Client);
+  Client.hasMany(ClientOrder);
+
+  /** FINANCE-HR RELATIONS */
+  /** payroll-financialTransaction */
+  Payroll.belongsTo(FinancialTransaction);
+
+  /** FINANCE-INVENTORY RELATIONS */
+  /** invoice-supply */
+  Supply.belongsTo(Invoice);
+  /** invoice-supplier */
+  Invoice.belongsTo(Supplier);
+  Supplier.hasMany(Invoice);
+
+  /** FINANCE-RBAC RELATIONS */
+  /**  user-invoice */
+  Invoice.belongsTo(User);
+  User.hasMany(Invoice, {
+    foreignKey: 'createdBy',
+    foreignKeyConstraint: true,
+  });
+  /**  user-expenses */
+  Expense.belongsTo(User);
+  User.hasMany(Expense, {
+    foreignKey: 'createdBy',
+    foreignKeyConstraint: true,
+  });
+
+  /** FINANCE-SALES RELATIONS */
+  /** financialTransaction-order */
+  Order.belongsTo(FinancialTransaction);
+
+  /** HR-RBAC RELATIONS */
+  /**  user-employee */
+  // Employee.hasOne(User, { foreignKey: { allowNull: true } });
+  User.belongsTo(Employee);
+  /**  user-payroll */
+  Payroll.belongsTo(User);
+  User.hasMany(Payroll, {
+    foreignKey: 'createdBy',
+    foreignKeyConstraint: true,
+  });
+
+  /** INVENTORY-PRODUCTS RELATIONS */
+  /**  product-invItem */
+  Product.belongsToMany(InvItem, { through: ProductInvItem });
+  InvItem.belongsToMany(Product, { through: ProductInvItem });
+  /**  Product-ProductInvItem */
+  Product.hasMany(ProductInvItem, { as: 'productInvItems' });
+  ProductInvItem.belongsTo(Product);
+  /**  ProductInvItem-InvItem */
+  ProductInvItem.belongsTo(InvItem);
+
+  /**  invItem-suppliment */
+  Suppliment.belongsTo(InvItem);
+  InvItem.hasMany(Suppliment);
+
+  /** INVENTORY-RBAC RELATIONS */
+  /**  user-damages */
+  Damages.belongsTo(User);
+  User.hasMany(Damages, {
+    foreignKey: 'createdBy',
+    foreignKeyConstraint: true,
+  });
+
+  /** ORDER-PRODUCTS RELATIONS */
   /**  product-orderProduct */
   OrderProduct.belongsTo(Product);
   Product.hasMany(OrderProduct);
@@ -188,29 +271,181 @@ export const dbInit = async () => {
   /** orderProductSuppliment-Suppliment */
   Suppliment.hasMany(OrderProductSuppliment);
   OrderProductSuppliment.belongsTo(Suppliment);
-  /** PRODUCTION-RBAC RELATIONS */
-  /**  user-supply */
-  Supply.belongsTo(User);
-  User.hasMany(Supply, { foreignKey: 'createdBy', foreignKeyConstraint: true });
-  /**  user-employee */
-  // Employee.hasOne(User, { foreignKey: { allowNull: true } });
-  User.belongsTo(Employee);
-  /**  user-payroll */
-  Payroll.belongsTo(User);
-  User.hasMany(Payroll, {
-    foreignKey: 'createdBy',
-    foreignKeyConstraint: true,
-  });
+
+  /** RBAC-SALES RELATIONS */
   /**  user-order */
   Order.belongsTo(User, {
     foreignKey: 'createdBy',
     foreignKeyConstraint: true,
   });
   User.hasMany(Order);
+  // ############################################################
+  // HOOKS
+  // ############################################################
+  // FinancialAccount Auto update
+  FinancialTransaction.addHook('afterCreate', (fTData) => {
+    FinancialAccount.findOne()
+      .then(async (fAData) => {
+        fTData.setDataValue('caisseValue', fAData.value);
+        await fTData.save();
+        const typeId = await TransactionType.findByPk(
+          fTData.getDataValue('transactionTypeId')
+        );
+        if (typeId.sign === 'POS') {
+          return fAData.increment('value', {
+            by: fTData.getDataValue('value'),
+          });
+        }
+        return fAData.decrement('value', { by: fTData.getDataValue('value') });
+      })
+      .catch(log.error);
+  });
+  FinancialTransaction.addHook('beforeDestroy', (fTData) => {
+    FinancialAccount.findOne()
+      .then(async (fAData) => {
+        const tType = await TransactionType.findByPk(
+          fTData.getDataValue('transactionTypeId')
+        );
+        if (tType.sign === 'NEG') {
+          return fAData.increment('value', {
+            by: fTData.getDataValue('value'),
+          });
+        }
+        return fAData.decrement('value', { by: fTData.getDataValue('value') });
+      })
+      .catch(log.error);
+  });
+
+  // FinancialTransaction auto create
+  Order.addHook('afterCreate', async (orderData) => {
+    const tType = await TransactionType.findOne({ where: { source: 'order' } });
+    const fTData = await FinancialTransaction.create({
+      transactionTypeId: tType.id,
+      value: orderData.getDataValue('totalPrice'),
+    });
+    orderData.setDataValue('financialTransactionId', fTData.id);
+    orderData.save();
+  });
+  Payroll.addHook('beforeCreate', async (payrollData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'payroll' },
+    });
+    const fTData = await FinancialTransaction.create({
+      transactionTypeId: tType.id,
+      value: payrollData.getDataValue('amount'),
+    });
+    payrollData.setDataValue('financialTransactionId', fTData.id);
+  });
+  Expense.addHook('beforeCreate', async (expenseData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'expense' },
+    });
+    const fTData = await FinancialTransaction.create({
+      transactionTypeId: tType.id,
+      value: expenseData.getDataValue('amount'),
+    });
+    expenseData.setDataValue('financialTransactionId', fTData.id);
+  });
+  Invoice.addHook('beforeCreate', async (invoiceData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'expense' },
+    });
+    if (invoiceData.getDataValue('isPaid') === true) {
+      const fTData = await FinancialTransaction.create({
+        transactionTypeId: tType.id,
+        value: invoiceData.getDataValue('amount'),
+      });
+      invoiceData.setDataValue('financialTransactionId', fTData.id);
+    }
+  });
+  Invoice.addHook('afterUpdate', async (invoiceData) => {
+    const tType = await TransactionType.findOne({
+      where: { source: 'expense' },
+    });
+    if (
+      invoiceData.getDataValue('isPaid') === true &&
+      !invoiceData.getDataValue('financialTransactionId')
+    ) {
+      const fTData = await FinancialTransaction.create({
+        transactionTypeId: tType.id,
+        value: invoiceData.getDataValue('amount'),
+      });
+      invoiceData.setDataValue('financialTransactionId', fTData.id);
+    }
+  });
+
+  // maxQuantity autoupdate
+  Product.addHook('afterCreate', async (productData) => {
+    const pi = await Product.findByPk(productData.getDataValue('id'), {
+      include: [{ model: ProductInvItem, include: [InvItem] }],
+    });
+    const maxQ = pi.productInvItems.reduce((max, pIIData) => {
+      return max > pIIData.invItem.inStock
+        ? Math.floor(pIIData.invItem.inStock / pIIData.quantity)
+        : max;
+    }, Infinity);
+    productData.setDataValue('maxQuantity', maxQ);
+  });
+  Product.addHook('afterUpdate', async (productData) => {
+    const pi = await Product.findByPk(productData.getDataValue('id'), {
+      include: [{ model: ProductInvItem, include: [InvItem] }],
+    });
+    const maxQ = pi.productInvItems.reduce((max, pIIData) => {
+      return max > pIIData.invItem.inStock
+        ? Math.floor(pIIData.invItem.inStock / pIIData.quantity)
+        : max;
+    }, Infinity);
+    productData.setDataValue('maxQuantity', maxQ);
+  });
+  InvItem.addHook('beforeSave', async (invItemData) => {
+    const pIIsData = await ProductInvItem.findAll({
+      where: { invItemId: invItemData.getDataValue('id') },
+      include: Product,
+    });
+    const prevQ = (await InvItem.findByPk(invItemData.getDataValue('id')))
+      .inStock;
+    if (pIIsData && pIIsData.length > 0) {
+      pIIsData.forEach((pIIData) => {
+        const qq = Math.floor(
+          invItemData.getDataValue('inStock') / pIIData.quantity
+        );
+        if (
+          prevQ > invItemData.getDataValue('inStock') &&
+          pIIData.product.maxQuantity > qq
+        )
+          pIIData.product.setAttributes('maxQuantity', qq);
+        if (
+          prevQ < invItemData.getDataValue('inStock') &&
+          pIIData.product.maxQuantity === Math.floor(prevQ / pIIData.quantity)
+        )
+          pIIData.product.setAttributes('maxQuantity', qq);
+      });
+    }
+  });
+
+  // inStock auto update
+  Damages.addHook('afterCreate', (damagesData) => {
+    InvItem.findByPk(damagesData.getDataValue('id'))
+      .then((invItemData) =>
+        invItemData.decrement('inStock', {
+          by: damagesData.getDataValue('quantity'),
+        })
+      )
+      .catch(log.error);
+  });
+  Supply.addHook('afterCreate', (supplyData) => {
+    InvItem.findByPk(supplyData.getDataValue('invItemId'))
+      .then((invItemData) =>
+        invItemData.increment('inStock', {
+          by: supplyData.getDataValue('quantity'),
+        })
+      )
+      .catch(log.error);
+  });
 
   /* SYNCING */
   await dbConfig
     .sync()
-    .then(() => console.log('database created and syncronized'))
-    .catch((err) => console.log('couldnt synchronize db', err));
+    .then(() => log.info('database created and syncronized'))
+    .catch((err) => log.info('couldnt synchronize db', err));
 };

@@ -4,7 +4,7 @@ import objectHash from 'object-hash';
 import {
   OrderCreationAttributes,
   OrderAttributes,
-} from '../../../db/models/order/type';
+} from '../../../db/models/sales/order/type';
 import {
   successResponse,
   dbError,
@@ -17,13 +17,14 @@ import dbConfig, {
   OrderProduct,
   OrderProductSuppliment,
   Product,
-  ProductStockable,
+  ProductInvItem,
   Suppliment,
 } from '../../../db/models';
-import StockableHelper from '../../../db/helpers/stockable.helper';
+import InvItemHelper from '../../../db/helpers/invItem.helper';
+import { JwtRequest } from '../../../middlewares/authCheck';
 
 export default class OrderController {
-  public static async createOrder(req: Request, res: Response) {
+  public static async createOrder(req: JwtRequest, res: Response) {
     // eslint-disable-next-line no-constant-condition
     if (req.body.orderProducts && req.body.num && req.body.type) {
       const t = await dbConfig.transaction();
@@ -31,6 +32,7 @@ export default class OrderController {
         const orderParams: OrderCreationAttributes = {
           num: req.body.num, // req.body.num,
           type: req.body.type,
+          createdBy: req.auth.id,
         };
         // create order
         const o = await Order.create(orderParams, { transaction: t });
@@ -107,27 +109,30 @@ export default class OrderController {
                 },
                 {
                   model: Product,
-                  include: [
-                    { model: ProductStockable, as: 'productStockables' },
-                  ],
+                  include: [{ model: ProductInvItem, as: 'productInvItems' }],
                 },
               ],
             });
-            const stockablesDict: { [id: string]: number } = {};
+            const invItemsDict: { [id: string]: number } = {};
+            let total = 0;
             opsInc.forEach((e) => {
-              e.product.productStockables.forEach((ee) => {
-                stockablesDict[ee.stockableId] =
-                  stockablesDict[ee.stockableId] - e.quantity * ee.quantity ||
+              total += e.product.priceTTC * e.quantity;
+              e.product.productInvItems.forEach((ee) => {
+                invItemsDict[ee.invItemId] =
+                  invItemsDict[ee.invItemId] - e.quantity * ee.quantity ||
                   0 - e.quantity * ee.quantity;
               });
               e.orderProductSuppliments.forEach((ee) => {
-                stockablesDict[ee.suppliment.stockableId] =
-                  stockablesDict[ee.suppliment.stockableId] -
+                total += ee.suppliment.price * e.quantity * ee.quantity;
+                invItemsDict[ee.suppliment.invItemId] =
+                  invItemsDict[ee.suppliment.invItemId] -
                     e.quantity * ee.quantity * ee.suppliment.quantity ||
                   0 - e.quantity * ee.quantity * ee.suppliment.quantity;
               });
             });
-            return StockableHelper.updateStockables(stockablesDict);
+            o.totalPrice = total;
+            await o.save();
+            return InvItemHelper.updateInvItems(invItemsDict);
           })
           .catch((err) => dbError(err, res));
       } catch (err) {
@@ -230,7 +235,7 @@ export default class OrderController {
               },
               {
                 model: Product,
-                include: [{ model: ProductStockable, as: 'productStockables' }],
+                include: [{ model: ProductInvItem, as: 'productInvItems' }],
               },
             ],
           },
@@ -241,26 +246,26 @@ export default class OrderController {
         const orderData = await Order.findOne(orderFilter);
         if (!orderData) throw new Error('cant find order');
         // readjust the stock values
-        // i need stockable-quantity(op.quantity)
+        // i need invItem-quantity(op.quantity)
         // successResponse('TEST didnt delete just getting', orderData, res);
-        const stockableQtDict: { [index: string]: number } = {};
+        const invItemQtDict: { [index: string]: number } = {};
         orderData.orderProducts.forEach((op) => {
-          op.product.productStockables.forEach((ps) => {
-            stockableQtDict[ps.stockableId] =
-              stockableQtDict[ps.stockableId] + op.quantity * ps.quantity ||
+          op.product.productInvItems.forEach((ps) => {
+            invItemQtDict[ps.invItemId] =
+              invItemQtDict[ps.invItemId] + op.quantity * ps.quantity ||
               op.quantity * ps.quantity;
           });
           op.orderProductSuppliments.forEach((ops) => {
-            stockableQtDict[ops.suppliment.stockableId] =
-              stockableQtDict[ops.suppliment.stockableId] +
+            invItemQtDict[ops.suppliment.invItemId] =
+              invItemQtDict[ops.suppliment.invItemId] +
                 ops.quantity * ops.suppliment.quantity * op.quantity ||
               ops.quantity * ops.suppliment.quantity * op.quantity;
           });
         });
         t.commit();
-        successResponse('TEST didnt delete just getting', stockableQtDict, res);
+        successResponse('TEST didnt delete just getting', invItemQtDict, res);
         // Print Cancel to adequate printers
-        await StockableHelper.updateStockables(stockableQtDict);
+        await InvItemHelper.updateInvItems(invItemQtDict);
         // .catch((err) => dbError(err, res));
       } catch (err) {
         t.rollback();
@@ -281,7 +286,7 @@ export default class OrderController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/order/type').Order> = {
+    const options: FindOptions<import('../../../db/models/sales/order/type').Order> = {
       limit,
       offset,
     };

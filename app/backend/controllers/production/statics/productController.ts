@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize';
-import { ProductCreationAttributes } from '../../../db/models/product/type';
+import { ProductCreationAttributes } from '../../../db/models/products/product/type';
 import {
   successResponse,
   dbError,
@@ -9,10 +9,10 @@ import {
 } from '../../common/service';
 import dbConfig, {
   DEFAULT_LIMIT,
-  ProductStockable,
+  ProductInvItem,
   Product,
   Family,
-  Stockable,
+  InvItem,
 } from '../../../db/models';
 
 export default class ProductController {
@@ -23,10 +23,10 @@ export default class ProductController {
       typeof req.body.isComposed === 'boolean' &&
       req.body.priceTtc &&
       typeof req.body.priceTtc === 'number' &&
-      ((req.body.stockableId &&
-        typeof req.body.stockableId === 'string' &&
+      ((req.body.invItemId &&
+        typeof req.body.invItemId === 'string' &&
         !req.body.isComposed) ||
-        (req.body.stockables && typeof req.body.stockables === 'object')) &&
+        (req.body.invItems && typeof req.body.invItems === 'object')) &&
       req.body.familyId &&
       typeof req.body.familyId === 'string'
     ) {
@@ -42,20 +42,20 @@ export default class ProductController {
         if (!p) throw new Error('coudnt create user');
         await p.setFamily(req.body.familyId, { transaction: t });
         if (req.body.isComposed) {
-          // validate stockables
-          (<Array<{ id: string; quantity: number }>>(
-            req.body.stockables
-          )).forEach((row, i) => {
-            if (row.quantity < 0)
-              throw new Error(
-                `qunatity shouldnt be less than 0 in row ${i + 1}`
-              );
-          });
-          const ps = await ProductStockable.bulkCreate(
-            (<Array<{ id: string; quantity: number }>>req.body.stockables).map(
+          // validate invItems
+          (<Array<{ id: string; quantity: number }>>req.body.invItems).forEach(
+            (row, i) => {
+              if (row.quantity < 0)
+                throw new Error(
+                  `qunatity shouldnt be less than 0 in row ${i + 1}`
+                );
+            }
+          );
+          const ps = await ProductInvItem.bulkCreate(
+            (<Array<{ id: string; quantity: number }>>req.body.invItems).map(
               (row) => ({
                 productId: p.id,
-                stockableId: row.id,
+                invItemId: row.id,
                 quantity: row.quantity,
               })
             ),
@@ -63,7 +63,7 @@ export default class ProductController {
           );
           if (!ps) throw new Error('coudnt create ingredients');
         } else {
-          await p.addStockable(req.body.stockableId, {
+          await p.addInvItem(req.body.invItemId, {
             through: {
               quantity:
                 req.body.quantity && typeof req.body.quantity === 'number'
@@ -185,16 +185,16 @@ export default class ProductController {
       typeof req.query.page === 'number' && req.query.page > 0
         ? (req.query.page - 1) * limit
         : 0;
-    const options: FindOptions<import('../../../db/models/product/type').Product> = {
+    const options: FindOptions<import('../../../db/models/products/product/type').Product> = {
       limit,
       offset,
       include: [],
     };
     if (req.query.incFamily === 'true')
       (<Includeable[]>options.include).push({ model: Family });
-    if (req.query.incStockables === 'true')
+    if (req.query.incInvItems === 'true')
       (<Includeable[]>options.include).push({
-        model: Stockable,
+        model: InvItem,
         through: { attributes: ['quantity'] },
       });
     if (!(req.query.all === 'true')) options.where = { toBeArchived: false };
