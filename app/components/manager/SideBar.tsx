@@ -7,12 +7,26 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
+import { Icon } from '@material-ui/core';
 import routes from '../../constants/routes.json';
+import {
+  ProduitSvg,
+  sellSvg,
+  buySvg,
+  financeSvg,
+  stockSvg,
+  grhSvg,
+  userSvg,
+} from '../../assets/svgs';
 
 function SidebarButton({
   feature,
 }: {
-  feature: { id: string; listFeatures: Array<{ id: string; link: string }> };
+  feature: {
+    id: string;
+    icon: any;
+    listFeatures: Array<{ id: string; link: string }>;
+  };
 }): JSX.Element {
   const [open, setOpen] = React.useState(false);
   const handleClick = () => {
@@ -22,8 +36,17 @@ function SidebarButton({
   return (
     <List component="nav" aria-labelledby="nested-list-subheader">
       <ListItem button onClick={handleClick}>
-        <ListItemIcon />
-        <ListItemText primary={feature.id} className="text-white" />
+        <ListItemIcon>
+          <Icon fontSize="large">
+            <img className="pb-5" alt="edit" src={feature.icon} />
+          </Icon>
+        </ListItemIcon>
+        <ListItemText
+          disableTypography
+          primary={feature.id}
+          className="text-white "
+          style={{ fontSize: '1.2rem' }}
+        />
         {open ? (
           <KeyboardArrowDownIcon className="text-white" />
         ) : (
@@ -38,7 +61,11 @@ function SidebarButton({
               key={listfeature.id}
               onClick={() => history.push(listfeature.link)}
             >
-              <ListItemText className="text-white" primary={listfeature.id} />
+              <ListItemText
+                disableTypography
+                className="text-white"
+                primary={listfeature.id}
+              />
             </ListItem>
           ))}
         </List>
@@ -51,6 +78,7 @@ export default function Sidebar(): JSX.Element {
   const features = [
     {
       id: 'Produit',
+      icon: ProduitSvg,
       listFeatures: [
         {
           id: 'List des Produits',
@@ -68,6 +96,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'Vente',
+      icon: sellSvg,
       listFeatures: [
         {
           id: 'List des ventes',
@@ -77,6 +106,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'Achat',
+      icon: buySvg,
       listFeatures: [
         {
           id: 'Dépenses',
@@ -90,6 +120,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'Finance',
+      icon: financeSvg,
       listFeatures: [
         {
           id: 'Finance',
@@ -99,6 +130,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'Stock',
+      icon: stockSvg,
       listFeatures: [
         {
           id: 'List de Stock',
@@ -116,6 +148,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'Personnes',
+      icon: userSvg,
       listFeatures: [
         {
           id: 'Utilisateurs',
@@ -133,6 +166,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'GRH',
+      icon: grhSvg,
       listFeatures: [
         {
           id: 'Employés',
@@ -150,6 +184,7 @@ export default function Sidebar(): JSX.Element {
     },
     {
       id: 'Rapport',
+      icon: ProduitSvg,
       listFeatures: [
         {
           id: 'Rapport sommaire',

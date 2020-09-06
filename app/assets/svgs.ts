@@ -11,6 +11,13 @@ import OrderSvg from './order.svg';
 import SaleSvg from './sale.svg';
 import SaleWhiteSvg from './sale-white.svg';
 import SignUpSvg from './sign-up.svg';
+import ProduitSvg from './fast-food.svg';
+import sellSvg from './sell-2.svg';
+import buySvg from './buy.svg';
+import financeSvg from './money-3.svg';
+import stockSvg from './stock.svg';
+import grhSvg from './human-resources.svg';
+import userSvg from './user.svg';
 
 export {
   AddSvg,
@@ -26,4 +33,11 @@ export {
   SaleSvg,
   SaleWhiteSvg,
   SignUpSvg,
+  ProduitSvg,
+  sellSvg,
+  buySvg,
+  financeSvg,
+  stockSvg,
+  grhSvg,
+  userSvg,
 };

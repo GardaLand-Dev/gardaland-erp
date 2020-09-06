@@ -136,6 +136,10 @@ export default class InvItemController {
       limit,
       offset,
     };
+    if (req.query.all === 'true') {
+      options.limit = null;
+      options.offset = null;
+    }
     if (req.query.ingredient === 'true') options.where = { isIngredient: true };
     InvItem.findAll(options)
       .then((invItemsData) =>

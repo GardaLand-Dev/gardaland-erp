@@ -4,8 +4,10 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
+  Snackbar,
 } from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import { Alert } from '@material-ui/lab';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
 import inventoryService from '../../../../services/inventory.service';
@@ -35,20 +37,16 @@ import inventoryService from '../../../../services/inventory.service';
 
 const columns = [
   {
-    name: 'InvItem',
+    name: 'Article',
     selector: 'name',
     sortable: true,
   },
   {
-    name: 'Quantité',
-    selector: 'quantity',
+    name: 'Quantité en stock',
+    selector: 'inStock',
     sortable: true,
   },
-  {
-    name: 'Unité',
-    selector: 'unit',
-    sortable: true,
-  },
+
   {
     name: 'Alert Quantité',
     selector: 'alertQuantity',
@@ -60,7 +58,7 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'last update',
+    name: 'Dernière mise à jour',
     selector: 'updatedAt',
     sortable: true,
   },
@@ -104,34 +102,45 @@ export default function StockList(): JSX.Element {
     {
       id: string;
       name: string;
-      quantity: number;
+      inStock: number;
       unit: string;
       isIngredient: boolean;
       alertQuantity: number;
     }[]
   >([]);
-  useEffect(() => {
+  const dataLoader = () => {
     inventoryService
-      .getInvItems()
+      .getInvItems(true)
       .then((d) => {
         console.log(d);
         return setData(
           d.map((s) => ({
             id: s.id,
             name: s.name,
-            quantity: s.quantity,
-            unit: s.unit,
+            inStock: `${s.inStock} ${s.unit}`,
             isIngredient: s.isIngredient ? 'Oui' : 'Non',
             alertQuantity: s.alertQuantity,
-            updatedAt: new Date(Date.parse(s.updatedAt)).toDateString(),
+            updatedAt: new Date(Date.parse(s.updatedAt)).toLocaleString(),
           }))
         );
       })
       .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    dataLoader();
   }, []);
   const handleAddClicked = () => {
     setModalVisible(true);
   };
+  const [open, setOpen] = useState(false);
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     inventoryService
@@ -142,9 +151,16 @@ export default function StockList(): JSX.Element {
         stockParams.alertQuantity,
         stockParams.quantity
       )
-      .then((ok) =>
-        console.log('invItem add (exit modal and refresh data)', ok)
-      )
+      .then((ok) => {
+        console.log('invItem add (exit modal and refresh data)', ok);
+        if (ok) {
+          setOpen(true);
+          setModalVisible(false);
+          dataLoader();
+          return true;
+        }
+        throw new Error('didnt create');
+      })
       .catch((err) => console.log(err));
   };
   return (
@@ -155,6 +171,11 @@ export default function StockList(): JSX.Element {
         title="liste des stock"
         onAddClicked={handleAddClicked}
       />
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Article ajouté avec succès
+        </Alert>
+      </Snackbar>
       <SimpleModal
         onClose={() => setModalVisible(false)}
         visible={modalVisible}

@@ -23,12 +23,14 @@ import StockDamage from '../components/manager/features/Stock/StockDamage';
 export default function MangerPage(): JSX.Element {
   return (
     <div className="d-flex flex-row w-100 h-100 ">
-      <div className="h-100 managerSideBar of-x-auto">
+      <div className="h-100 managerSideBar of-x-auto theme-gradient-y">
         <SideBar />
       </div>
       <div className="d-flex flex-column flex-grow-1 h-100 theme-background">
-        <Header />
-        <div className="flex-grow-1 mt-3 mx-3 ">
+        <div className="m-3 p-0">
+          <Header />
+        </div>
+        <div className="flex-grow-1 mx-3 ">
           {/* Features */}
           <Route
             path={routes.MANAGER.ProductManagement.ProductList}
