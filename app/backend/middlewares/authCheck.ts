@@ -1,5 +1,6 @@
 import ejwt from 'express-jwt';
 import { Request, Response, NextFunction } from 'express';
+import log from 'electron-log';
 import { unauthorizedRequest } from '../controllers/common/service';
 
 const reqProp = 'auth';
@@ -18,7 +19,7 @@ export interface JwtRequest extends Request {
 }
 
 export default ejwt(config).unless({
-  path: ['/token', '/api/login'],
+  path: ['/token', '/api/login', '/imgs'],
 });
 
 export const notAuthHandler = (
@@ -29,8 +30,14 @@ export const notAuthHandler = (
 ) => {
   if (
     err.name === 'UnauthorizedError' &&
-    !(req.path.endsWith('/token') || req.path.endsWith('/api/login'))
+    !(
+      req.path.endsWith('/token') ||
+      req.path.endsWith('/api/login') ||
+      req.path.startsWith('/imgs') ||
+      req.path.endsWith('/favicon.ico')
+    )
   ) {
+    log.info('path is', req.path);
     unauthorizedRequest(res);
   } else next();
 };

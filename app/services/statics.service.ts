@@ -70,11 +70,12 @@ function createFamily(name: string, stationId = null) {
 }
 function getFamilies(
   all = false,
+  incStation = false,
+  incProducts = false,
   limit: number = null,
-  page: number = null,
-  incStation = true
+  page: number = null
 ) {
-  const params = { all, limit, page, incStation };
+  const params = { all, limit, page, incProducts, incStation };
   const url = new URL(`${config.apiUrl}/families`);
   Object.entries(params).forEach((p) =>
     url.searchParams.set(p[0], p[1]?.toString())

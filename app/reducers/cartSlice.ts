@@ -3,15 +3,22 @@ import { createSlice } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from '../store';
 
 export type Suppliment = {
-  supId: string;
-  q: number;
+  id: string;
+  name: string;
+  price: number;
+};
+
+export type Product = {
+  id: string;
+  name: string;
+  priceTTC: number;
 };
 
 type Row = {
   index: number;
-  articleId: string;
+  product: Product;
   q: number;
-  suppliments: Suppliment[];
+  suppliments: { suppliment: Suppliment; q: number }[];
 };
 
 // type List = {
@@ -30,14 +37,14 @@ const cartSlice = createSlice({
   },
   reducers: {
     addArticle: (state, { payload }) => {
-      const articleId: string = payload;
+      const product: Product = payload;
       const list = state.lists.find((lst) => lst.tab === state.selectedTab);
       if (list) {
         const index =
           list.rows.length === 0
             ? 1
             : list.rows[list.rows.length - 1].index + 1;
-        list.rows.push({ index, articleId, q: 1, suppliments: [] });
+        list.rows.push({ index, product, q: 1, suppliments: [] });
       }
     },
     delArticle: (state, { payload }) => {
@@ -65,16 +72,17 @@ const cartSlice = createSlice({
     },
     addSuppliment: (state, { payload }) => {
       // TODO: revise this maybe false
-      const index: number = payload;
+      const { index } = payload;
       if (state.selectedArticle > -1) {
         const list = state.lists.find((lst) => lst.tab === state.selectedTab);
         if (list) {
           const row = list.rows.find((rw) => rw.index === index);
-          if (row) row.suppliments.push({ supId: payload.supId, q: 1 });
+          if (row)
+            row.suppliments.push({ suppliment: payload.suppliment, q: 1 });
         }
       }
     },
-    delSuppliment: (state, { payload: { supId } }) => {
+    delSuppliment: (state, { payload: { suppliment } }) => {
       if (state.selectedArticle > -1) {
         const list = state.lists.find((lst) => lst.tab === state.selectedTab);
         if (list) {
@@ -83,21 +91,21 @@ const cartSlice = createSlice({
           );
           if (row)
             row.suppliments = row.suppliments.filter(
-              (supp) => supp.supId !== supId
+              (supp) => supp.suppliment.id !== suppliment.id
             );
         }
       }
     },
-    incrSuppliment: (state, { payload: { supId } }) => {
+    incrSuppliment: (state, { payload: { suppliment } }) => {
       if (state.selectedArticle > -1) {
         const list = state.lists.find((lst) => lst.tab === state.selectedTab);
         if (list) {
           const row = list.rows.find((_row, i) => i === state.selectedArticle);
           if (row) {
-            const suppliment = row.suppliments.find(
-              (supp) => supp.supId === supId
+            const supp = row.suppliments.find(
+              (s) => s.suppliment.id === suppliment.id
             );
-            if (suppliment) suppliment.q += 1;
+            if (supp) supp.q += 1;
           }
         }
       }
@@ -109,7 +117,7 @@ const cartSlice = createSlice({
           const row = list.rows.find((_row, i) => i === payload.index);
           if (row) {
             const suppliment = row.suppliments.find(
-              (supp) => supp.supId === payload.supId
+              (supp) => supp.suppliment.id === payload.suppliment.id
             );
             if (suppliment && suppliment.q > 1) {
               suppliment.q -= 1;
@@ -166,23 +174,23 @@ export const {
   selectTab,
 } = cartSlice.actions;
 
-export const incOrAddSuppliment = (supId: string): AppThunk => {
+export const incOrAddSuppliment = (suppliment: Suppliment): AppThunk => {
   return (dispatch, getState) => {
     const state = getState();
     if (
       state.cart.lists
         .find((lst) => lst.tab === state.cart.selectedTab)
         ?.rows.find((_row, i) => i === state.cart.selectedArticle)
-        ?.suppliments.find((sup) => sup.supId === supId)
+        ?.suppliments.find((sup) => sup.suppliment.id === suppliment.id)
     ) {
-      dispatch(incrSuppliment({ supId }));
+      dispatch(incrSuppliment({ suppliment }));
     } else {
-      dispatch(addSuppliment({ supId }));
+      dispatch(addSuppliment({ suppliment }));
     }
   };
 };
 
-export const decOrDelSuppliment = (supId: string): AppThunk => {
+export const decOrDelSuppliment = (suppliment: Suppliment): AppThunk => {
   return (dispatch, getState) => {
     const state = getState();
     const list = state.cart.lists.find(
@@ -191,11 +199,13 @@ export const decOrDelSuppliment = (supId: string): AppThunk => {
     if (list) {
       const row = list.rows.find((_row, i) => i === state.cart.selectedArticle);
       if (row) {
-        const supp = row.suppliments.find((sup) => sup.supId === supId);
+        const supp = row.suppliments.find(
+          (sup) => sup.suppliment.id === suppliment.id
+        );
         if (supp && supp.q > 1) {
-          dispatch(decSuppliment({ supId }));
+          dispatch(decSuppliment({ suppliment }));
         } else {
-          dispatch(delSuppliment({ supId }));
+          dispatch(delSuppliment({ suppliment }));
         }
       }
     }

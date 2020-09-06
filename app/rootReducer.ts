@@ -1,14 +1,12 @@
+/* eslint-disable import/no-cycle */
 import { combineReducers } from 'redux';
 import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
-// eslint-disable-next-line import/no-cycle
 import cartReducer from './reducers/cartSlice';
-// eslint-disable-next-line import/no-cycle
 import homePageReducer from './reducers/homePageSlice';
-// eslint-disable-next-line import/no-cycle
 import authenticationReducer from './reducers/authentication.reducer';
-// eslint-disable-next-line import/no-cycle
 import loginComponentReducer from './reducers/loginComponentSlice';
+import familiesDataReducer from './reducers/data.reducer';
 
 export default function createRootReducer(history: History) {
   return combineReducers({
@@ -17,5 +15,6 @@ export default function createRootReducer(history: History) {
     homePage: homePageReducer,
     authentication: authenticationReducer,
     loginComponent: loginComponentReducer,
+    familiesData: familiesDataReducer,
   });
 }

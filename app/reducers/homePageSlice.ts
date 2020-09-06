@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-import data from '../services/api';
 // eslint-disable-next-line import/no-cycle
 import { RootState } from '../store';
 
-const initSelectedFam = data.families[0].id;
+const initSelectedFam = '';
 
 const homePageSlice = createSlice({
   name: 'homePage',

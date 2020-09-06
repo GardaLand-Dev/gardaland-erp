@@ -5,14 +5,13 @@ import {
   faChevronUp,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
-import data from '../../services/api';
-import { Suppliment } from '../../reducers/cartSlice';
+import { Suppliment, Product } from '../../reducers/cartSlice';
 
 type Props = {
   index: number;
-  articleId: string;
+  product: Product;
   q: number;
-  suppliments?: Array<Suppliment>;
+  suppliments?: Array<{ suppliment: Suppliment; q: number }>;
   funcs: {
     delRow: (index: number) => void;
     incrQ: (index: number) => void;
@@ -22,7 +21,7 @@ type Props = {
 
 export default function CartRow({
   index,
-  articleId,
+  product,
   q,
   suppliments,
   funcs,
@@ -30,15 +29,13 @@ export default function CartRow({
   const delClicked = () => funcs.delRow(index);
   const incrClicked = () => funcs.incrQ(index);
   const decrClicked = () => funcs.decrQ(index);
-
-  const article = data.getArticle(articleId);
   const getTotal = () => {
-    if (article) {
-      const aprice = article.price;
+    if (product) {
+      const aprice = product.priceTTC;
       let supsp = 0;
       if (suppliments) {
         suppliments.forEach((sup) => {
-          const supdata = data.getSuppliment(sup.supId);
+          const supdata = sup.suppliment;
           if (supdata) supsp += supdata.price * sup.q;
         });
       }
@@ -49,11 +46,11 @@ export default function CartRow({
   let suplist: Array<JSX.Element> = [];
   if (suppliments) {
     suplist = suppliments.map((sup) => (
-      <p key={sup.supId} className="m-05 p-1 rounded ">
-        {sup.supId}
+      <p key={sup.suppliment.id} className="m-05 p-1 rounded ">
+        {sup.suppliment.name}
         {/* Cheese */}
         <i>
-          {`@${data.getSuppliment(sup.supId)?.price}da`}
+          {`@${sup.suppliment.price}da`}
           {/* @20da */}
         </i>
         <span className="font-weight-bold">
@@ -84,11 +81,11 @@ export default function CartRow({
         </div>
         <div className="mr-auto">
           <p className="m-0 font-weight-semibold text-capitalize">
-            {articleId}
+            {product.name}
             {/* pizza fdm */}
           </p>
           <p className="m-0 text-black-25 font-italic">
-            {`@${article?.price} da`}
+            {`@${product?.priceTTC} da`}
             {/* @400DA */}
           </p>
         </div>

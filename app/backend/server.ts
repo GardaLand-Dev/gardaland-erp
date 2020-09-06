@@ -1,5 +1,6 @@
 import express from 'express';
 import log from 'electron-log';
+import path from 'path';
 import bodyParser from 'body-parser';
 import { dbInit } from './db/models';
 import authCheck, { notAuthHandler } from './middlewares/authCheck';
@@ -31,6 +32,17 @@ class Server {
 
   private config(): void {
     this.app.use(/\/((?!api\/thumbnail).)*/, bodyParser.json());
+    this.app.use(
+      '/imgs',
+      express.static(path.join('./', 'uploads'), {
+        extensions: ['jpg', 'jpeg', 'png'],
+      })
+    );
+    this.app.use((req, res, next) => {
+      if (req.path.startsWith('/imgs')) {
+        res.redirect('/imgs/default');
+      } else next();
+    });
     this.app.use(
       /\/((?!api\/thumbnail).)*/,
       bodyParser.urlencoded({ extended: true })

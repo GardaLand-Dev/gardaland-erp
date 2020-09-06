@@ -76,7 +76,7 @@ export default function FamilleList(): JSX.Element {
   }, []);
   useEffect(() => {
     staticService
-      .getFamilies()
+      .getFamilies(true, true)
       .then((d) => {
         return setData(
           d.map((f) => ({

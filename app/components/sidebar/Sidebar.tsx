@@ -1,21 +1,26 @@
 import React from 'react';
-import data from '../../services/api';
+import { useSelector } from 'react-redux';
 import SideBarButton from './sideBarButton';
+import { selectData } from '../../reducers/data.reducer';
 // TODO: redisign this shit is ugly
 type Props = {
   callback: (familyId: string) => unknown;
   selectedFam: string;
 };
 export default function Sidebar({ callback, selectedFam }: Props): JSX.Element {
-  const families = data.families.map((family) => family.id);
+  const data = useSelector(selectData);
+  const families = data?.map((family) => ({
+    id: family.id,
+    name: family.name,
+  }));
 
   return (
     <div className="d-flex flex-row w-100 p-0">
-      {families.map((fam, i) => (
+      {families?.map((fam, i) => (
         <SideBarButton
-          key={fam}
-          famId={fam}
-          selected={fam === selectedFam}
+          key={fam.id}
+          family={fam}
+          selected={fam.id === selectedFam}
           callback={callback}
           className={i === families.length - 1 ? '' : 'mr-2'}
         />

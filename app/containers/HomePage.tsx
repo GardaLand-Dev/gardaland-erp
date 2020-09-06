@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Icon, Button, List, ListItem } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import staticService from '../services/statics.service';
 import Sidebar from '../components/sidebar/Sidebar';
 // import SuppDropdown from '../components/home/SuppDropdown';
 // import CommentDropdown from '../components/home/CommentDropdown';
@@ -10,6 +11,8 @@ import { selectFamily, selectSelectedFamily } from '../reducers/homePageSlice';
 import MenuArticles from '../components/article/MenuArticles';
 import Header from '../components/header/Header';
 import { OrderSvg, MenuSvg } from '../assets/svgs';
+import { updateData, selectData } from '../reducers/data.reducer';
+import loadImages from '../helpers/data-helper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,6 +39,16 @@ export default function HomePage(): JSX.Element {
   const dispatch = useDispatch();
   const selectedFam = useSelector(selectSelectedFamily);
   const famSelect = (familyId: string) => dispatch(selectFamily(familyId));
+  useEffect(() => {
+    staticService
+      .getFamilies(true, false, true)
+      .then((d) => {
+        dispatch(updateData(d));
+        dispatch(selectFamily(d[0]?.id));
+        return loadImages(d);
+      })
+      .catch(console.error);
+  }, [dispatch]);
 
   // const classes = useStyles();
   return (
@@ -98,7 +111,7 @@ export default function HomePage(): JSX.Element {
         <Box className="w-100 of-x-auto flex-shrink-0 py-3 noScrollBar">
           <Sidebar callback={famSelect} selectedFam={selectedFam} />
         </Box>
-        <Box className="flex-shrink-1 overflow-auto customScrollBar">
+        <Box className="flex-shrink-1 of-x-hidden customScrollBar">
           <MenuArticles />
         </Box>
       </Box>

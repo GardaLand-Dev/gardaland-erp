@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Clock from 'react-live-clock';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import moment from 'moment';
 import { Divider, Grid, Button, Icon, IconButton } from '@material-ui/core';
 import CartRow from './CartRow';
@@ -17,7 +17,6 @@ import {
   delList,
 } from '../../reducers/cartSlice';
 import TabButton from './TabButton';
-import data from '../../services/api';
 // svgs
 import {
   EmporterSvg,
@@ -75,7 +74,7 @@ export default function Cart(): JSX.Element {
       <CartRow
         key={rw.index}
         index={rw.index}
-        articleId={rw.articleId}
+        product={rw.product}
         q={rw.q}
         suppliments={rw.suppliments}
         funcs={rowFuncs}
@@ -85,13 +84,13 @@ export default function Cart(): JSX.Element {
   const getTotal = () => {
     if (list) {
       return list.rows.reduce((acc, rw) => {
-        const article = data.getArticle(rw.articleId);
-        if (article) {
-          const aprice = article.price;
+        const { product } = rw;
+        if (product) {
+          const aprice = product.priceTTC;
           let supsp = 0;
           if (rw.suppliments) {
             rw.suppliments.forEach((sup) => {
-              const supdata = data.getSuppliment(sup.supId);
+              const supdata = sup.suppliment;
               if (supdata) supsp += supdata.price * sup.q;
             });
           }
