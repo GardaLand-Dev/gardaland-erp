@@ -131,18 +131,6 @@ function createProduct(
 }
 
 function updateProductThumbnail(file: File, id: string) {
-  // const requestOptions = {
-  //   method: 'POST',
-  //   headers: {
-  //     // 'Content-type': 'multipart/form-data',
-  //     Authorization: authHeader().Authorization,
-  //   },
-  //   body: file,
-  // };
-  // return fetch(
-  //   `${config.apiUrl}/thumbnail`,
-  //   requestOptions
-  // ).then((res: Response) => res.json());
   const data = new FormData();
   data.append('thumbnail', file, 'thumbnail.jpg');
   data.append('id', id);

@@ -12,11 +12,12 @@ import {
   FormHelperText,
   Grid,
   withStyles,
+  Snackbar,
 } from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Add from '@material-ui/icons/Add';
-import { Autocomplete } from '@material-ui/lab';
+import { Autocomplete, Alert } from '@material-ui/lab';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
 import inventoryService from '../../../../services/inventory.service';
@@ -136,13 +137,16 @@ const AddtextField = ({
   onDelete: (id: number) => void;
   fieldId: number;
 }) => {
-  const [ingredientId, setIngredientId] = useState('');
+  const [ingredientId, setIngredientId] = useState<{
+    id?: string;
+    unit?: string;
+  }>();
   const [quantity, setquantity] = useState(0);
   // const [ingredient, setIngredient] = useState<
   //   { id: string; name: string; unit: string; selected: boolean }[]
   // >([]);
   const handleChange = (id: string, qt: number) => {
-    onChange(id, qt, ingredientId);
+    onChange(id, qt, ingredientId?.id);
   };
   return (
     <Grid container spacing={2}>
@@ -154,7 +158,7 @@ const AddtextField = ({
           onChange={(_event: any, newValue: any | null) => {
             const Value = newValue ? newValue.id : null;
             handleChange(Value, quantity);
-            setIngredientId(Value);
+            setIngredientId(newValue);
           }}
           renderInput={(params) => (
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -167,14 +171,19 @@ const AddtextField = ({
           <Input
             type="number"
             id="standard-adornment-quantity"
-            endAdornment={<InputAdornment position="end">Kg</InputAdornment>}
+            endAdornment={
+              // eslint-disable-next-line react/jsx-wrap-multilines
+              <InputAdornment position="end">
+                {ingredientId?.unit ? ingredientId.unit : ' '}
+              </InputAdornment>
+            }
             aria-describedby="standard-quantity-helper-text"
             inputProps={{
               'aria-label': 'quantity',
             }}
             onChange={(e) => {
               const val = parseFloat(e.target.value);
-              handleChange(ingredientId, val);
+              handleChange(ingredientId.id, val);
               setquantity(val);
             }}
           />
@@ -188,8 +197,8 @@ const AddtextField = ({
           size="small"
           color="secondary"
           onClick={() => {
-            onChange('', null, ingredientId);
             onDelete(fieldId);
+            onChange('', null, ingredientId?.id);
           }}
         >
           <DeleteIcon fontSize="large" />
@@ -210,7 +219,7 @@ export default function ListeProduit(): JSX.Element {
       familyName: string;
     }[]
   >([]);
-  useEffect(() => {
+  const dataLoader = () => {
     staticService
       .getProducts()
       .then((d) => {
@@ -225,8 +234,11 @@ export default function ListeProduit(): JSX.Element {
           }))
         );
       })
-      // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    dataLoader();
+    // eslint-disable-next-line no-console
   }, []);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -315,13 +327,22 @@ export default function ListeProduit(): JSX.Element {
     // );
   };
   const handleDeleteField = (id: number) => {
-    setFieldId(fieldsId.filter((item) => item.id !== id));
+    if (fieldsId.length > 1)
+      setFieldId(fieldsId.filter((item) => item.id !== id));
   };
   const handleAddClicked = () => {
     setModalVisible(true);
   };
   const handleChecked = () => {
     setisChecked(!isChecked);
+  };
+  const [open, setOpen] = useState(false);
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
   };
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -340,15 +361,33 @@ export default function ListeProduit(): JSX.Element {
       // eslint-disable-next-line no-console
       .then((res) => {
         if (res && res.DATA?.id) {
-          staticService.updateProductThumbnail(
+          return staticService.updateProductThumbnail(
             productParams.thumbnail,
             res.DATA.id
           );
         }
         throw new Error('coudnt create family');
       })
+      .then((status) => {
+        console.log('familly added ', status);
+        if (status === 200) {
+          setOpen(true);
+          setModalVisible(false);
+          dataLoader();
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          modalReset();
+          return true;
+        }
+        throw new Error('didnt create');
+      })
       // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
+  };
+  const modalReset = () => {
+    setModalVisible(false);
+    setisChecked(false);
+    setFieldId([{ id: 1 }]);
+    setIngredients(ingredients.map((i) => ({ ...i, selected: false })));
   };
   return (
     <div>
@@ -358,13 +397,13 @@ export default function ListeProduit(): JSX.Element {
         title="liste des produits"
         onAddClicked={handleAddClicked}
       />
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Produit ajouté avec succès
+        </Alert>
+      </Snackbar>
       <SimpleModal
-        onClose={() => {
-          setModalVisible(false);
-          setisChecked(false);
-          setFieldId([]);
-          setIngredients([]);
-        }}
+        onClose={modalReset}
         visible={modalVisible}
         title="Ajouter Produit"
         onSubmit={handleCreate}
