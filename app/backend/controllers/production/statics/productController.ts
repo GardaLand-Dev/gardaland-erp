@@ -1,4 +1,8 @@
 import { Request, Response } from 'express';
+import log from 'electron-log';
+import fs from 'fs';
+import path from 'path';
+import mime from 'mime';
 import { FindOptions, Includeable } from 'sequelize';
 import { ProductCreationAttributes } from '../../../db/models/products/product/type';
 import {
@@ -160,6 +164,29 @@ export default class ProductController {
   //     insufficientParameters(res);
   //   }
   // }
+  public static async updateThumbnail(req: Request, res: Response) {
+    const productData = await Product.findByPk(req.body.id);
+    if (productData) {
+      fs.rename(
+        path.join('./', req.file.path),
+        path.join(
+          './',
+          'uploads',
+          `${productData.id}.${mime.getExtension(req.file.mimetype)}`
+        ),
+        (err) => {
+          if (!err) {
+            successResponse('thumbnail update successful', {}, res);
+          } else {
+            log.error(err);
+            failureResponse('coudnt update thumbnail', {}, res);
+          }
+        }
+      );
+    } else {
+      failureResponse('coudnt update thumbnail', {}, res);
+    }
+  }
 
   public static deleteProduct(req: Request, res: Response) {
     if (req.body.id) {

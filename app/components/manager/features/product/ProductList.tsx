@@ -286,6 +286,7 @@ export default function ListeProduit(): JSX.Element {
     invItemId?: string;
     isComposed: boolean;
     familyId: string;
+    thumbnail: File;
   }>();
 
   const handleIngredients = (id: string, quantity: number, prevId: string) => {
@@ -337,7 +338,15 @@ export default function ListeProduit(): JSX.Element {
         productParams.familyId
       )
       // eslint-disable-next-line no-console
-      .then((ok) => console.log('familly added ', ok))
+      .then((res) => {
+        if (res && res.DATA?.id) {
+          staticService.updateProductThumbnail(
+            productParams.thumbnail,
+            res.DATA.id
+          );
+        }
+        throw new Error('coudnt create family');
+      })
       // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
   };
@@ -442,6 +451,23 @@ export default function ListeProduit(): JSX.Element {
             />
           )}
         />
+        <CssInputField
+          className="mt-3"
+          required
+          style={{ width: '100%' }}
+          variant="outlined"
+        >
+          <OutlinedInput
+            inputProps={{ accept: 'image/*' }}
+            type="file"
+            onChange={(e) => {
+              setProductParams({
+                ...productParams,
+                thumbnail: (e.currentTarget as HTMLInputElement).files[0],
+              });
+            }}
+          />
+        </CssInputField>
         <FormControlLabel
           control={<Checkbox checked={isChecked} onChange={handleChecked} />}
           label="isComposed"

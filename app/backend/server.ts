@@ -30,8 +30,11 @@ class Server {
   }
 
   private config(): void {
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(/\/((?!api\/thumbnail).)*/, bodyParser.json());
+    this.app.use(
+      /\/((?!api\/thumbnail).)*/,
+      bodyParser.urlencoded({ extended: true })
+    );
     this.app.use((req, _res, next) => {
       log.info(
         `${req.method}: ${req.path} body is`,

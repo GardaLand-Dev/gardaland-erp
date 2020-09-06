@@ -1,4 +1,5 @@
 // import jwt from 'jsonwebtoken';
+import axios from 'axios';
 import config from '../config';
 import authHeader from '../helpers/auth-header';
 
@@ -123,10 +124,35 @@ function createProduct(
       familyId,
     }),
   };
-  return fetch(`${config.apiUrl}/product`, requestOptions)
-    .then((res: Response) => res.ok)
-    .catch((err) => err);
+  return fetch(
+    `${config.apiUrl}/product`,
+    requestOptions
+  ).then((res: Response) => res.json());
 }
+
+function updateProductThumbnail(file: File, id: string) {
+  // const requestOptions = {
+  //   method: 'POST',
+  //   headers: {
+  //     // 'Content-type': 'multipart/form-data',
+  //     Authorization: authHeader().Authorization,
+  //   },
+  //   body: file,
+  // };
+  // return fetch(
+  //   `${config.apiUrl}/thumbnail`,
+  //   requestOptions
+  // ).then((res: Response) => res.json());
+  const data = new FormData();
+  data.append('thumbnail', file, 'thumbnail.jpg');
+  data.append('id', id);
+  return axios
+    .post(`${config.apiUrl}/thumbnail`, data, {
+      headers: { Authorization: authHeader().Authorization },
+    })
+    .then((res) => res.status);
+}
+
 function getProducts(
   all = false,
   limit: number = null,
@@ -205,6 +231,7 @@ const staticService = {
   createFamily,
   getFamilies,
   createProduct,
+  updateProductThumbnail,
   getProducts,
   createSuppliment,
   getSuppliments,
