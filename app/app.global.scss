@@ -10,19 +10,19 @@ $grid-breakpoints: (
   // Small screen / phone
     sm: 576px,
   // Medium screen / tablet
-    md: 768px,
+    md: 1020px,
   // Large screen / desktop
-    lg: 992px,
+    lg: 1135px,
   // Extra large screen / wide desktop
-    xl: 1200px,
+    xl: 1300px,
   // Extra Extra large screen
     xxl: 1600px
 );
 $container-max-widths: (
   sm: 540px,
   md: 720px,
-  lg: 960px,
-  xl: 1140px,
+  lg: 1100px,
+  xl: 1240px,
   xxl: 1520px,
 );
 @import './vars.scss';
