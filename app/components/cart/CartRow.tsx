@@ -63,7 +63,7 @@ export default function CartRow({
 
   return (
     <div
-      className="d-flex flex-column border-bottom p-4 custom-row selected"
+      className="d-flex flex-column border-bottom p-3 custom-row selected"
       // onClick={this.handleRowClick} this should not be here should include a event listener
     >
       <div className="d-flex flex-row align-items-center w-100">

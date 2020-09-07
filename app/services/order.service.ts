@@ -11,6 +11,7 @@ type OrderType = {
     suppliments?: { supplimentId: string; quantity: number }[];
   }[];
   num: number;
+  type: string;
 };
 function createOrder(order: OrderType) {
   const requestOptions = {
@@ -21,11 +22,11 @@ function createOrder(order: OrderType) {
     },
     body: JSON.stringify(order),
   };
-  return fetch(`${config.apiUrl}/order`, requestOptions)
-    .then((res: Response) => {
+  return fetch(`${config.apiUrl}/order`, requestOptions).then(
+    (res: Response) => {
       return res.ok;
-    })
-    .catch((err) => err);
+    }
+  );
 }
 function updateOrder(order: OrderType) {
   const requestOptions = {

@@ -47,7 +47,7 @@ const dbConfig = (() => {
     {
       dialect: 'sqlite',
       dialectModulePath: '@journeyapps/sqlcipher',
-      storage: path.join(__dirname, 'db.sqlite'),
+      storage: path.join('./', 'db.sqlite'),
       logging: () => {},
     }
   );
@@ -329,17 +329,31 @@ export const dbInit = async () => {
   });
 
   // FinancialTransaction auto create
-  Order.addHook('afterCreate', async (orderData, options) => {
+  Order.addHook('afterUpdate', async (orderData, options) => {
     const func = async () => {
-      const tType = await TransactionType.findOne({
-        where: { source: 'order' },
-      });
-      const fTData = await FinancialTransaction.create({
-        transactionTypeId: tType.id,
-        value: orderData.getDataValue('totalPrice'),
-      });
-      orderData.setDataValue('financialTransactionId', fTData.id);
-      orderData.save();
+      if (orderData.getDataValue('totalPrice') > 0) {
+        if (!orderData.getDataValue('financialTransactionId')) {
+          const tType = await TransactionType.findOne({
+            where: { source: 'order' },
+          });
+          const fTData = await FinancialTransaction.create({
+            transactionTypeId: tType.id,
+            value: orderData.getDataValue('totalPrice'),
+          });
+          if (fTData) {
+            orderData.setDataValue('financialTransactionId', fTData.id);
+            orderData.save();
+          }
+        } else {
+          const fTDATA = await FinancialTransaction.findByPk(
+            orderData.getDataValue('financialTransactionId')
+          );
+          if (fTDATA && fTDATA.value !== orderData.getDataValue('totalPrice')) {
+            fTDATA.value = orderData.getDataValue('totalPrice');
+            fTDATA.save();
+          }
+        }
+      }
     };
     if (options.transaction) options.transaction.afterCommit(func);
     else func();
@@ -496,5 +510,29 @@ export const dbInit = async () => {
   await dbConfig
     .sync()
     .then(() => log.info('database created and syncronized'))
+    .then(async () => {
+      await TransactionType.findOrCreate({
+        where: { source: 'order' },
+        defaults: { source: 'order', sign: 'POS' },
+      });
+      await TransactionType.findOrCreate({
+        where: { source: 'expense' },
+        defaults: { source: 'expense', sign: 'NEG' },
+      });
+      await TransactionType.findOrCreate({
+        where: { source: 'payroll' },
+        defaults: { source: 'payroll', sign: 'NEG' },
+      });
+      await TransactionType.findOrCreate({
+        where: { source: 'invoice' },
+        defaults: { source: 'invoice', sign: 'NEG' },
+      });
+      await FinancialAccount.findOrCreate({
+        where: {},
+        defaults: { value: 0 },
+      });
+
+      return true;
+    })
     .catch((err) => log.info('couldnt synchronize db', err));
 };

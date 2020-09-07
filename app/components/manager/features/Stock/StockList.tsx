@@ -171,7 +171,7 @@ export default function StockList(): JSX.Element {
         title="liste des stock"
         onAddClicked={handleAddClicked}
       />
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success">
           Article ajouté avec succès
         </Alert>

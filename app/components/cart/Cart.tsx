@@ -5,7 +5,16 @@ import Clock from 'react-live-clock';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import moment from 'moment';
-import { Divider, Grid, Button, Icon, IconButton } from '@material-ui/core';
+import {
+  Divider,
+  Grid,
+  Button,
+  Icon,
+  IconButton,
+  Snackbar,
+} from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
+import SimpleModal from '../manager/SimpleModal';
 import CartRow from './CartRow';
 import {
   selectCart,
@@ -30,6 +39,7 @@ import {
   DeleteSvg,
   MoneySvg,
 } from '../../assets/svgs';
+import orderService from '../../services/order.service';
 //
 
 const useStyles = makeStyles(() =>
@@ -103,6 +113,38 @@ export default function Cart(): JSX.Element {
     return 0;
   };
   const [selected, setSelected] = useState('sale');
+  const [payModalVisible, setPayModalVisible] = useState(false);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const handleSnackClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackOpen(false);
+  };
+  const handlePayment = () => {
+    const orderProducts = cartState.lists
+      .find((lst) => lst.tab === cartState.selectedTab)
+      .rows.map((v) => ({
+        productId: v.product.id,
+        quantity: v.q,
+        suppliments: v.suppliments.map((s) => ({
+          supplimentId: s.suppliment.id,
+          quantity: s.q,
+        })),
+      }));
+    orderService
+      .createOrder({ orderProducts, num: 1, type: 'delivery' })
+      .then((ok) => {
+        console.log('created succ', ok);
+        delListClicked();
+        setSnackOpen(true);
+        setPayModalVisible(false);
+        // delete the current
+        return true;
+      })
+      .catch(console.error);
+  };
+
   return (
     <div className="d-flex flex-column h-100 table_container ">
       <div className="flex-shrink-1 mb-2 px-4 py-3 ">
@@ -127,7 +169,7 @@ export default function Cart(): JSX.Element {
       </div>
       <Divider />
 
-      <Grid container justify="center" spacing={2} className="my-3 px-2">
+      {/* <Grid container justify="center" spacing={2} className="my-3 px-2">
         <Grid item xs>
           <Button
             id="sale"
@@ -185,9 +227,9 @@ export default function Cart(): JSX.Element {
             Delivery
           </Button>
         </Grid>
-      </Grid>
+      </Grid> */}
 
-      <Grid container spacing={3} justify="center" className="mb-1 px-4">
+      {/* <Grid container spacing={3} justify="center" className="mb-1 px-4">
         <Grid item xs>
           <Button className="custButton color-gradient">
             <Icon fontSize="large" className="mx-2">
@@ -204,9 +246,9 @@ export default function Cart(): JSX.Element {
             Add Table
           </Button>
         </Grid>
-      </Grid>
+      </Grid> */}
 
-      <Divider />
+      {/* <Divider /> */}
       <div className="flex-grow-1 h-100 table of-x-auto customScrollBar ">
         <div className="d-flex flex-column">
           {/* make a list of rows */}
@@ -216,7 +258,7 @@ export default function Cart(): JSX.Element {
         </div>
       </div>
       <Divider />
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid item xs>
           <span className="float-left mx-5 mt-2">Total</span>
         </Grid>
@@ -224,10 +266,10 @@ export default function Cart(): JSX.Element {
           <span className="float-right mx-5 mt-2">{`${getTotal()}DA`}</span>
         </Grid>
       </Grid>
-      <Grid container justify="center" spacing={3}>
+      <Grid container justify="center">
         <Grid item xs>
           <Button
-            className="mt-5 mb-3 ml-3 py-3"
+            className="mt-5 mb-3 mx-3 py-3"
             variant="outlined"
             color="secondary"
             onClick={delListClicked}
@@ -239,7 +281,10 @@ export default function Cart(): JSX.Element {
           </Button>
         </Grid>
         <Grid item xs>
-          <Button className="btnsuccess  mt-5 mb-3 py-3 px-4">
+          <Button
+            className="btnsuccess mt-5 mb-3 mr-3 py-3 px-4"
+            onClick={() => setPayModalVisible(true)}
+          >
             <Icon fontSize="small" className="mx-2">
               <img className="pb-5" alt="edit" src={MoneySvg} />
             </Icon>
@@ -247,6 +292,110 @@ export default function Cart(): JSX.Element {
           </Button>
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackClose}
+      >
+        <Alert onClose={handleSnackClose} severity="success">
+          Commande passée avec succès
+        </Alert>
+      </Snackbar>
+      <SimpleModal
+        title="Paiement"
+        onClose={() => setPayModalVisible(false)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handlePayment();
+        }}
+        visible={payModalVisible}
+      >
+        <Grid container direction="row">
+          <Grid item className="flex-grow-1">
+            <span>numpad</span>
+          </Grid>
+          <Grid item direction="column">
+            <Grid item xs className="mb-2">
+              <Button
+                id="sale"
+                className={`colorButton color-gradient ${
+                  selected === 'sale' ? 'active' : ''
+                }`}
+                classes={{ root: useStyles().button, label: useStyles().label }}
+                onClick={(e) => setSelected(e.currentTarget.id)}
+              >
+                <Icon className={useStyles().icon}>
+                  <img
+                    className="pb-5"
+                    alt="edit"
+                    src={selected === 'sale' ? SaleWhiteSvg : SaleSvg}
+                  />
+                </Icon>
+                salle
+              </Button>
+            </Grid>
+            <Grid item xs className="mb-2">
+              <Button
+                id="emporter"
+                className={`colorButton color-gradient ${
+                  selected === 'emporter' ? 'active' : ''
+                }`}
+                classes={{ root: useStyles().button, label: useStyles().label }}
+                onClick={(e) => setSelected(e.currentTarget.id)}
+              >
+                <Icon className={useStyles().icon}>
+                  <img
+                    className="pb-5"
+                    alt="edit"
+                    src={
+                      selected === 'emporter' ? EmporterWhiteSvg : EmporterSvg
+                    }
+                  />
+                </Icon>
+                Emporter
+              </Button>
+            </Grid>
+            <Grid item xs className="mb-2">
+              <Button
+                id="delivery"
+                className={`colorButton color-gradient ${
+                  selected === 'delivery' ? 'active' : ''
+                }`}
+                classes={{ root: useStyles().button, label: useStyles().label }}
+                onClick={(e) => setSelected(e.currentTarget.id)}
+              >
+                <Icon className={useStyles().icon}>
+                  <img
+                    className="pb-5"
+                    alt="edit"
+                    src={
+                      selected === 'delivery' ? DeliveryWhiteSvg : DeliverySvg
+                    }
+                  />
+                </Icon>
+                Delivery
+              </Button>
+            </Grid>
+            <Divider className="mb-2" />
+            <Grid item xs>
+              <Button
+                className="colorButton color-gradient"
+                classes={{ root: useStyles().button, label: useStyles().label }}
+              >
+                <Icon className={useStyles().icon}>
+                  <img className="pb-5" alt="edit" src={AddSvg} />
+                </Icon>
+                Client
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        {/* <div className="p-0 ">
+          <h1>change calc</h1>
+          <h1>order type</h1>
+          <h1>client</h1>
+        </div> */}
+      </SimpleModal>
     </div>
   );
 }

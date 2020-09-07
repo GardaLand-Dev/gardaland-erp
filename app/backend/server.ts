@@ -54,12 +54,6 @@ class Server {
         '\nquery params are',
         req.query
       );
-      // console.log(
-      //   `${req.method}: ${req.path} body is`,
-      //   req.body,
-      //   '\nquery params are',
-      //   req.query
-      // );
       next();
     }); // for debuging
     this.app.use(authCheck);

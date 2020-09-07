@@ -13,7 +13,7 @@ export default function FinancialTransactionFactory(
     },
     caisseValue: {
       type: DataTypes.NUMBER.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
     },
     value: {
       type: DataTypes.NUMBER,

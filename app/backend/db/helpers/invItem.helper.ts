@@ -13,10 +13,12 @@ async function updateInvItems(
     },
     transaction,
   });
-  invItems.forEach(async (s) => {
-    s.inStock += invItemQtDict[s.id];
-    await s.save({ transaction });
-  });
+  if (invItems && invItems.length > 0) {
+    invItems.forEach(async (s) => {
+      s.inStock += invItemQtDict[s.id];
+      await s.save({ transaction });
+    });
+  }
 }
 
 const InvItemHelper = {

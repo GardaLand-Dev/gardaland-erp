@@ -12,7 +12,7 @@ export default function TransactionTypeFactory(
       allowNull: false,
     },
     source: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     sign: {

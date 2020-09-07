@@ -42,7 +42,7 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes>
 
   public canceled!: boolean;
 
-  public financialTransactionId: string;
+  public financialTransactionId!: string;
 
   public createdBy!: string;
 

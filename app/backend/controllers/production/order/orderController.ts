@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Op } from 'sequelize';
+import log from 'electron-log';
 import objectHash from 'object-hash';
 import {
   OrderCreationAttributes,
@@ -90,10 +91,12 @@ export default class OrderController {
           },
           []
         );
-        const opsps = await OrderProductSuppliment.bulkCreate(opspsIns, {
-          transaction: t,
-        });
-        if (!opsps) throw new Error('coudnt create orderProductSuppliment');
+        if (opspsIns && opspsIns.length > 0) {
+          const opsps = await OrderProductSuppliment.bulkCreate(opspsIns, {
+            transaction: t,
+          });
+          if (!opsps) throw new Error('coudnt create orderProductSuppliment');
+        }
         t.commit()
           .then(async () => {
             successResponse('order created successfully', o.toJSON(), res);
@@ -134,12 +137,18 @@ export default class OrderController {
             await o.save();
             return InvItemHelper.updateInvItems(invItemsDict);
           })
-          .catch((err) => dbError(err, res));
+          .catch((err) => {
+            log.error('error while on commit', err);
+            return dbError(err, res);
+          });
       } catch (err) {
-        console.log('ERRRR COUGHT', err);
+        log.error('ERRRR COUGHT', err);
 
         t.rollback()
-          .then(() => dbError(err, res))
+          .then(() => {
+            log.error('rollingback', err);
+            return dbError(err, res);
+          })
           .catch((err1) => dbError(err1, res));
       }
     } else {
@@ -269,7 +278,7 @@ export default class OrderController {
         // .catch((err) => dbError(err, res));
       } catch (err) {
         t.rollback();
-        console.log(err);
+        log.error(err);
         failureResponse('failed to delete order', err, res);
       }
     } else {
@@ -290,6 +299,10 @@ export default class OrderController {
       limit,
       offset,
     };
+    if (req.query.all === 'true') {
+      options.limit = null;
+      options.offset = null;
+    }
     Order.findAll(options)
       .then((ordersData) =>
         successResponse('orders retrieved', ordersData, res)
