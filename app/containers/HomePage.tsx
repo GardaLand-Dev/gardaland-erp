@@ -38,7 +38,7 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'Annuler',
+    name: 'Annulée',
     selector: 'canceled',
     format: (row) => (row.deleted ? 'Oui' : 'Non'),
     sortable: true,
@@ -54,7 +54,7 @@ const columns = [
     cell: function editButton(row) {
       return (
         // eslint-disable-next-line no-console
-        <IconButton onClick={() => console.log(row)}>
+        <IconButton disabled={row.deleted} onClick={() => console.log(row)}>
           <EditOutlinedIcon />
         </IconButton>
       );
@@ -226,6 +226,14 @@ export default function HomePage(): JSX.Element {
                   columns={columns}
                   data={data}
                   title="liste des Ventes"
+                  onDelete={(selectedRows: any[]) => {
+                    OrderService.cancelOrder(selectedRows[0].id)
+                      .then((ok) => {
+                        if (ok) dataLoader();
+                        return true;
+                      })
+                      .catch(console.error);
+                  }}
                 />
               </Box>
             );

@@ -16,6 +16,7 @@ type Props = {
   columns: Array<IDataTableColumn>;
   title: string;
   onAddClicked?: () => void;
+  onDelete?: (selectedRows: any[]) => void;
 };
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -79,6 +80,7 @@ const CustomTable = ({
   columns,
   title,
   onAddClicked,
+  onDelete,
 }: Props): JSX.Element => {
   const [filterText, setFilterText] = React.useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = React.useState(
@@ -145,7 +147,10 @@ const CustomTable = ({
           <IconButton
             color="secondary"
             // eslint-disable-next-line no-console
-            onClick={() => console.log(selectedRows)}
+            onClick={() => {
+              onDelete(selectedRows);
+              console.log(selectedRows);
+            }}
           >
             <Delete />
           </IconButton>
