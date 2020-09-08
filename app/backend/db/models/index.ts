@@ -306,6 +306,29 @@ export const dbInit = async () => {
     if (options.transaction) options.transaction.afterCommit(func);
     else func();
   });
+  FinancialTransaction.addHook(
+    'beforeUpdate',
+    (
+      fTData: import('./finance/financialTransaction/type').FinancialTransaction,
+      options
+    ) => {
+      const func = async () => {
+        const prev = fTData.previous('value');
+        const typeId = await TransactionType.findByPk(
+          fTData.getDataValue('transactionTypeId')
+        );
+        const fA = await FinancialAccount.findOne();
+        if (typeId.sign === 'POS') {
+          fA.value += fTData.value - prev;
+        } else {
+          fA.value += prev - fTData.value;
+        }
+        fA.save();
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
   FinancialTransaction.addHook('beforeDestroy', (fTData, options) => {
     const func = () => {
       FinancialAccount.findOne()
@@ -328,7 +351,7 @@ export const dbInit = async () => {
     else func();
   });
 
-  // FinancialTransaction auto create
+  // FinancialTransaction auto create / update
   Order.addHook('afterUpdate', async (orderData, options) => {
     const func = async () => {
       if (orderData.getDataValue('totalPrice') > 0) {
@@ -352,6 +375,7 @@ export const dbInit = async () => {
             fTDATA.value = orderData.getDataValue('totalPrice');
             fTDATA.save();
           }
+          if (orderData.getDataValue('canceled')) fTDATA.destroy();
         }
       }
     };
@@ -386,6 +410,23 @@ export const dbInit = async () => {
     if (options.transaction) options.transaction.afterCommit(func);
     else func();
   });
+  Expense.addHook(
+    'beforeUpdate',
+    (eData: import('./finance/expense/type').Expense, options) => {
+      const func = async () => {
+        const prev = eData.previous('amount');
+        if (eData.amount !== prev && eData.financialTransactionId) {
+          const tData = await FinancialTransaction.findByPk(
+            eData.financialTransactionId
+          );
+          tData.value = eData.amount;
+          tData.save();
+        }
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
   Invoice.addHook('beforeCreate', async (invoiceData, options) => {
     const func = async () => {
       const tType = await TransactionType.findOne({

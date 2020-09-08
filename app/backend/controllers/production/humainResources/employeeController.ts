@@ -144,12 +144,18 @@ export default class EmployeeController {
 
   public static getEmployees(req: Request, res: Response) {
     const limit =
-      typeof req.query.limit === 'number' && req.query.limit > 0
-        ? req.query.limit
+      typeof req.query.limit === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.limit, 10)) &&
+      parseInt(req.query.limit, 10) > 0
+        ? parseInt(req.query.limit, 10)
         : DEFAULT_LIMIT;
     const offset =
-      typeof req.query.page === 'number' && req.query.page > 0
-        ? (req.query.page - 1) * limit
+      typeof req.query.page === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.page, 10)) &&
+      parseInt(req.query.page, 10) > 0
+        ? (parseInt(req.query.page, 10) - 1) * limit
         : 0;
     const options = { limit, offset };
     Employee.findAll(options)

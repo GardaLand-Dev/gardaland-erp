@@ -15,5 +15,9 @@ export default function ExpenseFactory(
       type: DataTypes.NUMBER.UNSIGNED,
       allowNull: false,
     },
+    note: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   });
 }

@@ -12,18 +12,22 @@ import { User } from '../../rbac/user/type';
 export interface ExpenseAttributes {
   id: string;
   amount: number;
+  note: string;
   createdBy: string;
   financialTransactionId: string;
+  createdAt: Date;
 }
 export type ExpenseCreationAttributes = Optional<
   ExpenseAttributes,
-  'id' | 'financialTransactionId'
+  'id' | 'financialTransactionId' | 'createdAt'
 >;
 export class Expense extends Model<ExpenseAttributes, ExpenseCreationAttributes>
   implements ExpenseAttributes {
   public id!: string;
 
   public amount!: number;
+
+  public note!: string;
 
   public createdBy!: string;
 
