@@ -15,7 +15,7 @@ type Props = {
   data: Array<unknown>;
   columns: Array<IDataTableColumn>;
   title: string;
-  onAddClicked: () => void;
+  onAddClicked?: () => void;
 };
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

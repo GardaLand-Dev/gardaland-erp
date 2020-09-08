@@ -24,6 +24,7 @@ import {
   incrQuantity,
   decQuantity,
   delList,
+  setQuantity,
 } from '../../reducers/cartSlice';
 import TabButton from './TabButton';
 // svgs
@@ -52,7 +53,7 @@ const useStyles = makeStyles(() =>
       flexDirection: 'column',
     },
     icon: {
-      fontSize: '52px !important',
+      fontSize: '48px',
     },
   })
 );
@@ -66,6 +67,8 @@ export default function Cart(): JSX.Element {
     delRow: (index: number) => dispatch(delArticle(index)),
     incrQ: (index: number) => dispatch(incrQuantity(index)),
     decrQ: (index: number) => dispatch(decQuantity(index)),
+    setQ: (index: number, value: number) =>
+      dispatch(setQuantity({ index, value })),
   };
 
   const tabs: Array<JSX.Element> = cartState.lists.map((list) => (
@@ -133,7 +136,7 @@ export default function Cart(): JSX.Element {
         })),
       }));
     orderService
-      .createOrder({ orderProducts, num: 1, type: 'delivery' })
+      .createOrder({ orderProducts, num: 1, type: selected })
       .then((ok) => {
         console.log('created succ', ok);
         delListClicked();
@@ -146,25 +149,20 @@ export default function Cart(): JSX.Element {
   };
 
   return (
-    <div className="d-flex flex-column h-100 table_container ">
+    <div className="d-flex flex-column h-100 " style={{ minWidth: 326 }}>
       <div className="flex-shrink-1 mb-2 px-4 py-3 ">
         <h1 className="h5 m-0 color-gradient">Order # 7</h1>
         <div>
           {tabs}
-          {/* <i className=" fa fa-plus-square fa-2x" /> */}
           <IconButton size="small" onClick={addTabClicked}>
             <AddCircleOutlineOutlinedIcon fontSize="large" />
           </IconButton>
-          {/*  */}
         </div>
-        {/* <hr className="ligne m-1"/> */}
         <p className="h5 m-0 float-right text-black-50">
           <Clock format="hh:mm:ss A" ticking />
-          {/* 10:00:00 AM */}
         </p>
         <p className="m-0 text-capitalize text-black-50">
           {moment().format('dddd Do MMMM YYYY')}
-          {/* saturday 28 july 2020 */}
         </p>
       </div>
       <Divider />
@@ -248,47 +246,44 @@ export default function Cart(): JSX.Element {
         </Grid>
       </Grid> */}
 
-      {/* <Divider /> */}
-      <div className="flex-grow-1 h-100 table of-x-auto customScrollBar ">
-        <div className="d-flex flex-column">
-          {/* make a list of rows */}
-          {/* <CartRow /> */}
-          {rows}
-          {/*  */}
-        </div>
+      {/* <Divider azzzzzzzzzzzzzzzzzzzz/> */}
+      <div className="flex-grow-1 h-100 table of-x-auto customScrollBar">
+        <div className="d-flex flex-column">{rows}</div>
       </div>
       <Divider />
       <Grid container>
         <Grid item xs>
-          <span className="float-left mx-5 mt-2">Total</span>
+          <span className="float-left ml-4 mt-2">Total</span>
         </Grid>
         <Grid item xs>
-          <span className="float-right mx-5 mt-2">{`${getTotal()}DA`}</span>
+          <span className="float-right text-right mt-2 mr-4">{`${getTotal()}DA`}</span>
         </Grid>
       </Grid>
       <Grid container justify="center">
-        <Grid item xs>
+        <Grid item>
           <Button
-            className="mt-5 mb-3 mx-3 py-3"
+            className="mt-4 mb-3 mr-3 p-1"
             variant="outlined"
             color="secondary"
             onClick={delListClicked}
+            style={{ minWidth: 'fit-content', minHeight: 32 }}
           >
-            <Icon fontSize="small" className="mx-2">
+            <Icon fontSize="small" className="">
               <img className="pb-5" alt="edit" src={DeleteSvg} />
             </Icon>
-            <span>Supprimer</span>
+            {/* <span>Supprimer</span> */}
           </Button>
         </Grid>
-        <Grid item xs>
+        <Grid item className="w-50  ">
           <Button
-            className="btnsuccess mt-5 mb-3 mr-3 py-3 px-4"
+            className="btnsuccess mt-4 mb-3 mr-3 py-1 "
             onClick={() => setPayModalVisible(true)}
+            style={{ minWidth: 'fit-content', width: '100%' }}
           >
-            <Icon fontSize="small" className="mx-2">
+            <Icon fontSize="small">
               <img className="pb-5" alt="edit" src={MoneySvg} />
             </Icon>
-            <span className="text-white">Pay Now</span>
+            <span className="text-white mx-auto">Pay Now</span>
           </Button>
         </Grid>
       </Grid>

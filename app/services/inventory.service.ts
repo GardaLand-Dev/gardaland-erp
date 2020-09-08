@@ -16,7 +16,13 @@ function createInvItem(
       'Content-type': 'application/json',
       Authorization: authHeader().Authorization,
     },
-    body: JSON.stringify({ name, unit, isIngredient, alertQuantity, inStock }),
+    body: JSON.stringify({
+      name,
+      unit,
+      isIngredient: isIngredient === undefined ? false : isIngredient,
+      alertQuantity,
+      inStock,
+    }),
   };
   return fetch(`${config.apiUrl}/invItem`, requestOptions)
     .then((res: Response) => {

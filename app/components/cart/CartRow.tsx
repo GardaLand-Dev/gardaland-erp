@@ -5,6 +5,7 @@ import {
   faChevronUp,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
+import { Input } from '@material-ui/core';
 import { Suppliment, Product } from '../../reducers/cartSlice';
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
     delRow: (index: number) => void;
     incrQ: (index: number) => void;
     decrQ: (index: number) => void;
+    setQ: (index: number, value: number) => void;
   };
 };
 
@@ -29,6 +31,7 @@ export default function CartRow({
   const delClicked = () => funcs.delRow(index);
   const incrClicked = () => funcs.incrQ(index);
   const decrClicked = () => funcs.decrQ(index);
+  const qChanged = (value) => funcs.setQ(index, value);
   const getTotal = () => {
     if (product) {
       const aprice = product.priceTTC;
@@ -63,14 +66,14 @@ export default function CartRow({
 
   return (
     <div
-      className="d-flex flex-column border-bottom p-3 custom-row selected"
+      className="d-flex flex-column border-bottom p-2 custom-row selected"
       // onClick={this.handleRowClick} this should not be here should include a event listener
     >
       <div className="d-flex flex-row align-items-center w-100">
         <div className="">
           <button
             // onClick={deletefunction}
-            className="btn text-danger"
+            className="btn text-danger pl-0"
             type="button"
             onClick={delClicked}
           >
@@ -80,28 +83,44 @@ export default function CartRow({
           </button>
         </div>
         <div className="mr-auto">
-          <p className="m-0 font-weight-semibold text-capitalize">
+          <p
+            className="m-0 font-weight-semibold text-capitalize"
+            style={{ width: '15ch' }}
+          >
             {product.name}
             {/* pizza fdm */}
           </p>
-          <p className="m-0 text-black-25 font-italic">
+          <p className="m-0 text-black-50 font-italic">
             {`@${product?.priceTTC} da`}
-            {/* @400DA */}
           </p>
         </div>
-        <div className="mx-4">
+        <div className="mx-2">
           <div className="d-flex flex-row align-items-stretch theme-gradient-y rounded-xlg p-025 ">
-            <div className="d-flex justify-content-center align-items-center col-6 bg-white rounded-left-xlg text-body">
-              <p className="my-0 font-weight-semibold">
-                {/* quantity */}
-                {q}
-              </p>
+            <div className="d-flex justify-content-center align-items-center px-0 col-6 bg-white rounded-left-xlg text-body">
+              <Input
+                className="my-0 font-weight-semibold "
+                // style={{ width: '3ch' }}
+                type="number"
+                value={q}
+                onChange={(e) => {
+                  const val = e.currentTarget.value
+                    ? parseInt(e.currentTarget.value, 10)
+                    : 1;
+                  qChanged(val);
+                }}
+                inputProps={{
+                  className: 'text-center',
+                  style: { width: '3ch', padding: 0 },
+                }}
+                disableUnderline
+              />
+              {/* quantity */}
             </div>
             <div className="d-flex flex-column col-6 px-0">
               <div className="quant-icon border-bottom border-white-25">
                 <button
                   // onClick={this.increaseQunatity}
-                  className="btn text-white py-1"
+                  className="btn text-white py-0"
                   type="button"
                   onClick={incrClicked}
                 >
@@ -113,7 +132,7 @@ export default function CartRow({
               <div className="quant-icon">
                 <button
                   // onClick={this.decreaseQunatity}
-                  className="btn text-white py-1"
+                  className="btn text-white py-0"
                   type="button"
                   onClick={decrClicked}
                 >
@@ -125,8 +144,8 @@ export default function CartRow({
             </div>
           </div>
         </div>
-        <div className="">
-          <p className="m-0 font-weight-semibold">{`${getTotal()}DA`}</p>
+        <div className="p-0" style={{ width: '8ch' }}>
+          <p className="m-0 font-weight-semibold text-right">{`${getTotal()}DA`}</p>
         </div>
       </div>
       <div className="d-flex flex-column flex-wrap w-100 suppliments pl-5">

@@ -1,7 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Icon, Button, List, ListItem } from '@material-ui/core';
+import {
+  Box,
+  Icon,
+  Button,
+  List,
+  ListItem,
+  IconButton,
+} from '@material-ui/core';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import moment from 'moment';
 import staticService from '../services/statics.service';
 import Sidebar from '../components/sidebar/Sidebar';
 // import SuppDropdown from '../components/home/SuppDropdown';
@@ -13,7 +22,46 @@ import Header from '../components/header/Header';
 import { OrderSvg, MenuSvg } from '../assets/svgs';
 import { updateData, selectData } from '../reducers/data.reducer';
 import loadImages from '../helpers/data-helper';
+import OrderService from '../services/order.service';
+import CustomTable from '../components/manager/CustomTable';
 
+const columns = [
+  {
+    name: 'Numéro de commande',
+    selector: 'num',
+    sortable: true,
+  },
+  {
+    name: 'Date',
+    selector: 'createdAt',
+    format: (row) => moment(row.createdAt as Date).format('hh:mm | DD/MM/YY'),
+    sortable: true,
+  },
+  {
+    name: 'Annuler',
+    selector: 'canceled',
+    format: (row) => (row.deleted ? 'Oui' : 'Non'),
+    sortable: true,
+  },
+  {
+    name: 'Total',
+    selector: 'totalPrice',
+    format: (row) => `${row.totalPrice} DA`,
+    sortable: true,
+  },
+  {
+    name: 'Modifier',
+    cell: function editButton(row) {
+      return (
+        // eslint-disable-next-line no-console
+        <IconButton onClick={() => console.log(row)}>
+          <EditOutlinedIcon />
+        </IconButton>
+      );
+    },
+    button: true,
+  },
+];
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -30,9 +78,6 @@ const useStyles = makeStyles((theme: Theme) =>
     label: {
       flexDirection: 'column',
     },
-    icon: {
-      fontSize: '60px !important',
-    },
   })
 );
 export default function HomePage(): JSX.Element {
@@ -43,13 +88,50 @@ export default function HomePage(): JSX.Element {
     staticService
       .getFamilies(true, false, true)
       .then((d) => {
+        console.log(d);
         dispatch(updateData(d));
         dispatch(selectFamily(d[0]?.id));
         return loadImages(d);
       })
       .catch(console.error);
   }, [dispatch]);
-
+  const [sideBarSelect, setSideBarSelect] = useState('newOrder');
+  const [newOrderOpacity, setNewOrderOpacity] = useState(1);
+  const [OrdersOpacity, setOrdersOpacity] = useState(0.7);
+  type DataRow = {
+    id: string;
+    num: number;
+    type: string;
+    modified: boolean;
+    canceled: boolean;
+    totalPrice: number;
+    createdAt: Date;
+    orderProducts?: {
+      id: string;
+      quantity: number;
+      note?: string;
+      productId: string;
+      orderProductSuppliments?: {
+        supplimentId: string;
+        quantity: number;
+      }[];
+    }[];
+  };
+  const [data, setData] = useState<DataRow[]>([]);
+  const dataLoader = () => {
+    OrderService.getOrders(false, true, false, 50, 1)
+      .then((d) => {
+        console.log(d);
+        if (d) {
+          setData(d.map((r) => r as DataRow));
+        }
+        return true;
+      })
+      .catch(console.error);
+  };
+  useEffect(() => {
+    dataLoader();
+  }, []);
   // const classes = useStyles();
   return (
     <Box className="d-flex p-0 flex-row container-fluid h-100">
@@ -70,10 +152,18 @@ export default function HomePage(): JSX.Element {
                 root: useStyles().button,
                 label: useStyles().label,
               }}
+              style={{
+                opacity: newOrderOpacity,
+              }}
               variant="text"
               size="small"
+              onClick={() => {
+                setSideBarSelect('newOrder');
+                setNewOrderOpacity(1);
+                setOrdersOpacity(0.7);
+              }}
             >
-              <Icon fontSize="large" className={useStyles().icon}>
+              <Icon fontSize="large">
                 <img className="pb-5" alt="edit" src={OrderSvg} />
               </Icon>
               <span>New Order</span>
@@ -82,15 +172,23 @@ export default function HomePage(): JSX.Element {
           <ListItem className="p-0">
             <Button
               style={{
-                opacity: '0.7',
+                opacity: OrdersOpacity,
               }}
               className="text-white"
               classes={{
                 root: useStyles().button,
                 label: useStyles().label,
               }}
+              variant="text"
+              size="small"
+              onClick={() => {
+                setSideBarSelect('Orders');
+                setNewOrderOpacity(0.7);
+                setOrdersOpacity(1);
+                dataLoader();
+              }}
             >
-              <Icon fontSize="large" className={useStyles().icon}>
+              <Icon fontSize="large">
                 <img className="pb-5" alt="edit" src={MenuSvg} />
               </Icon>
               <span>Orders</span>
@@ -106,15 +204,33 @@ export default function HomePage(): JSX.Element {
         }}
         className="h-100 d-flex px-3 flex-column"
       >
-        <Box className="pt-3">
+        <Box className="pt-3 mb-3">
           <Header />
         </Box>
-        <Box className="w-100 of-x-auto flex-shrink-0 py-3 noScrollBar">
-          <Sidebar callback={famSelect} selectedFam={selectedFam} />
-        </Box>
-        <Box className="flex-shrink-1 of-x-hidden customScrollBar">
-          <MenuArticles />
-        </Box>
+        {(() => {
+          if (sideBarSelect === 'newOrder')
+            return (
+              <Box>
+                <Box className="w-100 of-x-auto flex-shrink-0 py-3 noScrollBar">
+                  <Sidebar callback={famSelect} selectedFam={selectedFam} />
+                </Box>
+                <Box className="flex-shrink-1 of-x-hidden customScrollBar">
+                  <MenuArticles />
+                </Box>
+              </Box>
+            );
+          if (sideBarSelect === 'Orders')
+            return (
+              <Box>
+                <CustomTable
+                  columns={columns}
+                  data={data}
+                  title="liste des Ventes"
+                />
+              </Box>
+            );
+          return null;
+        })()}
       </Box>
       <Box
         style={{

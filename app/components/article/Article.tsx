@@ -27,9 +27,12 @@ export default function Article({ article, callback }: Props): JSX.Element {
             </h4>
           </div>
           <div>
-            <h2 className="card-title badge py-2 px-2  text-capitalize cardTitle">
+            <p
+              className="card-title badge py-2 px-2 text-capitalize cardTitle text-wrap"
+              style={{ maxWidth: '16ch' }}
+            >
               {article?.name}
-            </h2>
+            </p>
           </div>
         </div>
       </div>

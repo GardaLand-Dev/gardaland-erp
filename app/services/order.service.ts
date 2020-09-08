@@ -57,7 +57,37 @@ function cancelOrder(orderId: string) {
     .catch((err) => err);
 }
 
+function getOrders(
+  all = false,
+  incOrderProducts = false,
+  incProductSuppliments = false,
+  limit: number = null,
+  page: number = null
+) {
+  const params = { all, limit, page, incOrderProducts, incProductSuppliments };
+  const url = new URL(`${config.apiUrl}/orders`);
+  Object.entries(params).forEach((p) =>
+    url.searchParams.set(p[0], p[1]?.toString())
+  );
+  const requestOptions = {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json',
+      Authorization: authHeader().Authorization,
+    },
+  };
+  return fetch(url.href, requestOptions)
+    .then((res: Response) => res.json())
+    .then((data) => {
+      console.log(data);
+      if (data.STATUS !== 'SUCCESS') throw new Error(data);
+      return data.DATA;
+    })
+    .catch((err) => err);
+}
+
 const orderService = {
+  getOrders,
   createOrder,
   updateOrder,
   cancelOrder,

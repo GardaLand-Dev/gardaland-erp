@@ -70,6 +70,14 @@ const cartSlice = createSlice({
         if (row && row.q > 1) row.q -= 1;
       }
     },
+    setQuantity: (state, { payload }) => {
+      const { index, value }: { index: number; value: number } = payload;
+      const list = state.lists.find((lst) => lst.tab === state.selectedTab);
+      if (list && value > 0) {
+        const row = list.rows.find((rw) => rw.index === index);
+        if (row && row.q > 1) row.q = value;
+      }
+    },
     addSuppliment: (state, { payload }) => {
       // TODO: revise this maybe false
       const { index } = payload;
@@ -165,6 +173,7 @@ export const {
   delArticle,
   incrQuantity,
   decQuantity,
+  setQuantity,
   addSuppliment,
   delSuppliment,
   incrSuppliment,

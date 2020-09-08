@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton, TextField } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
+import { IconButton, TextField, Snackbar } from '@material-ui/core';
+import { Autocomplete, Alert } from '@material-ui/lab';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import SimpleModal from '../../SimpleModal';
 import CustomTable from '../../CustomTable';
@@ -74,7 +74,7 @@ export default function FamilleList(): JSX.Element {
       })
       .catch((err) => console.log(err));
   }, []);
-  useEffect(() => {
+  const dataLoader = () => {
     staticService
       .getFamilies(true, true)
       .then((d) => {
@@ -88,6 +88,9 @@ export default function FamilleList(): JSX.Element {
         );
       })
       .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    dataLoader();
   }, []);
   const handleAddClicked = () => {
     setModalVisible(true);
@@ -95,11 +98,27 @@ export default function FamilleList(): JSX.Element {
   const handleFamilyName = (e) => {
     setFamilyName(e.target.value);
   };
+  const [open, setOpen] = useState(false);
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     staticService
       .createFamily(familyName, value)
-      .then((ok) => console.log('familly added ', ok))
+      .then((ok) => {
+        if (ok) {
+          setOpen(true);
+          setModalVisible(false);
+          dataLoader();
+          console.log('familly added ', ok);
+        } else console.log('family not created');
+        return true;
+      })
       .catch((err) => console.log(err));
   };
 
@@ -111,6 +130,11 @@ export default function FamilleList(): JSX.Element {
         title="liste des familles"
         onAddClicked={handleAddClicked}
       />
+      <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Article ajouté avec succès
+        </Alert>
+      </Snackbar>
       <SimpleModal
         onClose={() => {
           setModalVisible(false);

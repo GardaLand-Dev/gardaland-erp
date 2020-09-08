@@ -271,6 +271,8 @@ export default class OrderController {
               ops.quantity * ops.suppliment.quantity * op.quantity;
           });
         });
+        orderData.canceled = true;
+        orderData.save({ transaction: t });
         t.commit();
         successResponse('TEST didnt delete just getting', invItemQtDict, res);
         // Print Cancel to adequate printers
@@ -288,17 +290,34 @@ export default class OrderController {
 
   public static getOrders(req: Request, res: Response) {
     const limit =
-      typeof req.query.limit === 'number' && req.query.limit > 0
-        ? req.query.limit
+      typeof req.query.limit === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.limit, 10)) &&
+      parseInt(req.query.limit, 10) > 0
+        ? parseInt(req.query.limit, 10)
         : DEFAULT_LIMIT;
     const offset =
-      typeof req.query.page === 'number' && req.query.page > 0
-        ? (req.query.page - 1) * limit
+      typeof req.query.page === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.page, 10)) &&
+      parseInt(req.query.page, 10) > 0
+        ? (parseInt(req.query.page, 10) - 1) * limit
         : 0;
     const options: FindOptions<import('../../../db/models/sales/order/type').Order> = {
       limit,
       offset,
+      order: [['updatedAt', 'DESC']],
     };
+    if (req.query.incOrderProducts) {
+      options.include = {
+        model: OrderProduct,
+      };
+      if (req.query.incProductSuppliments) {
+        options.include.include = [
+          { model: OrderProductSuppliment, as: 'orderProductSuppliments' },
+        ];
+      }
+    }
     if (req.query.all === 'true') {
       options.limit = null;
       options.offset = null;
@@ -307,6 +326,9 @@ export default class OrderController {
       .then((ordersData) =>
         successResponse('orders retrieved', ordersData, res)
       )
-      .catch((err) => failureResponse('couldnt retrieve users', err, res));
+      .catch((err) => {
+        log.error(err);
+        failureResponse('couldnt retrieve orders', err.sql, res);
+      });
   }
 }

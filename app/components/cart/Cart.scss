@@ -15,7 +15,7 @@
   background-color: green !important;
 }
 .tabnum {
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+  // box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
   border-radius: 8px !important;
   border: none;
   // width: 20% !important;
@@ -24,7 +24,7 @@
     border: none;
   }
   &:hover {
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   }
   &:active {
     background: $theme-gradient;

@@ -157,6 +157,7 @@ export default function StockList(): JSX.Element {
           setOpen(true);
           setModalVisible(false);
           dataLoader();
+          setStockParams(null);
           return true;
         }
         throw new Error('didnt create');
@@ -184,6 +185,7 @@ export default function StockList(): JSX.Element {
         onSubmit={handleCreate}
       >
         <TextField
+          autoFocus
           className="my-3"
           style={{ width: '100%' }}
           id="outlined-basic"

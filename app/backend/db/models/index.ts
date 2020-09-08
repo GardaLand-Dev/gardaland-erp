@@ -448,35 +448,48 @@ export const dbInit = async () => {
     if (options.transaction) options.transaction.afterCommit(func);
     else func();
   });
-  InvItem.addHook('beforeUpdate', async (invItemData, options) => {
-    const func = async () => {
-      const pIIsData = await ProductInvItem.findAll({
-        where: { invItemId: invItemData.getDataValue('id') },
-        include: Product,
-      });
-      const prevQ = (await InvItem.findByPk(invItemData.getDataValue('id')))
-        .inStock;
-      if (pIIsData && pIIsData.length > 0) {
-        pIIsData.forEach((pIIData) => {
-          const qq = Math.floor(
-            invItemData.getDataValue('inStock') / pIIData.quantity
-          );
-          if (
-            prevQ > invItemData.getDataValue('inStock') &&
-            pIIData.product.maxQuantity > qq
-          )
-            pIIData.product.setAttributes('maxQuantity', qq);
-          if (
-            prevQ < invItemData.getDataValue('inStock') &&
-            pIIData.product.maxQuantity === Math.floor(prevQ / pIIData.quantity)
-          )
-            pIIData.product.setAttributes('maxQuantity', qq);
+  InvItem.addHook(
+    'beforeUpdate',
+    async (
+      invItemData: import('./inventory/invItem/type').InvItem,
+      options
+    ) => {
+      const func = async () => {
+        const prevQ = invItemData.previous('inStock');
+        // const prevQ = (await InvItem.findByPk(invItemData.getDataValue('id')))
+        //   .inStock;
+        const pIIsData = await ProductInvItem.findAll({
+          where: { invItemId: invItemData.getDataValue('id') },
+          include: Product,
         });
-      }
-    };
-    if (options.transaction) options.transaction.afterCommit(func);
-    else func();
-  });
+        log.info('beforesavehook', prevQ, invItemData.getDataValue('inStock'));
+        if (pIIsData && pIIsData.length > 0) {
+          pIIsData.forEach((pIIData) => {
+            const qq = Math.floor(
+              invItemData.getDataValue('inStock') / pIIData.quantity
+            );
+            if (
+              prevQ > invItemData.getDataValue('inStock') &&
+              pIIData.product.maxQuantity > qq
+            ) {
+              pIIData.product.maxQuantity = qq;
+              pIIData.product.save();
+            }
+            if (
+              prevQ < invItemData.getDataValue('inStock') &&
+              pIIData.product.maxQuantity ===
+                Math.floor(prevQ / pIIData.quantity)
+            ) {
+              pIIData.product.maxQuantity = qq;
+              pIIData.product.save();
+            }
+          });
+        }
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
 
   // inStock auto update
   Damages.addHook('afterCreate', (damagesData, options) => {
