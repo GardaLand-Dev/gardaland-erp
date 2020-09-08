@@ -40,7 +40,7 @@ const columns = [
   {
     name: 'Annulée',
     selector: 'canceled',
-    format: (row) => (row.deleted ? 'Oui' : 'Non'),
+    format: (row) => (row.canceled ? 'Oui' : 'Non'),
     sortable: true,
   },
   {
@@ -54,7 +54,7 @@ const columns = [
     cell: function editButton(row) {
       return (
         // eslint-disable-next-line no-console
-        <IconButton disabled={row.deleted} onClick={() => console.log(row)}>
+        <IconButton disabled={row.canceled} onClick={() => console.log(row)}>
           <EditOutlinedIcon />
         </IconButton>
       );
@@ -106,6 +106,7 @@ export default function HomePage(): JSX.Element {
     canceled: boolean;
     totalPrice: number;
     createdAt: Date;
+    isDisabled: boolean;
     orderProducts?: {
       id: string;
       quantity: number;
@@ -123,7 +124,7 @@ export default function HomePage(): JSX.Element {
       .then((d) => {
         console.log(d);
         if (d) {
-          setData(d.map((r) => r as DataRow));
+          setData(d.map((r) => ({ ...r, isDisabled: r.canceled } as DataRow)));
         }
         return true;
       })

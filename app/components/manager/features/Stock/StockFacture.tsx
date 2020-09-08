@@ -97,6 +97,7 @@ export default function StockFacture(): JSX.Element {
         }}
         visible={modalVisible}
         title="Ajouter Facture"
+        onSubmit={(e) => e.preventDefault()}
       >
         <Autocomplete
           className="my-3"
