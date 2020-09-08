@@ -15,7 +15,7 @@ export default function TabButton({ tabnum, selected, callback }: Props) {
       // }`}
       type="button"
       onClick={buttonClicked}
-      className={`tabnum mr-1 my-3  ${selected ? 'active' : ''}`}
+      className={`tabnum mr-1 my-3 px-3 py-2 ${selected ? 'active' : ''}`}
     >
       {tabnum}
     </button>
