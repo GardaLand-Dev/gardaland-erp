@@ -19,7 +19,6 @@ export interface SupplyAttributes {
   quantity: number;
   deliveredOn: Date;
   cost: number;
-  supplierId: string;
   invItemId: string;
   toBeArchived: boolean;
   remaining: number;
@@ -39,8 +38,6 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   public deliveredOn!: Date;
 
   public cost!: number;
-
-  public supplierId!: string;
 
   public invItemId!: string;
 
