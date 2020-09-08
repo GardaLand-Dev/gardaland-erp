@@ -10,7 +10,7 @@ import { logout } from '../../reducers/authentication.reducer';
 export default function Header() {
   const dispatch = useDispatch();
   return (
-    <div className="d-flex flex-row justify-content-end align-items-center bg-white m-0 p-3 rounded-xlg ">
+    <div className="d-flex flex-row justify-content-end align-items-center bg-white p-3 rounded-xlg ">
       <div className="d-flex flex-row align-items-center theme-gradient rounded mx-2 p-3">
         <FontAwesomeIcon icon={faUserCircle} size="2x" className="mr-4" />
         <span className="align-top text-capitalize">benzaamia rabie</span>

@@ -41,12 +41,9 @@ function SidebarButton({
             <img className="pb-5" alt="edit" src={feature.icon} />
           </Icon>
         </ListItemIcon>
-        <ListItemText
-          disableTypography
-          primary={feature.id}
-          className="text-white "
-          style={{ fontSize: '1.2rem' }}
-        />
+        <ListItemText disableTypography className="text-white ">
+          <h5 className="pt-2">{feature.id}</h5>
+        </ListItemText>
         {open ? (
           <KeyboardArrowDownIcon className="text-white" />
         ) : (
@@ -214,7 +211,7 @@ export default function Sidebar(): JSX.Element {
     },
   ];
   return (
-    <div id="accordion" className="mt-5">
+    <div>
       {features.map((feature) => (
         <SidebarButton key={feature.id} feature={feature} />
       ))}
