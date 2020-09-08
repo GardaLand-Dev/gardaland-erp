@@ -56,13 +56,14 @@ export default function HomePage(): JSX.Element {
       <Box
         style={{
           boxShadow: ' 0 0 20px 0 rgba(0, 0, 0, 0.1)',
-          flexBasis: '8 em',
-          flexShrink: 0,
+          flexBasis: '6 em',
+          flexShrink: 1,
+          minWidth: 'fit-content',
         }}
         className="overflow-auto customScrollBar h-100 theme-gradient-y"
       >
         <List>
-          <ListItem className="my-3">
+          <ListItem className="p-0">
             <Button
               className="text-white"
               classes={{
@@ -78,7 +79,7 @@ export default function HomePage(): JSX.Element {
               <span>New Order</span>
             </Button>
           </ListItem>
-          <ListItem>
+          <ListItem className="p-0">
             <Button
               style={{
                 opacity: '0.7',
