@@ -19,5 +19,10 @@ export default function FinancialTransactionFactory(
       type: DataTypes.NUMBER,
       allowNull: false,
     },
+    deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   });
 }

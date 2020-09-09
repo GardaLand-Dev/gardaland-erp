@@ -138,6 +138,7 @@ export default function Cart(): JSX.Element {
     orderService
       .createOrder({ orderProducts, num: 1, type: selected })
       .then((ok) => {
+        if (!ok) throw new Error('couldnt create order');
         console.log('created succ', ok);
         delListClicked();
         setSnackOpen(true);

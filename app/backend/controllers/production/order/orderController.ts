@@ -49,7 +49,9 @@ export default class OrderController {
             })
           ),
           { transaction: t }
-        );
+        ).catch((err) => {
+          throw new Error(err);
+        });
         if (!ops) throw new Error('coudnt create orderProducts');
         ops.forEach((op) => {
           const hash = objectHash({
@@ -257,26 +259,39 @@ export default class OrderController {
         // readjust the stock values
         // i need invItem-quantity(op.quantity)
         // successResponse('TEST didnt delete just getting', orderData, res);
-        const invItemQtDict: { [index: string]: number } = {};
-        orderData.orderProducts.forEach((op) => {
-          op.product.productInvItems.forEach((ps) => {
-            invItemQtDict[ps.invItemId] =
-              invItemQtDict[ps.invItemId] + op.quantity * ps.quantity ||
-              op.quantity * ps.quantity;
+        const { canceled } = orderData;
+        if (!canceled) {
+          orderData.canceled = true;
+          await orderData.save({ transaction: t });
+        }
+        t.commit()
+          .then(async () => {
+            if (!canceled) {
+              successResponse('order canceled', orderData, res);
+              const invItemQtDict: { [index: string]: number } = {};
+              orderData.orderProducts.forEach((op) => {
+                op.product.productInvItems.forEach((ps) => {
+                  invItemQtDict[ps.invItemId] =
+                    invItemQtDict[ps.invItemId] + op.quantity * ps.quantity ||
+                    op.quantity * ps.quantity;
+                });
+                op.orderProductSuppliments.forEach((ops) => {
+                  invItemQtDict[ops.suppliment.invItemId] =
+                    invItemQtDict[ops.suppliment.invItemId] +
+                      ops.quantity * ops.suppliment.quantity * op.quantity ||
+                    ops.quantity * ops.suppliment.quantity * op.quantity;
+                });
+              });
+              // Print Cancel to adequate printers
+              await InvItemHelper.updateInvItems(invItemQtDict);
+              return true;
+            }
+            throw new Error('order already canceled');
+          })
+          .catch((err) => {
+            throw err;
           });
-          op.orderProductSuppliments.forEach((ops) => {
-            invItemQtDict[ops.suppliment.invItemId] =
-              invItemQtDict[ops.suppliment.invItemId] +
-                ops.quantity * ops.suppliment.quantity * op.quantity ||
-              ops.quantity * ops.suppliment.quantity * op.quantity;
-          });
-        });
-        orderData.canceled = true;
-        orderData.save({ transaction: t });
-        t.commit();
-        successResponse('TEST didnt delete just getting', invItemQtDict, res);
-        // Print Cancel to adequate printers
-        await InvItemHelper.updateInvItems(invItemQtDict);
+
         // .catch((err) => dbError(err, res));
       } catch (err) {
         t.rollback();

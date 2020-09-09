@@ -6,10 +6,11 @@ export interface FinancialTransactionAttributes {
   transactionTypeId: number;
   value: number;
   caisseValue: number;
+  deleted: boolean;
 }
 export type FinancialTransactionCreationAttributes = Optional<
   FinancialTransactionAttributes,
-  'id' | 'caisseValue'
+  'id' | 'caisseValue' | 'deleted'
 >;
 export class FinancialTransaction
   extends Model<
@@ -24,6 +25,8 @@ export class FinancialTransaction
   public value!: number;
 
   public caisseValue!: number;
+
+  public deleted!: boolean;
 
   // timestamps
   public createdAt!: Date;

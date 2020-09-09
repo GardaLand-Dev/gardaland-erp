@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
+import log from 'electron-log';
+import { FindOptions, Includeable } from 'sequelize/types';
+import { JwtRequest } from '../../../middlewares/authCheck';
 import {
   EmployeeCreationAttributes,
   Employee,
+  EmployeeAttributes,
 } from '../../../db/models/humanResources/employee/type';
 import {
   successResponse,
@@ -9,15 +13,22 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, User } from '../../../db/models';
+import dbConfig, {
+  DEFAULT_LIMIT,
+  User,
+  Title,
+  Salary,
+} from '../../../db/models';
 
 export default class EmployeeController {
-  public static createEmployee(req: Request, res: Response) {
+  public static async createEmployee(req: JwtRequest, res: Response) {
     if (
       req.body.firstName &&
       req.body.lastName &&
+      req.body.title &&
       typeof req.body.firstName === 'string' &&
-      typeof req.body.lastName === 'string'
+      typeof req.body.lastName === 'string' &&
+      typeof req.body.title === 'string'
     ) {
       const employeeParams: EmployeeCreationAttributes = {
         firstName: (<string>req.body.firstName).normalize().toLowerCase(),
@@ -26,31 +37,51 @@ export default class EmployeeController {
         email: (<string>req.body.email)?.normalize().toLowerCase(),
         tel: (<string>req.body.tel)?.normalize().toLowerCase(),
       };
-      let id = '';
-      Employee.create(employeeParams)
-        .then((employeeData) => {
-          id = employeeData.id;
-          return successResponse(
-            'create employee successfull',
-            employeeData,
-            res
-          );
-        })
-        .then(() => {
-          if (
-            req.body.user &&
-            req.body.user.username &&
-            req.body.user.password
-          ) {
-            return User.create({
+      const transaction = await dbConfig.transaction();
+      try {
+        const empData = await Employee.create(employeeParams, { transaction });
+        empData.createTitle({ name: req.body.title }, { transaction });
+        if (
+          req.body.user &&
+          req.body.user.username &&
+          req.body.user.password &&
+          req.body.user.roles &&
+          typeof req.body.user.roles.length === 'number' &&
+          req.body.user.roles.length > 0
+        ) {
+          const userData = await User.create(
+            {
               userName: req.body.user.username,
               password: req.body.user.password,
-              employeeId: id,
-            });
-          }
-          return null;
-        })
-        .catch((err) => dbError(err, res));
+              employeeId: empData.id,
+            },
+            { transaction }
+          );
+          await userData.addRoles(req.body.roles as string[], { transaction });
+        }
+        if (
+          req.body.salary &&
+          typeof req.body.salary === 'number' &&
+          req.body.salary > 0 &&
+          req.body.hourlyRate &&
+          typeof req.body.hourlyRate === 'number' &&
+          req.body.hourlyRate > 0
+        ) {
+          await empData.createSalary(
+            {
+              hourlyRate: req.body.hourlyRate,
+              amount: req.body.salary,
+            },
+            { transaction }
+          );
+        }
+        await transaction.commit();
+        successResponse('employee created', empData, res);
+      } catch (error) {
+        log.error(error);
+        transaction.rollback();
+        dbError(error, res);
+      }
     } else {
       insufficientParameters(res);
     }
@@ -70,8 +101,15 @@ export default class EmployeeController {
             firstName: (<string>req.query.firstName).normalize().toLowerCase(),
             lastName: (<string>req.query.lastName).normalize().toLowerCase(),
           };
-      const employeeFilter = { where: filter };
-      Employee.findOne(employeeFilter)
+      const options: FindOptions<EmployeeAttributes> = { where: filter };
+      if (req.query.incAll === 'true') {
+        options.include = [
+          { model: Title, where: { to: null } },
+          { model: Salary, where: { to: null } },
+          { model: User },
+        ];
+      }
+      Employee.findOne(options)
         .then((employeeData) =>
           successResponse('get employee successfull', employeeData, res)
         )
@@ -144,14 +182,48 @@ export default class EmployeeController {
 
   public static getEmployees(req: Request, res: Response) {
     const limit =
-      typeof req.query.limit === 'number' && req.query.limit > 0
-        ? req.query.limit
+      typeof req.query.limit === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.limit, 10)) &&
+      parseInt(req.query.limit, 10) > 0
+        ? parseInt(req.query.limit, 10)
         : DEFAULT_LIMIT;
     const offset =
-      typeof req.query.page === 'number' && req.query.page > 0
-        ? (req.query.page - 1) * limit
+      typeof req.query.page === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.page, 10)) &&
+      parseInt(req.query.page, 10) > 0
+        ? (parseInt(req.query.page, 10) - 1) * limit
         : 0;
-    const options = { limit, offset };
+    const options: FindOptions<EmployeeAttributes> = {
+      limit,
+      offset,
+      include: [],
+    };
+    if (req.query.all === 'true') {
+      options.offset = null;
+      options.limit = null;
+    }
+    if (req.query.incAll === 'true') {
+      options.include = [
+        { model: Title, where: { to: null } },
+        { model: Salary, where: { to: null } },
+        { model: User },
+      ];
+    } else {
+      if (req.query.incTitle === 'true')
+        (options.include as Includeable[]).push({
+          model: Title,
+          where: { to: null },
+        });
+      if (req.query.incSalary === 'true')
+        (options.include as Includeable[]).push({
+          model: Salary,
+          where: { to: null },
+        });
+      if (req.query.incUser === 'true')
+        (options.include as Includeable[]).push({ model: User });
+    }
     Employee.findAll(options)
       .then((employeesData) =>
         successResponse('users retrieved', employeesData, res)

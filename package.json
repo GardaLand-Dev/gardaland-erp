@@ -211,6 +211,7 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/react-test-renderer": "^16.9.2",
     "@types/redux-logger": "^3.0.8",
+    "@types/socket.io-client": "^1.4.33",
     "@types/styled-components": "^5.1.2",
     "@types/validator": "^13.1.0",
     "@types/webpack": "^4.41.21",
@@ -323,6 +324,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.5",
     "sass": "^1.26.10",
+    "socket.io-client": "^2.3.0",
     "source-map-support": "^0.5.19",
     "styled-components": "^5.1.1"
   },

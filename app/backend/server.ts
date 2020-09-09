@@ -11,6 +11,7 @@ import CommonRoutes from './routes/common_routes';
 import RBACRoutes from './routes/rbac_routes';
 import LoginRoute from './routes/login_route';
 import ProductionRoutes from './routes/production_routes';
+import socket, { serverRTSync } from './module/telemetery';
 
 class Server {
   public app: express.Application;
@@ -22,7 +23,15 @@ class Server {
   constructor() {
     // init
     console.time('rbac');
-    rbacInit(dbInit);
+    rbacInit(dbInit)
+      .then(() => {
+        socket.on('connect', () => {
+          log.info('connected to server', socket.connected);
+          serverRTSync();
+        });
+        return true;
+      })
+      .catch(log.error);
     process.env.PRIVATE_KEY = 'yasser9999';
     this.test_routes = new TestRoutes();
     this.common_routes = new CommonRoutes();

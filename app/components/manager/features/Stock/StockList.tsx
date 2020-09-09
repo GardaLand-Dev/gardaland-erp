@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import { Alert } from '@material-ui/lab';
+import moment from 'moment';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
 import inventoryService from '../../../../services/inventory.service';
@@ -44,6 +45,7 @@ const columns = [
   {
     name: 'Quantité en stock',
     selector: 'inStock',
+    format: (row) => `${row.inStock} ${row.unit}`,
     sortable: true,
   },
 
@@ -60,6 +62,7 @@ const columns = [
   {
     name: 'Dernière mise à jour',
     selector: 'updatedAt',
+    format: (row) => moment(row.updatedAt as Date).format('hh:mm | DD/MM/YY'),
     sortable: true,
   },
   {
@@ -117,7 +120,8 @@ export default function StockList(): JSX.Element {
           d.map((s) => ({
             id: s.id,
             name: s.name,
-            inStock: `${s.inStock} ${s.unit}`,
+            inStock: s.inStock,
+            unit: s.unit,
             isIngredient: s.isIngredient ? 'Oui' : 'Non',
             alertQuantity: s.alertQuantity,
             updatedAt: new Date(Date.parse(s.updatedAt)).toLocaleString(),

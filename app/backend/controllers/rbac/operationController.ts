@@ -79,9 +79,19 @@ export default class OperationController {
 
   public static getOperations(req: Request, res: Response) {
     const limit =
-      req.body.limit && req.body.limit > 0 ? req.body.limit : DEFAULT_LIMIT;
+      typeof req.query.limit === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.limit, 10)) &&
+      parseInt(req.query.limit, 10) > 0
+        ? parseInt(req.query.limit, 10)
+        : DEFAULT_LIMIT;
     const offset =
-      req.body.page && req.body.page > 0 ? (req.body.page - 1) * limit : 0;
+      typeof req.query.page === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.page, 10)) &&
+      parseInt(req.query.page, 10) > 0
+        ? (parseInt(req.query.page, 10) - 1) * limit
+        : 0;
     const options = { limit, offset };
     Operation.findAll(options)
       .then((operationsData) =>

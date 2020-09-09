@@ -20,10 +20,11 @@ export default function SalaryFactory(sequelize: Sequelize): ModelCtor<Salary> {
     from: {
       type: DataTypes.DATEONLY,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     to: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
   });
 }

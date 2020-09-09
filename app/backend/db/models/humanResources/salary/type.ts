@@ -16,7 +16,10 @@ export interface SalaryAttributes {
   from: Date;
   to: Date;
 }
-export type SalaryCreationAttributes = Optional<SalaryAttributes, 'id'>;
+export type SalaryCreationAttributes = Optional<
+  SalaryAttributes,
+  'id' | 'to' | 'from'
+>;
 export class Salary extends Model<SalaryAttributes, SalaryCreationAttributes>
   implements SalaryAttributes {
   public id!: string;

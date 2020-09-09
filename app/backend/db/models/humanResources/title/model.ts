@@ -16,10 +16,11 @@ export default function TitleFactory(sequelize: Sequelize): ModelCtor<Title> {
     from: {
       type: DataTypes.DATEONLY,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     to: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
   });
 }

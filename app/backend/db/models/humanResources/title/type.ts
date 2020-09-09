@@ -15,7 +15,10 @@ export interface TitleAttributes {
   from: Date;
   to: Date;
 }
-export type TitleCreationAttributes = Optional<TitleAttributes, 'id'>;
+export type TitleCreationAttributes = Optional<
+  TitleAttributes,
+  'id' | 'to' | 'from'
+>;
 export class Title extends Model<TitleAttributes, TitleCreationAttributes>
   implements TitleAttributes {
   public id!: string;

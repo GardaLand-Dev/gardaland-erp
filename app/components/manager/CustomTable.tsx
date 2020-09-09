@@ -142,6 +142,10 @@ const CustomTable = ({
         subHeader
         onSelectedRowsChange={handleRowSelected}
         actions={actions}
+        selectableRowDisabled={(row) => {
+          return row.isDisabled !== undefined ? row.isDisabled : false;
+        }}
+        selectableRowsNoSelectAll
         // eslint-disable-next-line prettier/prettier
         contextActions={(
           <IconButton

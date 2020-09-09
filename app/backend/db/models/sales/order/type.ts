@@ -25,10 +25,16 @@ export interface OrderAttributes {
   financialTransactionId: string;
   createdBy: string;
   totalPrice: number;
+  createdAt: Date;
 }
 export type OrderCreationAttributes = Optional<
   OrderAttributes,
-  'id' | 'canceled' | 'modified' | 'financialTransactionId' | 'totalPrice'
+  | 'id'
+  | 'canceled'
+  | 'modified'
+  | 'financialTransactionId'
+  | 'totalPrice'
+  | 'createdAt'
 >;
 export class Order extends Model<OrderAttributes, OrderCreationAttributes>
   implements OrderAttributes {
