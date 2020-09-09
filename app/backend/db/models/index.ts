@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 import path from 'path';
 import log from 'electron-log';
 import UserFactory from './rbac/user/model';
@@ -31,6 +31,8 @@ import TransactionTypeFactory from './finance/transactionType/model';
 import FinancialAccountFactory from './finance/financialAccount/model';
 import ExpenseFactory from './finance/expense/model';
 import InvoiceFactory from './finance/invoice/model';
+// eslint-disable-next-line import/no-cycle
+import { serverRTSync } from '../../module/telemetery';
 
 /**
  * TODO: during setup ( only if this isn't done before ) don't forget to populate db with
@@ -301,6 +303,7 @@ export const dbInit = async () => {
             by: fTData.getDataValue('value'),
           });
         })
+        .then(() => serverRTSync())
         .catch(log.error);
     };
     if (options.transaction) options.transaction.afterCommit(func);
@@ -323,7 +326,9 @@ export const dbInit = async () => {
         } else {
           fA.value += prev - fTData.value;
         }
-        fA.save();
+        fA.save()
+          .then(() => serverRTSync())
+          .catch(log.error);
       };
       if (options.transaction) options.transaction.afterCommit(func);
       else func();
@@ -499,8 +504,9 @@ export const dbInit = async () => {
         const prevQ = invItemData.previous('inStock');
         // const prevQ = (await InvItem.findByPk(invItemData.getDataValue('id')))
         //   .inStock;
+        // updating products
         const pIIsData = await ProductInvItem.findAll({
-          where: { invItemId: invItemData.getDataValue('id') },
+          where: { invItemId: invItemData.id },
           include: Product,
         });
         log.info('beforesavehook', prevQ, invItemData.getDataValue('inStock'));
@@ -526,6 +532,32 @@ export const dbInit = async () => {
             }
           });
         }
+        const suppliesData = await Supply.findAll({
+          where: {
+            invItemId: invItemData.id,
+            consumedOn: null,
+          },
+          order: [['createdAt', 'DESC']],
+        });
+        if (
+          prevQ > invItemData.inStock &&
+          suppliesData &&
+          suppliesData.length > 0
+        ) {
+          let toConsume = prevQ - invItemData.inStock;
+          let i = 0;
+          while (toConsume > 0) {
+            if (suppliesData[i].remaining - toConsume > 0) {
+              suppliesData[i].remaining -= toConsume;
+            } else {
+              toConsume -= suppliesData[i].remaining;
+              suppliesData[i].remaining = 0;
+              suppliesData[i].consumedOn = new Date();
+            }
+            suppliesData[i].save();
+            i += 1;
+          }
+        }
       };
       if (options.transaction) options.transaction.afterCommit(func);
       else func();
@@ -548,6 +580,7 @@ export const dbInit = async () => {
   });
   Supply.addHook('afterCreate', (supplyData, options) => {
     const func = () => {
+      supplyData.setDataValue('remaining', supplyData.getDataValue('quantity'));
       InvItem.findByPk(supplyData.getDataValue('invItemId'))
         .then((invItemData) =>
           invItemData.increment('inStock', {
@@ -558,6 +591,47 @@ export const dbInit = async () => {
     };
     if (options.transaction) options.transaction.afterCommit(func);
     else func();
+  });
+  Supply.addHook(
+    'beforeUpdate',
+    (supplyData: import('./inventory/supply/type').Supply, options) => {
+      const func = () => {
+        const prevQ = supplyData.previous('quantity');
+        if (prevQ !== supplyData.quantity) {
+          supplyData.remaining += supplyData.quantity - prevQ;
+          InvItem.findByPk(supplyData.getDataValue('invItemId'))
+            .then((invItemData) =>
+              invItemData.increment('inStock', {
+                by: supplyData.getDataValue('quantity'),
+              })
+            )
+            .catch(log.error);
+        }
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
+
+  //
+  OrderProduct.addHook('beforeBulkCreate', async (orderProductsData) => {
+    const products = await Product.findAll({
+      where: {
+        id: {
+          [Op.in]: orderProductsData.map((op) => op.getDataValue('productId')),
+        },
+      },
+    });
+    const prodDict = new Map();
+    products.forEach((p) => {
+      prodDict.set(p.id, p.maxQuantity);
+    });
+    orderProductsData.forEach((op) => {
+      if (
+        op.getDataValue('quantity') > prodDict.get(op.getDataValue('productId'))
+      )
+        throw new Error('not enough ingredients in stock');
+    });
   });
 
   /* SYNCING */

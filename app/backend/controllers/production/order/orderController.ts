@@ -49,7 +49,9 @@ export default class OrderController {
             })
           ),
           { transaction: t }
-        );
+        ).catch((err) => {
+          throw new Error(err);
+        });
         if (!ops) throw new Error('coudnt create orderProducts');
         ops.forEach((op) => {
           const hash = objectHash({
