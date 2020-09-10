@@ -179,36 +179,6 @@ export default function Sidebar(): JSX.Element {
         },
       ],
     },
-    {
-      id: 'Rapport',
-      icon: ProduitSvg,
-      listFeatures: [
-        {
-          id: 'Rapport sommaire',
-          link: '',
-        },
-        {
-          id: 'Rapport des Produits',
-          link: '',
-        },
-        {
-          id: 'Rapport des Ventes',
-          link: '',
-        },
-        {
-          id: 'Rapport des Achats',
-          link: '',
-        },
-        {
-          id: 'Rapport des Fournisseur',
-          link: '',
-        },
-        {
-          id: 'Rapport de Finance',
-          link: '',
-        },
-      ],
-    },
   ];
   return (
     <div>

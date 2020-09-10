@@ -89,6 +89,7 @@ export default function Employee(): JSX.Element {
     email: string;
     address: string;
     salaire: number;
+    hourlyRate: number;
     isUser: boolean;
     user?: { username: string; password: string; role: string };
   }>();
@@ -196,22 +197,45 @@ export default function Employee(): JSX.Element {
             // eslint-disable-next-line react/jsx-curly-newline
           }
         />
-        <FormControl required style={{ width: '100%' }} variant="outlined">
-          <InputLabel>Salaire</InputLabel>
-          <OutlinedInput
-            type="number"
-            onChange={
-              (e) =>
-                setEmployeeParams({
-                  ...employeeParams,
-                  salaire: parseFloat(e.target.value),
-                })
-              // eslint-disable-next-line react/jsx-curly-newline
-            }
-            endAdornment={<InputAdornment position="end">DA</InputAdornment>}
-            labelWidth={60}
-          />
-        </FormControl>
+        <Grid container spacing={2}>
+          <Grid item xs>
+            <FormControl required style={{ width: '100%' }} variant="outlined">
+              <InputLabel>Salaire</InputLabel>
+              <OutlinedInput
+                type="number"
+                onChange={
+                  (e) =>
+                    setEmployeeParams({
+                      ...employeeParams,
+                      salaire: parseFloat(e.target.value),
+                    })
+                  // eslint-disable-next-line react/jsx-curly-newline
+                }
+                endAdornment={
+                  <InputAdornment position="end">DA</InputAdornment>
+                }
+                labelWidth={60}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs>
+            <TextField
+              fullWidth
+              id="outlined-basic"
+              label="Taux horaire"
+              variant="outlined"
+              type="number"
+              onChange={
+                (e) =>
+                  setEmployeeParams({
+                    ...employeeParams,
+                    hourlyRate: parseFloat(e.target.value),
+                  })
+                // eslint-disable-next-line react/jsx-curly-newline
+              }
+            />
+          </Grid>
+        </Grid>
         <FormControlLabel
           control={<Checkbox checked={isChecked} onChange={handleChecked} />}
           label="Ajouter comme utilisateur"
@@ -250,6 +274,7 @@ export default function Employee(): JSX.Element {
               style={{ width: '100%' }}
               id="outlined-basic"
               label="Password"
+              type="password"
               variant="outlined"
               onChange={
                 (e) =>

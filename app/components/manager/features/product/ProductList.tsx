@@ -509,7 +509,7 @@ export default function ListeProduit(): JSX.Element {
         </CssInputField>
         <FormControlLabel
           control={<Checkbox checked={isChecked} onChange={handleChecked} />}
-          label="isComposed"
+          label="Est composé"
           className="m-2"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setProductParams({

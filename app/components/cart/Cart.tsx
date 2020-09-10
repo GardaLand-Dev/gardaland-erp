@@ -260,31 +260,31 @@ export default function Cart(): JSX.Element {
           <span className="float-right text-right mt-2 mr-4">{`${getTotal()}DA`}</span>
         </Grid>
       </Grid>
-      <Grid container justify="center">
+      <Grid container justify="center" spacing={2} className=" mt-4 mb-3">
         <Grid item>
           <Button
-            className="mt-4 mb-3 mr-3 p-1"
-            variant="outlined"
+            className="py-2"
             color="secondary"
+            variant="outlined"
             onClick={delListClicked}
             style={{ minWidth: 'fit-content', minHeight: 32 }}
           >
-            <Icon fontSize="small" className="">
+            <Icon fontSize="small" className="mr-2">
               <img className="pb-5" alt="edit" src={DeleteSvg} />
             </Icon>
-            {/* <span>Supprimer</span> */}
+            <span>Supprimer</span>
           </Button>
         </Grid>
         <Grid item className="w-50  ">
           <Button
-            className="btnsuccess mt-4 mb-3 mr-3 py-1 "
+            className="btnsuccess py-2 "
             onClick={() => setPayModalVisible(true)}
             style={{ minWidth: 'fit-content', width: '100%' }}
           >
             <Icon fontSize="small">
               <img className="pb-5" alt="edit" src={MoneySvg} />
             </Icon>
-            <span className="text-white mx-auto">Pay Now</span>
+            <span className="text-white mx-auto">Paiement</span>
           </Button>
         </Grid>
       </Grid>

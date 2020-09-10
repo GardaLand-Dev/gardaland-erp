@@ -15,6 +15,7 @@ type Props = {
   data: Array<unknown>;
   columns: Array<IDataTableColumn>;
   title: string;
+  clearSelectedRows: boolean;
   onAddClicked?: () => void;
   onDelete?: (selectedRows: any[]) => void;
 };
@@ -79,6 +80,7 @@ const CustomTable = ({
   data,
   columns,
   title,
+  clearSelectedRows,
   onAddClicked,
   onDelete,
 }: Props): JSX.Element => {
@@ -131,6 +133,7 @@ const CustomTable = ({
       />
     );
   }, [filterText, resetPaginationToggle]);
+
   return (
     <div>
       <DataTable
@@ -138,6 +141,7 @@ const CustomTable = ({
         columns={columns}
         data={filteredItems}
         pagination
+        clearSelectedRows={clearSelectedRows}
         paginationResetDefaultPage={resetPaginationToggle} // optionally, a hook to reset pagination to page 1
         subHeader
         onSelectedRowsChange={handleRowSelected}

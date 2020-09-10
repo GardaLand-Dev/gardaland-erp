@@ -16,7 +16,8 @@ export default function Article({ article, callback }: Props): JSX.Element {
     >
       <div className="card text-white rounded-xlg border-0 card">
         <img
-          src={localStorage.getItem(article.id)}
+          // src={localStorage.getItem(article.id)}
+          src={`http://localhost:3333/imgs/${article.id}`}
           className="card-img rounded-xlg"
           alt="..."
         />
