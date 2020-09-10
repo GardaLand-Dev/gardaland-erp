@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { FindOptions, Includeable } from 'sequelize/types';
+import log from 'electron-log';
 import { SupplyCreationAttributes } from '../../../db/models/inventory/supply/type';
 import {
   successResponse,
@@ -10,9 +11,9 @@ import {
 import {
   DEFAULT_LIMIT,
   Supply,
-  Supplier,
   InvItem,
   Invoice,
+  Supplier,
 } from '../../../db/models';
 import { JwtRequest } from '../../../middlewares/authCheck';
 import { InvoiceCreationAttributes } from '../../../db/models/finance/invoice/type';
@@ -39,18 +40,22 @@ export default class SupplyController {
         invoiceParams.isPaid = req.body.isPaid;
 
       const invoiceData = await Invoice.create(invoiceParams);
-
+      let total = 0;
       const supplies: SupplyCreationAttributes[] = req.body.supplies.map(
-        (sup): SupplyCreationAttributes => ({
-          quantity: sup.quantity,
-          cost: sup.cost,
-          invItemId: sup.invItemId,
-          deliveredOn: req.body.deliveredOn,
-          invoiceId: invoiceData.id,
-        })
+        (sup): SupplyCreationAttributes => {
+          total += sup.cost;
+          return {
+            quantity: sup.quantity,
+            cost: sup.cost,
+            invItemId: sup.invItemId,
+            deliveredOn: req.body.deliveredOn,
+            invoiceId: invoiceData.id,
+          };
+        }
       );
-
-      await Supply.bulkCreate(supplies);
+      invoiceData.amount = total;
+      await invoiceData.save();
+      await Supply.bulkCreate(supplies).catch(log.error);
       successResponse('create supply successfull', invoiceData, res);
     } else {
       insufficientParameters(res);
@@ -158,19 +163,107 @@ export default class SupplyController {
       order: [],
       include: [],
     };
-    if (req.query.incSupplier === 'true')
-      (<Includeable[]>options.include).push({ model: Supplier });
+    if (req.query.all === 'true') {
+      options.limit = null;
+      options.offset = null;
+    }
+    if (typeof req.query.invoiceId === 'string')
+      options.where = { invoiceId: req.query.invoiceId };
+    if (req.query.incInvoice === 'true')
+      (<Includeable[]>options.include).push({ model: Invoice });
     if (req.query.incInvItem === 'true')
       (<Includeable[]>options.include).push({ model: InvItem });
     if (req.query.orderDateDesc === 'true')
       (<Array<any>>options.order).push(['createdAt', 'DESC']);
-    if (req.query.archived !== 'true')
-      options.where = { toBeArchived: 'false' };
+    if (req.query.archived !== 'true') options.where = { toBeArchived: false };
     // if (req.query.ingredient === 'true') options.where = { isIngredient: true };
     Supply.findAll(options)
       .then((suppliesData) =>
         successResponse('Supplies retrieved', suppliesData, res)
       )
+      .catch((err) => failureResponse('couldnt retrieve Supplies', err, res));
+  }
+
+  public static async getInvoices(req: Request, res: Response) {
+    const limit =
+      typeof req.query.limit === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.limit, 10)) &&
+      parseInt(req.query.limit, 10) > 0
+        ? parseInt(req.query.limit, 10)
+        : DEFAULT_LIMIT;
+    const offset =
+      typeof req.query.page === 'string' &&
+      // eslint-disable-next-line no-restricted-globals
+      !isNaN(parseInt(req.query.page, 10)) &&
+      parseInt(req.query.page, 10) > 0
+        ? (parseInt(req.query.page, 10) - 1) * limit
+        : 0;
+    const options: FindOptions<import('../../../db/models/inventory/supply/type').Supply> = {
+      limit,
+      offset,
+      order: [],
+      include: [],
+    };
+    if (req.query.all === 'true') {
+      options.limit = null;
+      options.offset = null;
+    }
+    (<Includeable[]>options.include).push({
+      model: Invoice,
+      include: req.query.incSupplier === 'true' ? [Supplier] : undefined,
+    });
+    if (req.query.incSupplies === 'true' && req.query.incInvItems === 'true')
+      (<Includeable[]>options.include).push({ model: InvItem });
+    if (req.query.orderDateDesc === 'true')
+      (<Array<any>>options.order).push(['createdAt', 'DESC']);
+    if (req.query.archived !== 'true') options.where = { toBeArchived: false };
+    // if (req.query.ingredient === 'true') options.where = { isIngredient: true };
+    await Supply.findAll(options)
+      .then((suppliesData) => {
+        // data
+        const map = new Map();
+        suppliesData.forEach((supplyData) => {
+          if (!map.get(supplyData.invoiceId)) {
+            const invoiceData: {
+              id: string;
+              amount: number;
+              dueDate: Date;
+              supplierId: string;
+              createdBy: string;
+              isPaid: boolean;
+              note: string;
+              financialTransactionId: string;
+              createdAt: Date;
+              updatedAt: Date;
+              supplies?: import('../../../db/models/inventory/supply/type').Supply[];
+              supplier?: import('../../../db/models/inventory/supplier/type').Supplier;
+            } = {
+              id: supplyData.invoice.id,
+              amount: supplyData.invoice.amount,
+              dueDate: supplyData.invoice.dueDate,
+              supplierId: supplyData.invoice.supplierId,
+              createdBy: supplyData.invoice.createdBy,
+              isPaid: supplyData.invoice.isPaid,
+              note: supplyData.invoice.note,
+              financialTransactionId: supplyData.invoice.financialTransactionId,
+              createdAt: supplyData.invoice.createdAt,
+              updatedAt: supplyData.invoice.updatedAt,
+              supplier: supplyData.invoice.supplier,
+              supplies: [],
+            };
+            if (req.query.incSupplies === 'true')
+              invoiceData.supplies = [supplyData];
+            map.set(supplyData.invoiceId, { ...invoiceData });
+          } else if (req.query.incSupplies === 'true')
+            map.get(supplyData.invoiceId).supplies.push(supplyData);
+        });
+        return successResponse(
+          'Supplies retrieved',
+          Array.from(map.values()),
+          res
+        );
+      })
       .catch((err) => failureResponse('couldnt retrieve Supplies', err, res));
   }
 }

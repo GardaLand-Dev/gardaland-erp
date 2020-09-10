@@ -9,7 +9,6 @@ import {
   Grid,
   FormControlLabel,
   Checkbox,
-  Divider,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
@@ -24,18 +23,40 @@ import inventoryService from '../../../../services/inventory.service';
 const columns = [
   {
     name: 'Fournisseur',
-    selector: 'name',
+    selector: 'supplier',
+    format: (row) => row?.supplier?.name,
     sortable: true,
   },
   {
     name: 'Status de Paiement',
     selector: 'isPaid',
     sortable: true,
+    format: (row) => {
+      if (row.isPaid) return 'Payée';
+      if (new Date(row.dueDate) > new Date()) return 'Non Payée';
+      return 'En Retard';
+    },
     conditionalCellStyles: [
       {
-        when: (row) => row.isPaid === 'Payé',
+        when: (row) => row.isPaid,
         style: {
           backgroundColor: 'rgba(63, 195, 128, 0.9)',
+          color: 'white',
+        },
+      },
+      {
+        when: (row) => !row.isPaid && new Date(row.dueDate) > new Date(),
+        // non payée
+        style: {
+          backgroundColor: 'rgba(63, 195, 5, 0.9)',
+          color: 'white',
+        },
+      },
+      {
+        when: (row) => !row.isPaid && new Date(row.dueDate) <= new Date(),
+        // en retard
+        style: {
+          backgroundColor: 'rgba(63, 195, 1, 0.9)',
           color: 'white',
         },
       },
@@ -48,47 +69,85 @@ const columns = [
   },
   {
     name: 'Date',
-    selector: 'createdAt',
+    selector: 'dueDate',
     sortable: true,
   },
 ];
-const data = [
-  {
-    name: 'Sliman',
-    isPaid: 'Payé',
-    amount: '300000.00 DA',
-    createdAt: '01/09/2020',
-  },
-];
-const fournisseurs = [
-  {
-    id: 'sliman',
-    name: 'Sliman',
-  },
-  {
-    id: 'azzouz',
-    name: 'Azzouz',
-  },
-];
+// const data = [
+//   {
+//     name: 'Sliman',
+//     isPaid: 'Payé',
+//     amount: '300000.00 DA',
+//     createdAt: '01/09/2020',
+//   },
+// ];
+// const suppliers = [
+//   {
+//     id: 'sliman',
+//     name: 'Sliman',
+//   },
+//   {
+//     id: 'azzouz',
+//     name: 'Azzouz',
+//   },
+// ];
 
 export default function StockFacture(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
+  const [suppliers, setSuppliers] = useState<
+    {
+      id: string;
+      name: string;
+      tel: string;
+      adresse: string;
+    }[]
+  >([]);
+  useEffect(() => {
+    inventoryService
+      .getSuppliers(true)
+      .then((d) => setSuppliers(d))
+      .catch(console.error);
+  }, []);
+  const [data, setData] = useState<
+    {
+      id: string;
+      dueDate: Date;
+      amount: number;
+      isPaid: boolean;
+      note: string;
+      createdAt: Date;
+      updatedAt: Date;
+      supplierId: string;
+      createdBy: string;
+      supplier?: { id: string; name: string; tel: string; address: string };
+    }[]
+  >([]);
+  const dataLoader = () => {
+    inventoryService.getInvoices(true).then(setData).catch(console.error);
+  };
+  useEffect(() => {
+    dataLoader();
+  }, []);
   const handleAddClicked = () => {
     setModalVisible(true);
   };
+  const now = new Date();
   const [factureParams, setFactureParams] = useState<{
-    fname?: string;
-    isPaid?: boolean;
-    createdAt?: Date;
-    dueDate?: Date;
+    supplierId?: string;
+    isPaid: boolean;
+    deliveredOn?: Date;
+    dueDate: Date;
+    note?: string;
     stockItems?: {
-      id: string;
-      name: string;
-      unit: string;
-      quantity?: number;
-      cost?: number;
+      invItemId: string;
+      quantity: number;
+      cost: number;
     }[];
-  }>({ stockItems: [] });
+  }>({
+    isPaid: false,
+    deliveredOn: new Date(),
+    dueDate: new Date(now.setDate(now.getDate() + 7)),
+  });
   const [stockables, setStockables] = useState<
     {
       id: string;
@@ -126,7 +185,7 @@ export default function StockFacture(): JSX.Element {
   const handleDelete = (id: string) => {
     setFactureParams({
       ...factureParams,
-      stockItems: factureParams.stockItems?.filter((i) => i.id !== id),
+      stockItems: factureParams.stockItems?.filter((i) => i.invItemId !== id),
     });
     setStockables(
       stockables.map((s) => {
@@ -135,12 +194,12 @@ export default function StockFacture(): JSX.Element {
       })
     );
   };
-  const now = new Date();
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedDueDate, setSelectedDueDate] = useState(
-    now.setDate(now.getDate() + 7)
-  );
-  const [isChecked, setisChecked] = useState(false);
+
+  // const [selectedDate, setSelectedDate] = useState(new Date());
+  // const [selectedDueDate, setSelectedDueDate] = useState(
+  //   new Date(now.setDate(now.getDate() + 7))
+  // );
+  // const [isChecked, setisChecked] = useState(false);
 
   return (
     <div>
@@ -153,20 +212,50 @@ export default function StockFacture(): JSX.Element {
       <SimpleModal
         onClose={() => {
           setModalVisible(false);
+          setStockables(stockables.map((s) => ({ ...s, selected: false })));
+          setFactureParams({
+            isPaid: false,
+            deliveredOn: new Date(),
+            dueDate: new Date(now.setDate(now.getDate() + 7)),
+          });
         }}
         visible={modalVisible}
         title="Ajouter Facture"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          inventoryService
+            .createSupply(
+              factureParams.supplierId,
+              factureParams.dueDate,
+              factureParams.deliveredOn,
+              factureParams.stockItems,
+              factureParams.note,
+              factureParams.isPaid
+            )
+            .then((ok) => {
+              if (!ok) throw new Error('cant create supply');
+              console.log('created successfully');
+              dataLoader();
+              setModalVisible(false);
+              setFactureParams({
+                isPaid: false,
+                deliveredOn: new Date(),
+                dueDate: new Date(now.setDate(now.getDate() + 7)),
+              });
+              return true;
+            })
+            .catch(console.error);
+        }}
       >
         <Autocomplete
           className="my-3"
           onChange={(_event: any, newValue: any | null) => {
             setFactureParams({
               ...factureParams,
-              fname: newValue ? newValue.id : null,
+              supplierId: newValue ? newValue.id : null,
             });
           }}
-          options={fournisseurs}
+          options={suppliers}
           getOptionLabel={(option) => option.name}
           fullWidth
           renderInput={(params) => (
@@ -190,12 +279,11 @@ export default function StockFacture(): JSX.Element {
                 format="DD/MM/yyyy"
                 id="date-picker-inline"
                 label="Date de creation"
-                value={selectedDate}
-                onChange={(date: Date) => {
-                  setSelectedDate(date);
+                value={factureParams.deliveredOn || new Date()}
+                onChange={(date: moment.Moment) => {
                   setFactureParams({
                     ...factureParams,
-                    createdAt: date,
+                    deliveredOn: date.toDate(),
                   });
                 }}
                 KeyboardButtonProps={{
@@ -209,8 +297,8 @@ export default function StockFacture(): JSX.Element {
               control={
                 // eslint-disable-next-line react/jsx-wrap-multilines
                 <Checkbox
-                  checked={isChecked}
-                  onChange={() => setisChecked(!isChecked)}
+                  checked={factureParams.isPaid}
+                  // onChange={() => setisChecked(!isChecked)}
                 />
               }
               label="Est Payé"
@@ -224,7 +312,7 @@ export default function StockFacture(): JSX.Element {
             />
           </Grid>
         </Grid>
-        {!isChecked ? (
+        {!factureParams.isPaid ? (
           <>
             <MuiPickersUtilsProvider utils={MomentUtils}>
               <KeyboardDatePicker
@@ -234,13 +322,11 @@ export default function StockFacture(): JSX.Element {
                 format="DD/MM/yyyy"
                 id="date-picker-inline"
                 label="Date d'échéance"
-                value={selectedDueDate}
-                onChange={(date: Date) => {
-                  setSelectedDueDate(date);
-                  console.log(date);
+                value={factureParams.dueDate}
+                onChange={(date: moment.Moment) => {
                   setFactureParams({
                     ...factureParams,
-                    dueDate: date,
+                    dueDate: date.toDate(),
                   });
                 }}
                 KeyboardButtonProps={{
@@ -262,14 +348,22 @@ export default function StockFacture(): JSX.Element {
             HandleStockable(newValue.id);
             setFactureParams({
               ...factureParams,
-              stockItems: [
-                ...factureParams?.stockItems,
-                {
-                  id: newValue ? newValue.id : null,
-                  name: newValue ? newValue.name : null,
-                  unit: newValue ? newValue.unit : null,
-                },
-              ],
+              stockItems: factureParams?.stockItems
+                ? [
+                    ...factureParams?.stockItems,
+                    {
+                      invItemId: newValue?.id,
+                      cost: newValue?.cost,
+                      quantity: newValue?.quantity,
+                    },
+                  ]
+                : [
+                    {
+                      invItemId: newValue?.id,
+                      cost: newValue?.cost,
+                      quantity: newValue?.quantity,
+                    },
+                  ],
             });
           }}
           options={stockables.filter((i) => !i.selected)}
@@ -295,70 +389,77 @@ export default function StockFacture(): JSX.Element {
             </tr>
           </thead>
           <tbody>
-            {factureParams?.stockItems.map((s) => (
-              <tr key={s.id}>
-                <td>{s.name}</td>
-                <td>
-                  <FormControl style={{ width: 100 }}>
-                    <Input
-                      type="number"
-                      id="standard-adornment-quantity"
-                      endAdornment={
-                        // eslint-disable-next-line react/jsx-wrap-multilines
-                        <InputAdornment position="end">{s.unit}</InputAdornment>
-                      }
-                      inputProps={{
-                        'aria-label': 'quantity',
+            {factureParams?.stockItems?.map((s) => {
+              const { name, unit } = stockables.find(
+                (ss) => ss.id === s.invItemId
+              );
+              return (
+                <tr key={s.invItemId}>
+                  <td>{name}</td>
+                  <td>
+                    <FormControl style={{ width: 100 }}>
+                      <Input
+                        type="number"
+                        id="standard-adornment-quantity"
+                        endAdornment={
+                          // eslint-disable-next-line react/jsx-wrap-multilines
+                          <InputAdornment position="end">{unit}</InputAdornment>
+                        }
+                        inputProps={{
+                          'aria-label': 'quantity',
+                        }}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          setFactureParams({
+                            ...factureParams,
+                            stockItems: factureParams.stockItems.map((ss) => {
+                              if (ss.invItemId === s.invItemId)
+                                return { ...ss, quantity: val };
+                              return ss;
+                            }),
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </td>
+                  <td>
+                    <FormControl style={{ width: 100 }}>
+                      <Input
+                        type="number"
+                        id="standard-adornment-quantity"
+                        endAdornment={
+                          // eslint-disable-next-line react/jsx-wrap-multilines
+                          <InputAdornment position="end">DA</InputAdornment>
+                        }
+                        inputProps={{
+                          'aria-label': 'prix',
+                        }}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          setFactureParams({
+                            ...factureParams,
+                            stockItems: factureParams.stockItems.map((ss) => {
+                              if (ss.invItemId === s.invItemId)
+                                return { ...ss, cost: val };
+                              return ss;
+                            }),
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </td>
+                  <td>
+                    <IconButton
+                      onClick={() => {
+                        handleDelete(s.invItemId);
                       }}
-                      onChange={(e) => {
-                        const val = parseFloat(e.target.value);
-                        setFactureParams({
-                          ...factureParams,
-                          stockItems: factureParams.stockItems.map((ss) => {
-                            if (ss.id === s.id) return { ...ss, quantity: val };
-                            return ss;
-                          }),
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </td>
-                <td>
-                  <FormControl style={{ width: 100 }}>
-                    <Input
-                      type="number"
-                      id="standard-adornment-quantity"
-                      endAdornment={
-                        // eslint-disable-next-line react/jsx-wrap-multilines
-                        <InputAdornment position="end">DA</InputAdornment>
-                      }
-                      inputProps={{
-                        'aria-label': 'prix',
-                      }}
-                      onChange={(e) => {
-                        const val = parseFloat(e.target.value);
-                        setFactureParams({
-                          ...factureParams,
-                          stockItems: factureParams.stockItems.map((ss) => {
-                            if (ss.id === s.id) return { ...ss, cost: val };
-                            return ss;
-                          }),
-                        });
-                      }}
-                    />
-                  </FormControl>
-                </td>
-                <td>
-                  <IconButton
-                    onClick={() => {
-                      handleDelete(s.id);
-                    }}
-                  >
-                    <DeleteIcon color="secondary" />
-                  </IconButton>
-                </td>
-              </tr>
-            ))}
+                    >
+                      <DeleteIcon color="secondary" />
+                    </IconButton>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </SimpleModal>

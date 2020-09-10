@@ -612,6 +612,26 @@ export const dbInit = async () => {
       else func();
     }
   );
+  Supply.addHook('afterBulkCreate', (suppliesData, options) => {
+    const func = () => {
+      suppliesData.forEach((supplyData) => {
+        supplyData.setDataValue(
+          'remaining',
+          supplyData.getDataValue('quantity')
+        );
+        supplyData.save();
+        InvItem.findByPk(supplyData.getDataValue('invItemId'))
+          .then((invItemData) =>
+            invItemData.increment('inStock', {
+              by: supplyData.getDataValue('quantity'),
+            })
+          )
+          .catch(log.error);
+      });
+    };
+    if (options.transaction) options.transaction.afterCommit(func);
+    else func();
+  });
 
   //
   OrderProduct.addHook('beforeBulkCreate', async (orderProductsData) => {

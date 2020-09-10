@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField } from '@material-ui/core';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
+import inventorySerivce from '../../../../services/inventory.service';
 
 const columns = [
   {
@@ -20,18 +21,34 @@ const columns = [
     sortable: true,
   },
 ];
-const data = [
-  {
-    name: 'Sliman',
-    tel: '077777777',
-    address: 'Firem chlef',
-  },
-];
+
 export default function Fournisseurs(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const handleAddClicked = () => {
     setModalVisible(true);
   };
+  const [data, setData] = useState<
+    {
+      id: string;
+      name: string;
+      address: string;
+      tel: string;
+      createdAt: Date;
+      updatedAt: Date;
+    }[]
+  >([]);
+  const dataLoader = () => {
+    inventorySerivce
+      .getSuppliers(true)
+      .then((d) => {
+        setData(d);
+        return true;
+      })
+      .catch(console.error);
+  };
+  useEffect(() => {
+    dataLoader();
+  }, []);
   const [fournisseurParams, setFournisseurParams] = useState<{
     name: string;
     tel: string;
@@ -48,9 +65,26 @@ export default function Fournisseurs(): JSX.Element {
       <SimpleModal
         onClose={() => {
           setModalVisible(false);
+          setFournisseurParams(null);
         }}
         visible={modalVisible}
         title="Ajouter Fournisseur"
+        onSubmit={(e) => {
+          e.preventDefault();
+          inventorySerivce
+            .createSupplier(
+              fournisseurParams.name,
+              fournisseurParams.tel,
+              fournisseurParams.address
+            )
+            .then((ok) => {
+              if (!ok) throw new Error('supplier not created');
+              dataLoader();
+              setModalVisible(false);
+              return true;
+            })
+            .catch(console.error);
+        }}
       >
         <TextField
           className="my-3"

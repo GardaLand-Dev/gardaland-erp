@@ -2,7 +2,7 @@ import { DataTypes, Sequelize, ModelCtor, UUIDV4 } from 'sequelize';
 import { Supply } from './type';
 
 export default function SupplyFactory(sequelize: Sequelize): ModelCtor<Supply> {
-  return sequelize.define('supplying', {
+  return sequelize.define('supplies', {
     id: {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,

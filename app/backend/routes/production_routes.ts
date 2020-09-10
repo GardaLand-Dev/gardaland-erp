@@ -9,6 +9,12 @@ import InvItemController from '../controllers/production/inventory/invItemContro
 import OrderController from '../controllers/production/order/orderController';
 import SupplimentController from '../controllers/production/statics/supplimentController';
 import PrinterController from '../controllers/production/statics/printerController';
+import SupplyController from '../controllers/production/inventory/supplyController';
+import SupplierController from '../controllers/production/inventory/supplierController';
+import EmployeeController from '../controllers/production/humainResources/employeeController';
+import AttendanceController from '../controllers/production/humainResources/attendanceController';
+import InvoiceController from '../controllers/production/finance/invoiceController';
+import ExpenseController from '../controllers/production/finance/expenseController';
 
 export default class ProductionRoutes {
   public static route(app: Application) {
@@ -163,37 +169,114 @@ export default class ProductionRoutes {
     );
 
     // Supplier
-    app.get(`${api}/supplier`, getAuthChecker('inventory/supplier:view'));
-    app.post(`${api}/supplier`, getAuthChecker('inventory/supplier:create'));
-    app.put(`${api}/supplier`, getAuthChecker('inventory/supplier:update'));
-    app.delete(`${api}/supplier`, getAuthChecker('inventory/supplier:delete'));
+    app.get(
+      `${api}/supplier`,
+      getAuthChecker('inventory/supplier:view'),
+      SupplierController.getSupplier
+    );
+    app.post(
+      `${api}/supplier`,
+      getAuthChecker('inventory/supplier:create'),
+      SupplierController.createSupplier
+    );
+    app.put(
+      `${api}/supplier`,
+      getAuthChecker('inventory/supplier:update'),
+      SupplierController.updateSupplier
+    );
+    app.delete(
+      `${api}/supplier`,
+      getAuthChecker('inventory/supplier:delete'),
+      SupplierController.deleteSupplier
+    );
 
-    app.get(`${api}/suppliers`, getAuthChecker('inventory/suppliers:view'));
+    app.get(
+      `${api}/suppliers`,
+      getAuthChecker('inventory/suppliers:view'),
+      SupplierController.getSuppliers
+    );
 
     // Supply
-    app.get(`${api}/supply`, getAuthChecker('inventory/supply:view'));
-    app.post(`${api}/supply`, getAuthChecker('inventory/supply:create'));
+    app.get(
+      `${api}/supply`,
+      getAuthChecker('inventory/supply:view'),
+      SupplyController.getSupply
+    );
+    app.post(
+      `${api}/supply`,
+      getAuthChecker('inventory/supply:create'),
+      SupplyController.createSupply
+    );
     app.put(`${api}/supply`, getAuthChecker('inventory/supply:update'));
-    app.delete(`${api}/supply`, getAuthChecker('inventory/supply:delete'));
+    app.delete(
+      `${api}/supply`,
+      getAuthChecker('inventory/supply:delete'),
+      SupplyController.deleteSupply
+    );
 
-    app.get(`${api}/supplies`, getAuthChecker('inventory/supplies:view'));
+    app.get(
+      `${api}/supplyInvoices`,
+      getAuthChecker('finance/invoices:view'),
+      SupplyController.getInvoices
+    );
+    app.get(
+      `${api}/supplies`,
+      getAuthChecker('inventory/supplies:view'),
+      SupplyController.getSupplies
+    );
 
     /** HUMAIN RESOURCES */
     // Employee
-    app.get(`${api}/employee`, getAuthChecker('hr/employee:view'));
-    app.post(`${api}/employee`, getAuthChecker('hr/employee:create'));
+    app.get(
+      `${api}/employee`,
+      getAuthChecker('hr/employee:view'),
+      EmployeeController.getEmployee
+    );
+    app.post(
+      `${api}/employee`,
+      getAuthChecker('hr/employee:create'),
+      EmployeeController.createEmployee
+    );
     app.put(`${api}/employee`, getAuthChecker('hr/employee:update'));
-    app.delete(`${api}/employee`, getAuthChecker('hr/employee:delete'));
+    app.delete(
+      `${api}/employee`,
+      getAuthChecker('hr/employee:delete'),
+      EmployeeController.deleteEmployee
+    );
 
-    app.get(`${api}/employees`, getAuthChecker('hr/employees:view'));
+    app.get(
+      `${api}/employees`,
+      getAuthChecker('hr/employees:view'),
+      EmployeeController.getEmployees
+    );
 
     // Attendence
-    app.get(`${api}/attendance`, getAuthChecker('hr/attendance:view'));
-    app.post(`${api}/attendance`, getAuthChecker('hr/attendance:create'));
-    app.put(`${api}/attendance`, getAuthChecker('hr/attendance:update'));
-    app.delete(`${api}/attendance`, getAuthChecker('hr/attendance:delete'));
+    app.get(
+      `${api}/attendance`,
+      getAuthChecker('hr/attendance:view'),
+      AttendanceController.getAttendance
+    );
+    app.post(
+      `${api}/attendance`,
+      getAuthChecker('hr/attendance:create'),
+      AttendanceController.createAttendance
+    );
+    app.put(
+      `${api}/attendance`,
+      getAuthChecker('hr/attendance:update'),
+      AttendanceController.updateAttendance
+    );
+    app.delete(
+      `${api}/attendance`,
+      getAuthChecker('hr/attendance:delete'),
+      AttendanceController.deleteAttendance
+    );
 
-    app.get(`${api}/attendances`, getAuthChecker('hr/attendances:view'));
+    app.get(
+      `${api}/attendances`,
+      getAuthChecker('hr/attendances:view'),
+      AttendanceController.getAttendances
+    );
 
     // Title
     app.get(`${api}/title`, getAuthChecker('hr/title:view'));
@@ -221,7 +304,11 @@ export default class ProductionRoutes {
 
     /** ORDERS */
     // Order
-    app.get(`${api}/order`, getAuthChecker('orders/order:view'));
+    app.get(
+      `${api}/order`,
+      getAuthChecker('orders/order:view'),
+      OrderController.getOrder
+    );
     app.post(
       `${api}/order`,
       getAuthChecker('orders/order:create'),
@@ -258,6 +345,62 @@ export default class ProductionRoutes {
     app.get(
       `${api}/orderproducts`,
       getAuthChecker('orders/orderproducts:view')
+    );
+
+    // Invoice
+    app.get(
+      `${api}/invoice`,
+      getAuthChecker('finance/invoice:view'),
+      InvoiceController.getInvoice
+    );
+    app.post(
+      `${api}/invoice`,
+      getAuthChecker('finance/invoice:create'),
+      InvoiceController.createInvoice
+    );
+    app.put(
+      `${api}/invoice`,
+      getAuthChecker('finance/invoice:update'),
+      InvoiceController.updateInvoice
+    );
+    app.delete(
+      `${api}/invoice`,
+      getAuthChecker('finance/invoice:delete'),
+      InvoiceController.deleteInvoice
+    );
+
+    app.get(
+      `${api}/invoices`,
+      getAuthChecker('finance/invoices:view'),
+      InvoiceController.getInvoices
+    );
+
+    // Expense
+    app.get(
+      `${api}/expense`,
+      getAuthChecker('finance/expense:view'),
+      ExpenseController.getExpense
+    );
+    app.post(
+      `${api}/expense`,
+      getAuthChecker('finance/expense:create'),
+      ExpenseController.createExpense
+    );
+    app.put(
+      `${api}/expense`,
+      getAuthChecker('finance/expense:update'),
+      ExpenseController.updateExpense
+    );
+    app.delete(
+      `${api}/expense`,
+      getAuthChecker('finance/expense:delete'),
+      ExpenseController.deleteExpense
+    );
+
+    app.get(
+      `${api}/expense`,
+      getAuthChecker('finance/expense:view'),
+      ExpenseController.getExpenses
     );
   }
 }
