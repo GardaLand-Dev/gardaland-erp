@@ -72,10 +72,10 @@ export class Supply extends Model<SupplyAttributes, SupplyCreationAttributes>
   // POSSIBLE INCLUSIONS FROM ASSOTIATIONS
   public readonly invItem?: InvItem;
 
-  public readonly supplier?: Supplier;
+  public readonly invoice?: Invoice;
 
   public static associations: {
     invItem: Association<InvItem, Supply>;
-    supplier: Association<Supplier, Supply>;
+    invoice: Association<Supplier, Supply>;
   };
 }

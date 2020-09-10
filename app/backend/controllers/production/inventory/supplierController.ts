@@ -7,7 +7,7 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Supplier, Supply } from '../../../db/models';
+import { DEFAULT_LIMIT, Supplier, Supply, Invoice } from '../../../db/models';
 
 export default class SupplierController {
   public static createSupplier(req: Request, res: Response) {
@@ -107,8 +107,8 @@ export default class SupplierController {
       offset,
       include: [],
     };
-    if (req.query.incSupplies === 'true')
-      (<Includeable[]>options.include).push({ model: Supply });
+    if (req.query.incInvoices === 'true')
+      (<Includeable[]>options.include).push({ model: Invoice });
     // if (req.query.ingredient === 'true') options.where = { isIngredient: true };
     Supplier.findAll(options)
       .then((suppliersData) =>
