@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton } from '@material-ui/core';
+import {
+  IconButton,
+  TextField,
+  FormControl,
+  InputAdornment,
+  OutlinedInput,
+  InputLabel,
+  Grid,
+} from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import { Autocomplete } from '@material-ui/lab';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
 import inventoryService from '../../../../services/inventory.service';
@@ -75,13 +88,13 @@ export default function StockDamage(): JSX.Element {
       // eslint-disable-next-line no-console
       .catch((err) => console.log(err));
   }, []);
-  const [stockDamage, setStockDamage] = useState<
-    {
-      id: string;
-      quantity: number;
-      note: string;
-    }[]
-  >([]);
+  const [stockDamage, setStockDamage] = useState<{
+    id?: string;
+    quantity?: number;
+    note?: string;
+    createdAt: Date;
+  }>({ createdAt: new Date() });
+  const [unitField, setUnitField] = useState('');
   return (
     <div>
       <CustomTable
@@ -97,13 +110,17 @@ export default function StockDamage(): JSX.Element {
         visible={modalVisible}
         title="Ajouter artcile endommagé"
       >
-        {/* <Autocomplete
-          className="mb-4"
+        <Autocomplete
+          className="mb-2"
           freeSolo
           id="free-solo-2-demo"
           disableClearable
           onChange={(_event: any, newValue: any | null) => {
-
+            setStockDamage({
+              ...stockDamage,
+              id: newValue ? newValue.id : null,
+            });
+            setUnitField(newValue.unit);
           }}
           options={stockables}
           getOptionLabel={(option) => option.name}
@@ -117,7 +134,64 @@ export default function StockDamage(): JSX.Element {
               InputProps={{ ...params.InputProps, type: 'search' }}
             />
           )}
-        /> */}
+        />
+        <Grid container spacing={2}>
+          <Grid item xs>
+            <FormControl required style={{ width: '100%' }} variant="outlined">
+              <InputLabel>Quantité</InputLabel>
+              <OutlinedInput
+                type="number"
+                onChange={
+                  (e) =>
+                    setStockDamage({
+                      ...stockDamage,
+                      quantity: parseFloat(e.target.value),
+                    })
+                  // eslint-disable-next-line react/jsx-curly-newline
+                }
+                endAdornment={
+                  <InputAdornment position="end">{unitField}</InputAdornment>
+                }
+                labelWidth={60}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+              <KeyboardDatePicker
+                className="ml-3"
+                disableToolbar
+                variant="inline"
+                format="DD/MM/yyyy"
+                id="date-picker-inline"
+                label="Date de creation"
+                value={stockDamage.createdAt}
+                onChange={(date: moment.Moment) => {
+                  setStockDamage({
+                    ...stockDamage,
+                    createdAt: date.toDate(),
+                  });
+                }}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </MuiPickersUtilsProvider>
+          </Grid>
+        </Grid>
+        <TextField
+          className="my-3"
+          style={{ width: '100%' }}
+          id="outlined-basic"
+          label="Note"
+          variant="outlined"
+          onChange={(e) => {
+            setStockDamage({
+              ...stockDamage,
+              note: e.target.value,
+            });
+          }}
+        />
       </SimpleModal>
     </div>
   );

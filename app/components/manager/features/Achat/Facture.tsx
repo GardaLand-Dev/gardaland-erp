@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { Autocomplete } from '@material-ui/lab';
-import { TextField } from '@material-ui/core';
+import {
+  TextField,
+  Grid,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+} from '@material-ui/core';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -55,17 +62,11 @@ export default function Facture(): JSX.Element {
     setModalVisible(true);
   };
   const [factureAchat, setFactureAchat] = useState<{
-    note: string;
-    fournisseur: string;
-    amount: number;
+    note?: string;
+    fournisseur?: string;
+    amount?: number;
     createdAt: Date;
-    items?: {
-      itemName: string;
-      quantity: number;
-      price: number;
-    }[];
-  }>();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  }>({ createdAt: new Date() });
   return (
     <div>
       <CustomTable
@@ -120,27 +121,50 @@ export default function Facture(): JSX.Element {
             // eslint-disable-next-line react/jsx-curly-newline
           }
         />
-        <MuiPickersUtilsProvider utils={MomentUtils}>
-          <KeyboardDatePicker
-            className="ml-3"
-            disableToolbar
-            variant="inline"
-            format="DD/MM/yyyy"
-            id="date-picker-inline"
-            label="Date de creation"
-            value={selectedDate}
-            onChange={(date: Date) => {
-              setSelectedDate(date);
-              setFactureAchat({
-                ...factureAchat,
-                createdAt: date,
-              });
-            }}
-            KeyboardButtonProps={{
-              'aria-label': 'change date',
-            }}
-          />
-        </MuiPickersUtilsProvider>
+        <Grid container spacing={2}>
+          <Grid item xs>
+            <FormControl required style={{ width: '100%' }} variant="outlined">
+              <InputLabel>Montant</InputLabel>
+              <OutlinedInput
+                type="number"
+                onChange={
+                  (e) =>
+                    setFactureAchat({
+                      ...factureAchat,
+                      amount: parseFloat(e.target.value),
+                    })
+                  // eslint-disable-next-line react/jsx-curly-newline
+                }
+                endAdornment={
+                  <InputAdornment position="end">DA</InputAdornment>
+                }
+                labelWidth={60}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+              <KeyboardDatePicker
+                className="ml-3"
+                disableToolbar
+                variant="inline"
+                format="DD/MM/yyyy"
+                id="date-picker-inline"
+                label="Date de creation"
+                value={factureAchat.createdAt}
+                onChange={(date: moment.Moment) => {
+                  setFactureAchat({
+                    ...factureAchat,
+                    createdAt: date.toDate(),
+                  });
+                }}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </MuiPickersUtilsProvider>
+          </Grid>
+        </Grid>
       </SimpleModal>
     </div>
   );

@@ -5,6 +5,10 @@ import {
   Grid,
   FormControlLabel,
   Checkbox,
+  InputAdornment,
+  OutlinedInput,
+  InputLabel,
+  FormControl,
 } from '@material-ui/core';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import { Autocomplete } from '@material-ui/lab';
@@ -84,6 +88,7 @@ export default function Employee(): JSX.Element {
     tel: string;
     email: string;
     address: string;
+    salaire: number;
     isUser: boolean;
     user?: { username: string; password: string; role: string };
   }>();
@@ -177,7 +182,7 @@ export default function Employee(): JSX.Element {
           </Grid>
         </Grid>
         <TextField
-          className="mb-2"
+          className="mb-3"
           fullWidth
           id="outlined-basic"
           label="Adresse"
@@ -191,6 +196,22 @@ export default function Employee(): JSX.Element {
             // eslint-disable-next-line react/jsx-curly-newline
           }
         />
+        <FormControl required style={{ width: '100%' }} variant="outlined">
+          <InputLabel>Salaire</InputLabel>
+          <OutlinedInput
+            type="number"
+            onChange={
+              (e) =>
+                setEmployeeParams({
+                  ...employeeParams,
+                  salaire: parseFloat(e.target.value),
+                })
+              // eslint-disable-next-line react/jsx-curly-newline
+            }
+            endAdornment={<InputAdornment position="end">DA</InputAdornment>}
+            labelWidth={60}
+          />
+        </FormControl>
         <FormControlLabel
           control={<Checkbox checked={isChecked} onChange={handleChecked} />}
           label="Ajouter comme utilisateur"
@@ -202,6 +223,7 @@ export default function Employee(): JSX.Element {
             });
           }}
         />
+
         {isChecked ? (
           <>
             <TextField

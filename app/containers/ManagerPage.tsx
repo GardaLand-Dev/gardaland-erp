@@ -10,9 +10,14 @@ import {
   IconButton,
   Typography,
   Hidden,
+  Button,
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import { useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import SideBar from '../components/manager/SideBar';
 import routes from '../constants/routes.json';
 import ProductList from '../components/manager/features/product/ProductList';
@@ -31,6 +36,7 @@ import Employee from '../components/manager/features/GRH/Employee';
 import Payroll from '../components/manager/features/GRH/Payroll';
 import Attendance from '../components/manager/features/GRH/Attendance';
 import StockDamage from '../components/manager/features/Stock/StockDamage';
+import { logout } from '../reducers/authentication.reducer';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme: Theme) =>
@@ -84,16 +90,11 @@ export default function MangerPage(): JSX.Element {
       <SideBar />
     </div>
   );
-
+  const dispatch = useDispatch();
   return (
     <div className={`${classes.root} h-100 overflow-auto`}>
       <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar
-          className="bg-white m-3"
-          style={{
-            boxShadow: '0 10px 6px -6px #777',
-          }}
-        >
+        <Toolbar className="bg-white m-3 rounded-xlg justify-content-between align-items-center">
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -103,9 +104,29 @@ export default function MangerPage(): JSX.Element {
           >
             <MenuIcon color="primary" />
           </IconButton>
-          <Typography variant="h6" noWrap>
-            Responsive drawer
-          </Typography>
+          <div className="">
+            <span className="text-black-50">Chouieur food & helado </span>
+          </div>
+          <div className="d-flex flex-row">
+            <div className="d-flex flex-row align-items-center theme-gradient rounded mx-2 py-3 px-2">
+              <FontAwesomeIcon icon={faUserCircle} className="mr-2" />
+              <span
+                className="align-top text-capitalize"
+                style={{ fontSize: '0.9rem' }}
+              >
+                benzaamia rabie
+              </span>
+            </div>
+            <Button
+              onClick={() => {
+                dispatch(logout());
+              }}
+              className="text-secondary"
+              type="button"
+            >
+              <ExitToAppIcon style={{ fontSize: 30 }} />
+            </Button>
+          </div>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer}>
