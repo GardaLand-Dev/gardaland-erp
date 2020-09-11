@@ -507,27 +507,50 @@ export const dbInit = async () => {
         // updating products
         const pIIsData = await ProductInvItem.findAll({
           where: { invItemId: invItemData.id },
-          include: Product,
+          include: [
+            {
+              model: Product,
+              include: [
+                {
+                  model: ProductInvItem,
+                  as: 'productInvItems',
+                  include: [InvItem],
+                },
+              ],
+            },
+          ],
         });
-        log.info('beforesavehook', prevQ, invItemData.getDataValue('inStock'));
+        log.info(
+          'beforesavehook',
+          prevQ,
+          invItemData.getDataValue('inStock'),
+          pIIsData.length
+        );
         if (pIIsData && pIIsData.length > 0) {
           pIIsData.forEach((pIIData) => {
             const qq = Math.floor(
               invItemData.getDataValue('inStock') / pIIData.quantity
             );
             if (
+              // quantity decrease
               prevQ > invItemData.getDataValue('inStock') &&
               pIIData.product.maxQuantity > qq
             ) {
               pIIData.product.maxQuantity = qq;
               pIIData.product.save();
             }
-            if (
-              prevQ < invItemData.getDataValue('inStock') &&
-              pIIData.product.maxQuantity ===
-                Math.floor(prevQ / pIIData.quantity)
-            ) {
-              pIIData.product.maxQuantity = qq;
+            // quantity increase
+            if (prevQ < invItemData.getDataValue('inStock')) {
+              // recalculate maxq
+              const maxQ = pIIData.product.productInvItems.reduce(
+                (max, pIIData2) => {
+                  return max > pIIData2.invItem.inStock
+                    ? Math.floor(pIIData2.invItem.inStock / pIIData2.quantity)
+                    : max;
+                },
+                Infinity
+              );
+              pIIData.product.maxQuantity = maxQ;
               pIIData.product.save();
             }
           });
@@ -614,19 +637,17 @@ export const dbInit = async () => {
   );
   Supply.addHook('afterBulkCreate', (suppliesData, options) => {
     const func = () => {
-      suppliesData.forEach((supplyData) => {
+      suppliesData.forEach(async (supplyData) => {
         supplyData.setDataValue(
           'remaining',
           supplyData.getDataValue('quantity')
         );
         supplyData.save();
-        InvItem.findByPk(supplyData.getDataValue('invItemId'))
-          .then((invItemData) =>
-            invItemData.increment('inStock', {
-              by: supplyData.getDataValue('quantity'),
-            })
-          )
-          .catch(log.error);
+        const invItemData = await InvItem.findByPk(
+          supplyData.getDataValue('invItemId')
+        );
+        invItemData.inStock += supplyData.getDataValue('quantity');
+        await invItemData.save();
       });
     };
     if (options.transaction) options.transaction.afterCommit(func);
