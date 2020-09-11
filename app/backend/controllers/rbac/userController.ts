@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { FindOptions } from 'sequelize/types';
+import { FindOptions, Includeable } from 'sequelize/types';
 import {
   insufficientParameters,
   dbError,
@@ -160,7 +160,14 @@ export default class UserController {
       limit,
       offset,
       attributes: { exclude: ['password'] },
+      include: [],
     };
+    if (req.query.all === 'true') {
+      options.limit = null;
+      options.offset = null;
+    }
+    if (req.query.incRoles === 'true')
+      (options.include as Includeable[]).push(Role);
     User.findAll(options)
       .then((usersData) => successResponse('users retrieved', usersData, res))
       .catch((err) => failureResponse('couldnt retrieve users', err, res));
