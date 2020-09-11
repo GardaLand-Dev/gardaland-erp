@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { TextField } from '@material-ui/core';
+import { TextField, Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
 import inventorySerivce from '../../../../services/inventory.service';
@@ -54,6 +55,13 @@ export default function Fournisseurs(): JSX.Element {
     tel: string;
     address: string;
   }>();
+  const [open, setOpen] = useState(false);
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
   return (
     <div>
       <CustomTable
@@ -62,6 +70,11 @@ export default function Fournisseurs(): JSX.Element {
         title="Fournisseur"
         onAddClicked={handleAddClicked}
       />
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Fournisseur ajouté avec succès
+        </Alert>
+      </Snackbar>
       <SimpleModal
         onClose={() => {
           setModalVisible(false);
@@ -81,6 +94,7 @@ export default function Fournisseurs(): JSX.Element {
               if (!ok) throw new Error('supplier not created');
               dataLoader();
               setModalVisible(false);
+              setOpen(true);
               return true;
             })
             .catch(console.error);

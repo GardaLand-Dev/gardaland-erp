@@ -48,7 +48,7 @@ const columns = [
         when: (row) => !row.isPaid && new Date(row.dueDate) > new Date(),
         // non payée
         style: {
-          backgroundColor: 'rgba(63, 195, 5, 0.9)',
+          backgroundColor: 'rgba(212, 209, 1)',
           color: 'white',
         },
       },
@@ -242,6 +242,7 @@ export default function StockFacture(): JSX.Element {
                 deliveredOn: new Date(),
                 dueDate: new Date(now.setDate(now.getDate() + 7)),
               });
+              setStockables(stockables.map((s) => ({ ...s, selected: false })));
               return true;
             })
             .catch(console.error);
