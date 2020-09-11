@@ -15,6 +15,7 @@ import EmployeeController from '../controllers/production/humainResources/employ
 import AttendanceController from '../controllers/production/humainResources/attendanceController';
 import InvoiceController from '../controllers/production/finance/invoiceController';
 import ExpenseController from '../controllers/production/finance/expenseController';
+import ClientController from '../controllers/production/client/clientController';
 
 export default class ProductionRoutes {
   public static route(app: Application) {
@@ -401,6 +402,34 @@ export default class ProductionRoutes {
       `${api}/expense`,
       getAuthChecker('finance/expense:view'),
       ExpenseController.getExpenses
+    );
+
+    // client
+    app.get(
+      `${api}/client`,
+      getAuthChecker('client/client:view'),
+      ClientController.getClient
+    );
+    app.post(
+      `${api}/client`,
+      getAuthChecker('client/client:create'),
+      ClientController.createClient
+    );
+    app.put(
+      `${api}/client`,
+      getAuthChecker('client/client:update'),
+      ClientController.updateClient
+    );
+    app.delete(
+      `${api}/client`,
+      getAuthChecker('client/client:delete'),
+      ClientController.deleteClient
+    );
+
+    app.get(
+      `${api}/client`,
+      getAuthChecker('client/client:view'),
+      ClientController.getClients
     );
   }
 }
