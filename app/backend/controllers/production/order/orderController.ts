@@ -20,9 +20,12 @@ import dbConfig, {
   Product,
   ProductInvItem,
   Suppliment,
+  Client,
+  ClientOrder,
 } from '../../../db/models';
 import InvItemHelper from '../../../db/helpers/invItem.helper';
 import { JwtRequest } from '../../../middlewares/authCheck';
+import { ClientCreationAttributes } from '../../../db/models/clients/client/type';
 
 export default class OrderController {
   public static async createOrder(req: JwtRequest, res: Response) {
@@ -37,8 +40,50 @@ export default class OrderController {
         };
         // create order
         const o = await Order.create(orderParams, { transaction: t });
-        if (!o) throw new Error('coudnt create user');
-
+        if (!o) throw new Error('coudnt create order');
+        // attach client
+        if (req.body.clientId && typeof req.body.clientId === 'string') {
+          const c = await Client.findByPk(req.body.clientId);
+          if (!c) throw new Error('coudnt find client');
+          await ClientOrder.create(
+            { orderId: o.id, clientId: c.id },
+            { transaction: t }
+          );
+          if (
+            !(await ClientOrder.create(
+              { orderId: o.id, clientId: c.id },
+              { transaction: t }
+            ))
+          )
+            throw new Error('coudnt create clientorder');
+        } else if (
+          req.body.client &&
+          req.body.client.firstname &&
+          req.body.client.lastname &&
+          typeof req.body.client.firstname === 'string' &&
+          typeof req.body.client.lastname === 'string'
+        ) {
+          const clientParams: ClientCreationAttributes = {
+            firstname: req.body.client.firstname,
+            lastname: req.body.client.lastname,
+            tel: req.body.client.tel,
+            email: req.body.client.email,
+          };
+          const c = await Client.create(clientParams, { transaction: t });
+          if (!c) throw new Error('coudnt create client');
+          await ClientOrder.create(
+            { orderId: o.id, clientId: c.id },
+            { transaction: t }
+          );
+          if (
+            !(await ClientOrder.create(
+              { orderId: o.id, clientId: c.id },
+              { transaction: t }
+            ))
+          )
+            throw new Error('coudnt create clientorder');
+        }
+        // end attachclient
         const opDict: { [opQtHash: string]: string[] } = {};
         const ops = await OrderProduct.bulkCreate(
           req.body.orderProducts.map(

@@ -23,7 +23,7 @@ export interface ClientAttributes {
 }
 export type ClientCreationAttributes = Optional<
   ClientAttributes,
-  'id' | 'email' | 'tel'
+  'id' | 'email' | 'tel' | 'lastOrder'
 >;
 export class Client extends Model<ClientAttributes, ClientCreationAttributes>
   implements ClientAttributes {
@@ -33,9 +33,9 @@ export class Client extends Model<ClientAttributes, ClientCreationAttributes>
 
   public lastname!: string;
 
-  public tel: string | undefined;
+  public tel!: string | undefined;
 
-  public email: string | undefined;
+  public email!: string | undefined;
 
   public lastOrder!: Date;
 

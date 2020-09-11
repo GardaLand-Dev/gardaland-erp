@@ -57,7 +57,9 @@ export default class EmployeeController {
             },
             { transaction }
           );
-          await userData.addRoles(req.body.roles as string[], { transaction });
+          await userData.addRoles(req.body.user.roles as string[], {
+            transaction,
+          });
           await userData.save({ transaction });
         }
         if (
