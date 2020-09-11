@@ -4,7 +4,6 @@ import { FindOptions, Includeable } from 'sequelize/types';
 import { JwtRequest } from '../../../middlewares/authCheck';
 import {
   EmployeeCreationAttributes,
-  Employee,
   EmployeeAttributes,
 } from '../../../db/models/humanResources/employee/type';
 import {
@@ -15,6 +14,7 @@ import {
 } from '../../common/service';
 import dbConfig, {
   DEFAULT_LIMIT,
+  Employee,
   User,
   Title,
   Salary,
@@ -40,7 +40,7 @@ export default class EmployeeController {
       const transaction = await dbConfig.transaction();
       try {
         const empData = await Employee.create(employeeParams, { transaction });
-        empData.createTitle({ name: req.body.title }, { transaction });
+        await empData.createTitle({ name: req.body.title }, { transaction });
         if (
           req.body.user &&
           req.body.user.username &&

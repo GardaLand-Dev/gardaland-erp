@@ -7,7 +7,7 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Supplier, Supply, Invoice } from '../../../db/models';
+import { DEFAULT_LIMIT, Supplier, Invoice } from '../../../db/models';
 
 export default class SupplierController {
   public static createSupplier(req: Request, res: Response) {

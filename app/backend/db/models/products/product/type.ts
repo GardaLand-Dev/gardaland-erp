@@ -20,6 +20,7 @@ import { Family } from '../family/type';
 import { InvItem } from '../../inventory/invItem/type';
 // eslint-disable-next-line import/no-cycle
 import { OrderProduct } from '../../sales/orderProducts/type';
+// eslint-disable-next-line import/no-cycle
 import { ProductInvItem } from '../productIngredients/type';
 
 export interface ProductAttributes {

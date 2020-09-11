@@ -23,6 +23,11 @@ export default class UserController {
         };
         const userData = User.build(userParams);
         userData.addRoles(req.body.roles);
+        if (req.body.employeeId) userData.employeeId = req.body.employeeId;
+        userData
+          .save()
+          .then((ud) => successResponse('create user successfull', ud, res))
+          .catch((err) => dbError(err, res));
       } else {
         const userParams: UserCreationAttributes = {
           userName: req.body.userName,

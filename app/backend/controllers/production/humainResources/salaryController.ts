@@ -1,15 +1,6 @@
 import { Request, Response } from 'express';
-import {
-  // SalaryCreationAttributes,
-  Salary,
-} from '../../../db/models/humanResources/salary/type';
-import {
-  successResponse,
-  // dbError,
-  // insufficientParameters,
-  failureResponse,
-} from '../../common/service';
-import { DEFAULT_LIMIT } from '../../../db/models';
+import { successResponse, failureResponse } from '../../common/service';
+import { DEFAULT_LIMIT, Salary } from '../../../db/models';
 
 export default class SalaryController {
   // public static createSalary(req: Request, res: Response) {
