@@ -9,11 +9,11 @@ export default function ClientFactory(sequilize: Sequelize): ModelCtor<Client> {
       primaryKey: true,
       allowNull: false,
     },
-    firstName: {
+    firstname: {
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    lastName: {
+    lastname: {
       type: DataTypes.STRING(50),
       allowNull: false,
     },
