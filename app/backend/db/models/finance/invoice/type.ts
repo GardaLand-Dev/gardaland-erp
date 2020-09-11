@@ -20,10 +20,11 @@ export interface InvoiceAttributes {
   isPaid: boolean;
   note: string;
   financialTransactionId: string;
+  createdAt: Date;
 }
 export type InvoiceCreationAttributes = Optional<
   InvoiceAttributes,
-  'id' | 'isPaid' | 'note' | 'financialTransactionId'
+  'id' | 'isPaid' | 'note' | 'financialTransactionId' | 'createdAt'
 >;
 export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   implements InvoiceAttributes {

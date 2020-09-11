@@ -432,42 +432,55 @@ export const dbInit = async () => {
       else func();
     }
   );
-  Invoice.addHook('beforeCreate', async (invoiceData, options) => {
-    const func = async () => {
-      const tType = await TransactionType.findOne({
-        where: { source: 'expense' },
-      });
-      if (invoiceData.getDataValue('isPaid') === true) {
-        const fTData = await FinancialTransaction.create({
-          transactionTypeId: tType.id,
-          value: invoiceData.getDataValue('amount'),
+  Invoice.addHook(
+    'beforeCreate',
+    async (invoiceData: import('./finance/invoice/type').Invoice, options) => {
+      const func = async () => {
+        if (invoiceData.isPaid) {
+          const tType = await TransactionType.findOne({
+            where: { source: 'expense' },
+          });
+          if (invoiceData.isPaid === true) {
+            const fTData = await FinancialTransaction.create({
+              transactionTypeId: tType.id,
+              value: invoiceData.amount,
+            });
+            invoiceData.financialTransactionId = fTData.id;
+          }
+        }
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
+  Invoice.addHook(
+    'afterUpdate',
+    async (invoiceData: import('./finance/invoice/type').Invoice, options) => {
+      const func = async () => {
+        const tType = await TransactionType.findOne({
+          where: { source: 'expense' },
         });
-        invoiceData.setDataValue('financialTransactionId', fTData.id);
-      }
-    };
-    if (options.transaction) options.transaction.afterCommit(func);
-    else func();
-  });
-  Invoice.addHook('afterUpdate', async (invoiceData, options) => {
-    const func = async () => {
-      const tType = await TransactionType.findOne({
-        where: { source: 'expense' },
-      });
-      if (
-        invoiceData.getDataValue('isPaid') === true &&
-        !invoiceData.getDataValue('financialTransactionId')
-      ) {
-        const fTData = await FinancialTransaction.create({
-          transactionTypeId: tType.id,
-          value: invoiceData.getDataValue('amount'),
-        });
-        invoiceData.setDataValue('financialTransactionId', fTData.id);
-        invoiceData.save();
-      }
-    };
-    if (options.transaction) options.transaction.afterCommit(func);
-    else func();
-  });
+        if (invoiceData.isPaid === true) {
+          if (invoiceData.financialTransactionId) {
+            const fTData = await FinancialTransaction.findByPk(
+              invoiceData.financialTransactionId
+            );
+            fTData.value = invoiceData.amount;
+            fTData.save();
+          } else {
+            const fTData = await FinancialTransaction.create({
+              transactionTypeId: tType.id,
+              value: invoiceData.getDataValue('amount'),
+            });
+            invoiceData.setDataValue('financialTransactionId', fTData.id);
+            invoiceData.save();
+          }
+        }
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
 
   // maxQuantity autoupdate
   Product.addHook('afterUpdate', async (productData, options) => {

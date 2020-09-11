@@ -7,7 +7,7 @@ import {
   insufficientParameters,
   failureResponse,
 } from '../../common/service';
-import { DEFAULT_LIMIT, Invoice, Employee, User } from '../../../db/models';
+import { DEFAULT_LIMIT, Invoice, User, Supplier } from '../../../db/models';
 import { JwtRequest } from '../../../middlewares/authCheck';
 
 export default class InvoiceController {
@@ -27,6 +27,7 @@ export default class InvoiceController {
         createdBy: req.auth.id,
         dueDate: new Date(req.body.dueDate),
         note: req.body.note,
+        createdAt: req.body.createdAt,
       };
       if (req.body.isPaid === true || req.body.isPaid === false)
         invoiceParams.isPaid = req.body.isPaid;
@@ -125,10 +126,10 @@ export default class InvoiceController {
       options.limit = null;
       options.offset = null;
     }
-    if (req.query.incEmployee === 'true')
+    if (req.query.incSupplier === 'true')
       (<Includeable[]>options.include).push({
         model: User,
-        include: [{ model: Employee }],
+        include: [{ model: Supplier }],
       });
     // if (req.query.ingredient === 'true') options.where = { isIngredient: true };
     Invoice.findAll(options)
