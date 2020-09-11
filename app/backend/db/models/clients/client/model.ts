@@ -25,8 +25,7 @@ export default function ClientFactory(sequilize: Sequelize): ModelCtor<Client> {
     },
     lastOrder: {
       type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
+      allowNull: true,
     },
   });
 }

@@ -107,6 +107,10 @@ export default class SupplierController {
       offset,
       include: [],
     };
+    if (req.query.all === 'true') {
+      options.limit = null;
+      options.offset = null;
+    }
     if (req.query.incInvoices === 'true')
       (<Includeable[]>options.include).push({ model: Invoice });
     // if (req.query.ingredient === 'true') options.where = { isIngredient: true };

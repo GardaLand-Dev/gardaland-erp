@@ -175,6 +175,12 @@ const defaultInitConf: RBACInitConf = {
         'finance/expense:update',
         'finance/expense:delete',
         'finance/expenses:view',
+        //
+        'client/client:view',
+        'client/client:create',
+        'client/client:delete',
+        'client/client:update',
+        'client/clients:view',
       ],
     },
   ],
