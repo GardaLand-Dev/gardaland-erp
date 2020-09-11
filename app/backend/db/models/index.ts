@@ -285,30 +285,34 @@ export const dbInit = async () => {
   // HOOKS
   // ############################################################
   // FinancialAccount Auto update
-  FinancialTransaction.addHook('afterCreate', (fTData, options) => {
-    const func = () => {
-      FinancialAccount.findOne()
-        .then(async (fAData) => {
-          fTData.setDataValue('caisseValue', fAData.value);
-          await fTData.save();
-          const typeId = await TransactionType.findByPk(
-            fTData.getDataValue('transactionTypeId')
-          );
-          if (typeId.sign === 'POS') {
-            return fAData.increment('value', {
-              by: fTData.getDataValue('value'),
-            });
-          }
-          return fAData.decrement('value', {
-            by: fTData.getDataValue('value'),
-          });
-        })
-        .then(() => serverRTSync())
-        .catch(log.error);
-    };
-    if (options.transaction) options.transaction.afterCommit(func);
-    else func();
-  });
+  FinancialTransaction.addHook(
+    'afterCreate',
+    (
+      fTData: import('./finance/financialTransaction/type').FinancialTransaction,
+      options
+    ) => {
+      const func = () => {
+        FinancialAccount.findOne()
+          .then(async (fAData) => {
+            fTData.caisseValue = fAData.value;
+            await fTData.save();
+            const typeId = await TransactionType.findByPk(
+              fTData.transactionTypeId
+            );
+            if (typeId.sign === 'POS') {
+              fAData.value += fTData.value;
+              return fAData.save();
+            }
+            fAData.value -= fTData.value;
+            return fAData.save();
+          })
+          .then(() => serverRTSync())
+          .catch(log.error);
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
   FinancialTransaction.addHook(
     'beforeUpdate',
     (
@@ -334,27 +338,31 @@ export const dbInit = async () => {
       else func();
     }
   );
-  FinancialTransaction.addHook('beforeDestroy', (fTData, options) => {
-    const func = () => {
-      FinancialAccount.findOne()
-        .then(async (fAData) => {
-          const tType = await TransactionType.findByPk(
-            fTData.getDataValue('transactionTypeId')
-          );
-          if (tType.sign === 'NEG') {
-            return fAData.increment('value', {
-              by: fTData.getDataValue('value'),
-            });
-          }
-          return fAData.decrement('value', {
-            by: fTData.getDataValue('value'),
-          });
-        })
-        .catch(log.error);
-    };
-    if (options.transaction) options.transaction.afterCommit(func);
-    else func();
-  });
+  FinancialTransaction.addHook(
+    'beforeDestroy',
+    (
+      fTData: import('./finance/financialTransaction/type').FinancialTransaction,
+      options
+    ) => {
+      const func = () => {
+        FinancialAccount.findOne()
+          .then(async (fAData) => {
+            const tType = await TransactionType.findByPk(
+              fTData.transactionTypeId
+            );
+            if (tType.sign === 'NEG') {
+              fAData.value += fTData.value;
+              return fAData.save();
+            }
+            fAData.value -= fTData.value;
+            return fAData.save();
+          })
+          .catch(log.error);
+      };
+      if (options.transaction) options.transaction.afterCommit(func);
+      else func();
+    }
+  );
 
   // FinancialTransaction auto create / update
   Order.addHook('afterUpdate', async (orderData, options) => {
@@ -580,9 +588,10 @@ export const dbInit = async () => {
           suppliesData &&
           suppliesData.length > 0
         ) {
+          log.debug(suppliesData.length, suppliesData);
           let toConsume = prevQ - invItemData.inStock;
           let i = 0;
-          while (toConsume > 0) {
+          while (toConsume > 0 && i < suppliesData.length) {
             if (suppliesData[i].remaining - toConsume > 0) {
               suppliesData[i].remaining -= toConsume;
             } else {
@@ -617,6 +626,7 @@ export const dbInit = async () => {
   Supply.addHook('afterCreate', (supplyData, options) => {
     const func = () => {
       supplyData.setDataValue('remaining', supplyData.getDataValue('quantity'));
+      supplyData.save();
       InvItem.findByPk(supplyData.getDataValue('invItemId'))
         .then((invItemData) =>
           invItemData.increment('inStock', {
