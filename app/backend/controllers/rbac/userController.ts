@@ -6,7 +6,7 @@ import {
   successResponse,
   failureResponse,
 } from '../common/service';
-import { User, Role, DEFAULT_LIMIT } from '../../db/models';
+import { User, Role, DEFAULT_LIMIT, Employee } from '../../db/models';
 import { UserCreationAttributes } from '../../db/models/rbac/user/type';
 
 export default class UserController {
@@ -168,6 +168,8 @@ export default class UserController {
     }
     if (req.query.incRoles === 'true')
       (options.include as Includeable[]).push(Role);
+    if (req.query.incEmployee === 'true')
+      (options.include as Includeable[]).push(Employee);
     User.findAll(options)
       .then((usersData) => successResponse('users retrieved', usersData, res))
       .catch((err) => failureResponse('couldnt retrieve users', err, res));
