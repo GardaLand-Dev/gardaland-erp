@@ -19,7 +19,7 @@ export interface JwtRequest extends Request {
 }
 
 export default ejwt(config).unless({
-  path: ['/token', '/api/login', '/imgs'],
+  path: ['/token', '/api/login', '/imgs', '/api/rbac/activation'],
 });
 
 export const notAuthHandler = (
@@ -34,7 +34,8 @@ export const notAuthHandler = (
       req.path.endsWith('/token') ||
       req.path.endsWith('/api/login') ||
       req.path.startsWith('/imgs') ||
-      req.path.endsWith('/favicon.ico')
+      req.path.endsWith('/favicon.ico') ||
+      req.path.endsWith('/activation')
     )
   ) {
     log.info('path is', req.path);
