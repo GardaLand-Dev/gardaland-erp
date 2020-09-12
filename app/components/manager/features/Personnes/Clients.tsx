@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import { IconButton, TextField, Grid } from '@material-ui/core';
+import { IconButton, TextField, Grid, Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import CustomTable from '../../CustomTable';
 import SimpleModal from '../../SimpleModal';
+import clientService from '../../../../services/client.service';
 
 const columns = [
   {
@@ -38,18 +40,33 @@ const columns = [
     button: true,
   },
 ];
-const data = [
-  {
-    lastname: 'Cristiano',
-    firstname: 'Ronaldo',
-    tel: '0444355654',
-    email: 'rbenzmi@gmail.com',
-  },
-];
+// const data = [
+//   {
+//     lastname: 'Cristiano',
+//     firstname: 'Ronaldo',
+//     tel: '0444355654',
+//     email: 'rbenzmi@gmail.com',
+//   },
+// ];
 export default function Clients(): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const handleAddClicked = () => {
     setModalVisible(true);
+  };
+  const [data, setData] = useState<
+    {
+      firstname: string;
+      lastname: string;
+      tel: string;
+      email: string;
+    }[]
+  >([]);
+  const [open, setOpen] = useState(false);
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
   };
   const [clientParams, setClientParams] = useState<{
     firstname: string;
@@ -57,6 +74,44 @@ export default function Clients(): JSX.Element {
     tel: string;
     email: string;
   }>();
+  const dataLoader = () => {
+    clientService
+      .getClients()
+      .then((c) => {
+        return setData(
+          c.map((p) => ({
+            firstname: p.firstname,
+            lastname: p.lastname,
+            email: p.email,
+            tel: p.tel,
+          }))
+        );
+      })
+      .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    dataLoader();
+  }, []);
+  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    clientService
+      .createClient(
+        clientParams.firstname,
+        clientParams.lastname,
+        clientParams.tel,
+        clientParams.email
+      )
+      .then((ok) => {
+        if (ok) {
+          setOpen(true);
+          setModalVisible(false);
+          dataLoader();
+          console.log('employee added ', ok);
+        } else console.log('employee not created');
+        return true;
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <div>
       <CustomTable
@@ -65,12 +120,18 @@ export default function Clients(): JSX.Element {
         title="Client"
         onAddClicked={handleAddClicked}
       />
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Client ajouté avec succès
+        </Alert>
+      </Snackbar>
       <SimpleModal
         onClose={() => {
           setModalVisible(false);
         }}
         visible={modalVisible}
         title="Ajouter Client"
+        onSubmit={handleCreate}
       >
         <Grid container spacing={2} className="my-2">
           <Grid item xs>

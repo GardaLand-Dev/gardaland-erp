@@ -122,7 +122,6 @@ export default function HomePage(): JSX.Element {
   const dataLoader = () => {
     OrderService.getOrders(false, true, false, 50, 1)
       .then((d) => {
-        console.log(d);
         if (d) {
           setData(d.map((r) => ({ ...r, isDisabled: r.canceled } as DataRow)));
         }
@@ -134,6 +133,7 @@ export default function HomePage(): JSX.Element {
     dataLoader();
   }, []);
   // const classes = useStyles();
+  const [toggleCleared, setToggleCleared] = useState(false);
   return (
     <Box className="d-flex p-0 flex-row container-fluid h-100">
       <Box
@@ -227,13 +227,22 @@ export default function HomePage(): JSX.Element {
                   columns={columns}
                   data={data}
                   title="liste des Ventes"
+                  clearSelectedRows={toggleCleared}
                   onDelete={(selectedRows: any[]) => {
-                    OrderService.cancelOrder(selectedRows[0].id)
-                      .then((ok) => {
-                        if (ok) dataLoader();
-                        return true;
-                      })
-                      .catch(console.error);
+                    if (
+                      // eslint-disable-next-line no-alert
+                      window.confirm(
+                        `Etes-vous sûr que vous voulez supprimer la commande numéro :\r ${selectedRows[0].num}?`
+                      )
+                    ) {
+                      OrderService.cancelOrder(selectedRows[0].id)
+                        .then((ok) => {
+                          if (ok) dataLoader();
+                          return true;
+                        })
+                        .catch(console.error);
+                      setToggleCleared(!toggleCleared);
+                    }
                   }}
                 />
               </Box>

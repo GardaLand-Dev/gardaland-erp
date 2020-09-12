@@ -12,6 +12,7 @@ import {
   Icon,
   IconButton,
   Snackbar,
+  TextField,
 } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import SimpleModal from '../manager/SimpleModal';
@@ -148,6 +149,28 @@ export default function Cart(): JSX.Element {
       })
       .catch(console.error);
   };
+  const Argent = [
+    {
+      id: '10',
+    },
+    {
+      id: '20',
+    },
+    {
+      id: '50',
+    },
+    {
+      id: '100',
+    },
+    {
+      id: '500',
+    },
+    {
+      id: '1000',
+    },
+  ];
+  const [argentRapide, setArgentRapide] = useState(0);
+  const [changement, setChangement] = useState(0);
 
   return (
     <div className="d-flex flex-column h-100 " style={{ minWidth: 326 }}>
@@ -307,8 +330,76 @@ export default function Cart(): JSX.Element {
         visible={payModalVisible}
       >
         <Grid container direction="row">
-          <Grid item className="flex-grow-1">
-            <span>numpad</span>
+          <Grid item className="row flex-grow-1">
+            <Grid item direction="column" className="mx-3">
+              <Grid item xs>
+                <h5>Argent Rapide</h5>
+              </Grid>
+              {Argent.map((i) => {
+                return (
+                  <Grid key={i.id} item xs>
+                    <Button
+                      onClick={() => {
+                        setArgentRapide(parseFloat(i.id) + argentRapide);
+                        setChangement(argentRapide - getTotal());
+                      }}
+                      size="large"
+                      className="theme-gradient text-white mb-3"
+                    >
+                      {i.id}
+                    </Button>
+                  </Grid>
+                );
+              })}
+
+              <Grid item xs>
+                <Button
+                  size="large"
+                  color="secondary"
+                  variant="contained"
+                  onClick={() => {
+                    setArgentRapide(0);
+                  }}
+                >
+                  Clair
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid item direction="column">
+              <Grid item xs className="mb-3">
+                <TextField
+                  id="outlined-basic"
+                  label="Reçu"
+                  variant="outlined"
+                  type="number"
+                  value={argentRapide}
+                  onChange={(e) => {
+                    setArgentRapide(parseFloat(e.target.value));
+                    setChangement(argentRapide - getTotal());
+                  }}
+                />
+              </Grid>
+              <Grid item xs className="mb-3">
+                <TextField
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  label="total"
+                  value={getTotal()}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs>
+                <TextField
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  label="Changement"
+                  value={changement}
+                  variant="outlined"
+                />
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item direction="column">
             <Grid item xs className="mb-2">

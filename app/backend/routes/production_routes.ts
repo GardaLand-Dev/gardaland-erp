@@ -399,8 +399,8 @@ export default class ProductionRoutes {
     );
 
     app.get(
-      `${api}/expense`,
-      getAuthChecker('finance/expense:view'),
+      `${api}/expenses`,
+      getAuthChecker('finance/expenses:view'),
       ExpenseController.getExpenses
     );
 
@@ -427,7 +427,7 @@ export default class ProductionRoutes {
     );
 
     app.get(
-      `${api}/client`,
+      `${api}/clients`,
       getAuthChecker('client/client:view'),
       ClientController.getClients
     );
