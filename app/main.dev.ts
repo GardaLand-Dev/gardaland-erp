@@ -60,6 +60,7 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    fullscreen: true,
     webPreferences:
       // TODO: this needs to be uncommented when depoloying
       // (process.env.NODE_ENV === 'development' ||
