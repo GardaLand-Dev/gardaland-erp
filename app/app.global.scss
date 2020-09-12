@@ -230,6 +230,7 @@ body {
 }
 
 //components
+@import './components/activation/activation.scss';
 @import './components/article/Article.scss';
 @import './components/login/Login.scss';
 @import './components/sidebar/SideBarButton.scss';
