@@ -1,5 +1,5 @@
 /* eslint react/jsx-props-no-spreading: off */
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import routes from './constants/routes.json';
@@ -9,6 +9,8 @@ import LoginPage from './containers/LoginPage';
 import { selectAuthState } from './reducers/authentication.reducer';
 import MangerPage from './containers/ManagerPage';
 import HomePage from './containers/HomePage';
+import { selectActivated } from './reducers/activation.reducer';
+import ActivationPage from './containers/ActivationPage';
 
 // Lazily load routes and code split with webpacck
 // const LazyCounterPage = React.lazy(() =>
@@ -75,23 +77,30 @@ function LoginRoute({
 }
 
 export default function Routes() {
+  const activated = useSelector(selectActivated);
   return (
     <App>
       <Switch>
-        <LoginRoute path={routes.LOGIN}>
-          <LoginPage />
-        </LoginRoute>
-        <PrivateRoute2 path={routes.MANAGER.root}>
-          <MangerPage />
-        </PrivateRoute2>
-        <PrivateRoute2 path={routes.HOME}>
-          <HomePage />
-        </PrivateRoute2>
-        <Route
-          path={routes.ROOT}
-          render={() => <Redirect to={routes.LOGIN} />}
-          exact
-        />
+        {activated ? (
+          <>
+            <LoginRoute path={routes.LOGIN}>
+              <LoginPage />
+            </LoginRoute>
+            <PrivateRoute2 path={routes.MANAGER.root}>
+              <MangerPage />
+            </PrivateRoute2>
+            <PrivateRoute2 path={routes.HOME}>
+              <HomePage />
+            </PrivateRoute2>
+            <Route
+              path={routes.ROOT}
+              render={() => <Redirect to={routes.LOGIN} />}
+              exact
+            />
+          </>
+        ) : (
+          <ActivationPage />
+        )}
       </Switch>
     </App>
   );

@@ -12,7 +12,7 @@ function handleResponse(response: Response) {
   return response.text().then((text) => {
     const jsonResponse = text && JSON.parse(text);
     if (!response.ok) {
-      console.log('not ok in activation.service');
+      console.log('not ok in activation.service', jsonResponse);
       const error =
         (jsonResponse && jsonResponse.MESSAGE) || response.statusText;
       throw new Error(error);
@@ -30,10 +30,10 @@ function activate(apikey: string) {
     headers: { 'Content-type': 'application/json' },
     body: JSON.stringify({ apikey }),
   };
-  return fetch(`${config.apiUrl}/activate`, requestOptions)
+  return fetch(`${config.apiUrl}/rbac/activation`, requestOptions)
     .then(handleResponse)
     .then((app) => {
-      localStorage.setItem('activationState', JSON.stringify(app));
+      // localStorage.setItem('activationState', JSON.stringify(app));
       return <
         {
           activated: boolean;
@@ -42,7 +42,22 @@ function activate(apikey: string) {
     });
 }
 
+function checkActivation() {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({}),
+  };
+  return fetch(`${config.apiUrl}/rbac/checkactivation`, requestOptions).then(
+    (d) => {
+      if (!d.ok) return false;
+      return true;
+    }
+  );
+}
+
 const activationService = {
   activate,
+  checkActivation,
 };
 export default activationService;

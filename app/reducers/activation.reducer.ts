@@ -16,7 +16,9 @@ const initialState: AppState = app
   ? {
       activated: app.activated,
     }
-  : undefined;
+  : {
+      activated: undefined,
+    };
 
 const authenticationSlice = createSlice({
   name: 'activation',

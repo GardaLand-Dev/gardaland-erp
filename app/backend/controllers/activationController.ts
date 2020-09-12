@@ -28,10 +28,20 @@ export default class LoginController {
           // id, apikey
           const jsonRespone = text && JSON.parse(text);
           const hwid = await getHWID();
-          return RestaurantCreds.create({
+          log.info({
             id: jsonRespone.DATA.id,
             apikey: jsonRespone.DATA.apikey,
             hwid,
+          });
+          return RestaurantCreds.findOrCreate({
+            where: {
+              id: jsonRespone.DATA.id,
+            },
+            defaults: {
+              id: jsonRespone.DATA.id,
+              apikey: jsonRespone.DATA.apikey,
+              hwid,
+            },
           });
         })
         .then(() => {
@@ -42,5 +52,19 @@ export default class LoginController {
           failureResponse('cant activate', err, res);
         });
     } else insufficientParameters(res);
+  }
+
+  public static checkActivation(
+    _req: Request,
+    res: import('express').Response
+  ) {
+    RestaurantCreds.findOne()
+      .then((credsData) => {
+        if (!credsData) {
+          return failureResponse('no activated yet', {}, res);
+        }
+        return successResponse('already activated', {}, res);
+      })
+      .catch((err) => failureResponse('not activated yet err', err, res));
   }
 }

@@ -179,5 +179,9 @@ export default class RBACRoutes {
     );
     // activation
     app.post(`${baseroute}/activation`, ActivationController.activate);
+    app.post(
+      `${baseroute}/checkactivation`,
+      ActivationController.checkActivation
+    );
   }
 }
