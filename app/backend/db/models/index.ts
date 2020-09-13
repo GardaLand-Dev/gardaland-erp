@@ -100,6 +100,7 @@ export const OrderProductSuppliment = OrderProductSupplimentFactory(dbConfig);
 /** Client */
 export const Client = ClientFactory(dbConfig);
 export const ClientOrder = ClientOrderFactory(dbConfig);
+
 /** Finance */
 export const FinancialTransaction = FinancialTransactionFactory(dbConfig);
 export const FinancialAccount = FinancialAccountFactory(dbConfig);

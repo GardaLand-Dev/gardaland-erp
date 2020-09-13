@@ -60,10 +60,9 @@ export default class LoginController {
   ) {
     RestaurantCreds.findOne()
       .then((credsData) => {
-        if (!credsData) {
-          return failureResponse('no activated yet', {}, res);
-        }
-        return successResponse('already activated', {}, res);
+        log.info('creads data are in actController', credsData);
+        if (credsData?.id) return successResponse('already activated', {}, res);
+        return failureResponse('no activated yet', {}, res);
       })
       .catch((err) => failureResponse('not activated yet err', err, res));
   }

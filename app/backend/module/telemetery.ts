@@ -9,7 +9,7 @@ import io from 'socket.io-client';
 import { Op, fn, col } from 'sequelize';
 import log from 'electron-log';
 // eslint-disable-next-line import/no-cycle
-import { FinancialAccount, Order } from '../db/models';
+import { FinancialAccount, Order, RestaurantCreds } from '../db/models';
 
 const url = 'http://localhost:3000/';
 const socket = io(url);

@@ -13,7 +13,7 @@ export default function InvoiceFactory(
     },
     dueDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     amount: {
       type: DataTypes.NUMBER.UNSIGNED,

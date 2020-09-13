@@ -7,11 +7,9 @@ export default function ClientOrderFactory(
   return sequilize.define('clientOrders', {
     orderId: {
       type: DataTypes.UUID,
-      primaryKey: true,
     },
     clientId: {
       type: DataTypes.UUID,
-      primaryKey: true,
     },
   });
 }

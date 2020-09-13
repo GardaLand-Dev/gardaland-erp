@@ -1,9 +1,5 @@
 import config from '../config';
 
-function logout() {
-  // remove user from local storage to log user out
-}
-
 function handleResponse(response: Response) {
   /**
    * TODO: if login is successful and user has admin/manager role
@@ -17,6 +13,11 @@ function handleResponse(response: Response) {
         (jsonResponse && jsonResponse.MESSAGE) || response.statusText;
       throw new Error(error);
     } else {
+      if (jsonResponse.STATUS !== 'SUCCESS') {
+        const error =
+          (jsonResponse && jsonResponse.MESSAGE) || response.statusText;
+        throw new Error(error);
+      }
       return {
         activated: jsonResponse.DATA,
       };
@@ -48,12 +49,16 @@ function checkActivation() {
     headers: { 'Content-type': 'application/json' },
     body: JSON.stringify({}),
   };
-  return fetch(`${config.apiUrl}/rbac/checkactivation`, requestOptions).then(
-    (d) => {
-      if (!d.ok) return false;
+  console.log('checkiiiiiing');
+  return fetch(`${config.apiUrl}/rbac/checkactivation`, requestOptions)
+    .then((d) => {
+      return d.text();
+    })
+    .then((text) => {
+      const jsonResponse = text && JSON.parse(text);
+      if (jsonResponse.STATUS !== 'SUCCESS') return false;
       return true;
-    }
-  );
+    });
 }
 
 const activationService = {

@@ -39,6 +39,7 @@ export default function Activation(): JSX.Element {
       activationService
         .checkActivation()
         .then((ok) => {
+          console.log('ok issss', ok);
           if (ok === true) {
             return dispatch(activationSuccess());
           }

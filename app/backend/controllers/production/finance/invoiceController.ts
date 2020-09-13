@@ -31,6 +31,7 @@ export default class InvoiceController {
       };
       if (req.body.isPaid === true || req.body.isPaid === false)
         invoiceParams.isPaid = req.body.isPaid;
+      if (req.body.isPaid) invoiceParams.dueDate = undefined;
       Invoice.create(invoiceParams)
         .then((invoiceData) =>
           successResponse('create invoice successfull', invoiceData, res)
