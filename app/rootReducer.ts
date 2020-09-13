@@ -7,6 +7,7 @@ import homePageReducer from './reducers/homePageSlice';
 import authenticationReducer from './reducers/authentication.reducer';
 import loginComponentReducer from './reducers/loginComponentSlice';
 import familiesDataReducer from './reducers/data.reducer';
+import activationReducer from './reducers/activation.reducer';
 
 export default function createRootReducer(history: History) {
   return combineReducers({
@@ -16,5 +17,6 @@ export default function createRootReducer(history: History) {
     authentication: authenticationReducer,
     loginComponent: loginComponentReducer,
     familiesData: familiesDataReducer,
+    appState: activationReducer,
   });
 }

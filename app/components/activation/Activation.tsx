@@ -1,7 +1,14 @@
-import React, { FormEvent, ChangeEvent, useState, FC } from 'react';
-import { useDispatch } from 'react-redux';
-// import { activate } from '../../reducers/activation.reducer';
-// import { selectLoginState, submit } from '../../reducers/loginComponentSlice';
+import React, { FormEvent, ChangeEvent, useState, FC, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  activate,
+  selectActivated,
+  selectAppState,
+  activationRequest,
+  activationSuccess,
+  activationFailure,
+} from '../../reducers/activation.reducer';
+import activationService from '../../services/activation.service';
 
 export default function Activation(): JSX.Element {
   /**
@@ -13,7 +20,7 @@ export default function Activation(): JSX.Element {
 
   const [restaurantApiKey, setRestaurantApiKey] = useState<string>();
   const [submitted, setSubmitted] = useState(false);
-  // const state = useSelector(selectLoginState);
+  // const state = useSelector(selectActivated);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,10 +29,24 @@ export default function Activation(): JSX.Element {
     setSubmitted(true);
     if (restaurantApiKey) {
       // console.log(username, password);
-      // dispatch(activate(restaurantApiKey));
+      dispatch(activate(restaurantApiKey));
     }
   };
-
+  const app = useSelector(selectAppState);
+  useEffect(() => {
+    if (app.activated === undefined) {
+      dispatch(activationRequest());
+      activationService
+        .checkActivation()
+        .then((ok) => {
+          if (ok === true) {
+            return dispatch(activationSuccess());
+          }
+          return dispatch(activationFailure());
+        })
+        .catch(console.error);
+    }
+  }, []);
   return (
     <div className="Logincontainer">
       <div className="p-5 LoginForm">
@@ -39,17 +60,12 @@ export default function Activation(): JSX.Element {
                 submitted && !restaurantApiKey ? 'is-invalid' : ''
               }`}
               name="Restaurant clé"
-              placeholder="Entrer Nom d'utilisateur .."
+              placeholder="Entrer le clé d'activation .."
               onChange={(e) => {
                 setRestaurantApiKey(e.target.value);
               }}
             />
           </div>
-          {/* <input
-            type=""
-            value="Login"
-            className="btn theme-gradient btn-user btn-block "
-          /> */}
           <input
             className="btn theme-gradient btn-user btn-block theme-glow"
             type="submit"

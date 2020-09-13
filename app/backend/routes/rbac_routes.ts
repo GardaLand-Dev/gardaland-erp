@@ -5,6 +5,7 @@ import RoleController from '../controllers/rbac/roleController';
 import PrivilegeController from '../controllers/rbac/privilegeController';
 import ResourceController from '../controllers/rbac/resourceController';
 import OperationController from '../controllers/rbac/operationController';
+import ActivationController from '../controllers/activationController';
 
 export default class RBACRoutes {
   public static route(app: Application) {
@@ -175,6 +176,12 @@ export default class RBACRoutes {
       `${baseroute}/operations`,
       getAuthChecker('rbac/operations:view'),
       OperationController.getOperation
+    );
+    // activation
+    app.post(`${baseroute}/activation`, ActivationController.activate);
+    app.post(
+      `${baseroute}/checkactivation`,
+      ActivationController.checkActivation
     );
   }
 }

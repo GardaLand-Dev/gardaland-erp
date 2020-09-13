@@ -56,3 +56,4 @@ app/backend/db.sqlite
 app/backend/index.ts
 db.sqlite
 uploads/*
+db.sqlite-journal
