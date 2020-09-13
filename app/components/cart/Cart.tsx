@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Clock from 'react-live-clock';
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutlineOutlined';
@@ -14,7 +14,7 @@ import {
   Snackbar,
   TextField,
 } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Alert, Autocomplete } from '@material-ui/lab';
 import SimpleModal from '../manager/SimpleModal';
 import CartRow from './CartRow';
 import {
@@ -42,6 +42,8 @@ import {
   MoneySvg,
 } from '../../assets/svgs';
 import orderService from '../../services/order.service';
+import clientService from '../../services/client.service';
+
 //
 
 const useStyles = makeStyles(() =>
@@ -117,6 +119,7 @@ export default function Cart(): JSX.Element {
     return 0;
   };
   const [selected, setSelected] = useState('sale');
+  const [clientId, setClientId] = useState('');
   const [payModalVisible, setPayModalVisible] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
   const handleSnackClose = (event?: React.SyntheticEvent, reason?: string) => {
@@ -137,7 +140,7 @@ export default function Cart(): JSX.Element {
         })),
       }));
     orderService
-      .createOrder({ orderProducts, num: 1, type: selected })
+      .createOrder({ orderProducts, num: 1, type: selected, clientId })
       .then((ok) => {
         if (!ok) throw new Error('couldnt create order');
         console.log('created succ', ok);
@@ -149,6 +152,19 @@ export default function Cart(): JSX.Element {
       })
       .catch(console.error);
   };
+  const [clients, setClients] = useState<
+    {
+      id: string;
+      firstname: string;
+      lastname: string;
+    }[]
+  >([]);
+  useEffect(() => {
+    clientService
+      .getClients(true)
+      .then((d) => setClients(d))
+      .catch(console.error);
+  }, []);
   const Argent = [
     {
       id: '10',
@@ -329,78 +345,99 @@ export default function Cart(): JSX.Element {
         }}
         visible={payModalVisible}
       >
-        <Grid container direction="row">
-          <Grid item className="row flex-grow-1">
-            <Grid item direction="column" className="mx-3">
-              <Grid item xs>
-                <h5>Argent Rapide</h5>
-              </Grid>
-              {Argent.map((i) => {
-                return (
-                  <Grid key={i.id} item xs>
-                    <Button
-                      onClick={() => {
-                        setArgentRapide(parseFloat(i.id) + argentRapide);
-                        setChangement(argentRapide - getTotal());
-                      }}
-                      size="large"
-                      className="theme-gradient text-white mb-3"
-                    >
-                      {i.id}
-                    </Button>
-                  </Grid>
-                );
-              })}
-
-              <Grid item xs>
-                <Button
-                  size="large"
-                  color="secondary"
-                  variant="contained"
-                  onClick={() => {
-                    setArgentRapide(0);
-                  }}
-                >
-                  Clair
-                </Button>
-              </Grid>
+        <Grid
+          container
+          direction="row"
+          className="justify-content-between align-items-center"
+        >
+          <Grid item direction="column">
+            <Grid item xs>
+              <span>Argent Rapide</span>
             </Grid>
-            <Grid item direction="column">
-              <Grid item xs className="mb-3">
-                <TextField
-                  id="outlined-basic"
-                  label="Reçu"
-                  variant="outlined"
-                  type="number"
-                  value={argentRapide}
-                  onChange={(e) => {
-                    setArgentRapide(parseFloat(e.target.value));
-                    setChangement(argentRapide - getTotal());
-                  }}
-                />
-              </Grid>
-              <Grid item xs className="mb-3">
-                <TextField
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                  label="total"
-                  value={getTotal()}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs>
-                <TextField
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                  label="Changement"
-                  value={changement}
-                  variant="outlined"
-                />
-              </Grid>
+            {Argent.map((i) => {
+              return (
+                <Grid key={i.id} item xs>
+                  <Button
+                    onClick={() => {
+                      setArgentRapide(parseFloat(i.id) + argentRapide);
+                      setChangement(argentRapide - getTotal());
+                    }}
+                    size="large"
+                    className="theme-gradient text-white mb-3"
+                  >
+                    {i.id}
+                  </Button>
+                </Grid>
+              );
+            })}
+            <Grid item xs>
+              <Button
+                size="large"
+                color="secondary"
+                variant="contained"
+                onClick={() => {
+                  setArgentRapide(0);
+                }}
+              >
+                Clair
+              </Button>
             </Grid>
           </Grid>
+          <Grid item direction="column">
+            <Grid item xs className="mb-5">
+              <Autocomplete
+                onChange={(_event: any, newValue: any | null) => {
+                  setClientId(newValue ? newValue.id : null);
+                }}
+                options={clients}
+                getOptionLabel={(option) => option.lastname}
+                fullWidth
+                renderInput={(params) => (
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  <TextField
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...params}
+                    label="Clients"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs className="mb-3">
+              <TextField
+                id="outlined-basic"
+                label="Reçu"
+                variant="outlined"
+                type="number"
+                value={argentRapide}
+                onChange={(e) => {
+                  setArgentRapide(parseFloat(e.target.value));
+                  setChangement(argentRapide - getTotal());
+                }}
+              />
+            </Grid>
+            <Grid item xs className="mb-3">
+              <TextField
+                InputProps={{
+                  readOnly: true,
+                }}
+                label="total"
+                value={getTotal()}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs>
+              <TextField
+                InputProps={{
+                  readOnly: true,
+                }}
+                label="Changement"
+                value={changement}
+                variant="outlined"
+              />
+            </Grid>
+          </Grid>
+
           <Grid item direction="column">
             <Grid item xs className="mb-2">
               <Button
@@ -461,18 +498,6 @@ export default function Cart(): JSX.Element {
                   />
                 </Icon>
                 Delivery
-              </Button>
-            </Grid>
-            <Divider className="mb-2" />
-            <Grid item xs>
-              <Button
-                className="colorButton color-gradient"
-                classes={{ root: useStyles().button, label: useStyles().label }}
-              >
-                <Icon className={useStyles().icon}>
-                  <img className="pb-5" alt="edit" src={AddSvg} />
-                </Icon>
-                Client
               </Button>
             </Grid>
           </Grid>

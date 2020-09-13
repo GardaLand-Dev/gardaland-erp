@@ -12,6 +12,7 @@ type OrderType = {
   }[];
   num: number;
   type: string;
+  clientId?: string;
 };
 function createOrder(order: OrderType) {
   const requestOptions = {

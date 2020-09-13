@@ -40,8 +40,13 @@ function createExpense(note: string, amount: number, createdAt: Date) {
     .then((res: Response) => res.ok)
     .catch((err) => err);
 }
-function getInvoices(all = false, limit: number = null, page: number = null) {
-  const params = { all, limit, page };
+function getInvoices(
+  all = false,
+  limit: number = null,
+  page: number = null,
+  incSupplier = true
+) {
+  const params = { all, limit, page, incSupplier };
   const url = new URL(`${config.apiUrl}/invoices`);
   Object.entries(params).forEach((p) =>
     url.searchParams.set(p[0], p[1]?.toString())

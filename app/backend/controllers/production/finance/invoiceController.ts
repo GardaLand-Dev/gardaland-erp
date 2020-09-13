@@ -128,10 +128,7 @@ export default class InvoiceController {
       options.offset = null;
     }
     if (req.query.incSupplier === 'true')
-      (<Includeable[]>options.include).push({
-        model: User,
-        include: [{ model: Supplier }],
-      });
+      (<Includeable[]>options.include).push(Supplier);
     // if (req.query.ingredient === 'true') options.where = { isIngredient: true };
     Invoice.findAll(options)
       .then((invoicesData) =>

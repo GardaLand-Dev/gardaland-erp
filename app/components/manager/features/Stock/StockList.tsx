@@ -60,9 +60,8 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'Dernière mise à jour',
-    selector: 'updatedAt',
-    format: (row) => moment(row.updatedAt as Date).format('hh:mm | DD/MM/YY'),
+    name: 'date de creation',
+    selector: 'createdAt',
     sortable: true,
   },
   {
