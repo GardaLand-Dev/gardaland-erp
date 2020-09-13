@@ -14,7 +14,7 @@ export default class AttendanceController {
     if (
       req.body.employeeId &&
       typeof req.body.employeeId === 'string' &&
-      req.body.checkOut &&
+      req.body.checkIn &&
       req.body.dayDate
     ) {
       const attendanceParams: AttendanceCreationAttributes = {
@@ -115,7 +115,7 @@ export default class AttendanceController {
       include: [],
     };
     if (req.query.incEmployee === 'true')
-      (<Includeable[]>options.include).push({ model: Employee });
+      (<Includeable[]>options.include).push(Employee);
     if (typeof req.query.employeeId === 'string' && req.query.employeeId)
       options.where = { id: req.query.employeeId };
     // if (req.query.ingredient === 'true') options.where = { isIngredient: true };

@@ -8,10 +8,12 @@ export default function ClientOrderFactory(
     orderId: {
       type: DataTypes.UUID,
       primaryKey: true,
+      unique: false,
     },
     clientId: {
       type: DataTypes.UUID,
       primaryKey: true,
+      unique: false,
     },
   });
 }

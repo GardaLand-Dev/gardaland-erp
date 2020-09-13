@@ -69,7 +69,7 @@ const columns = [
   },
   {
     name: 'Date',
-    selector: 'dueDate',
+    selector: 'createdAt',
     sortable: true,
   },
 ];
@@ -208,6 +208,7 @@ export default function StockFacture(): JSX.Element {
         data={data}
         title="Factures"
         onAddClicked={handleAddClicked}
+        clearSelectedRows={false}
       />
       <SimpleModal
         onClose={() => {
